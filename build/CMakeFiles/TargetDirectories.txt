@@ -1,0 +1,3 @@
+/home/arya/state.io/build/CMakeFiles/edit_cache.dir
+/home/arya/state.io/build/CMakeFiles/rebuild_cache.dir
+/home/arya/state.io/build/CMakeFiles/state.dir

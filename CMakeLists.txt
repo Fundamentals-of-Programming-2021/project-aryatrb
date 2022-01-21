@@ -6,5 +6,5 @@ file(GLOB_RECURSE SOURCE "src/*.c" "src/*.h")
 add_executable(state "${SOURCE}")
 
 include_directories("/usr/include/SDL2")
-target_link_libraries(state m SDL2 SDL2_gfx)
+target_link_libraries(state m SDL2 SDL2_gfx SDL2_ttf SDL2_mixer)
 link_directories("/usr/share/doc")

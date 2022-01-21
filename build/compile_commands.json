@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/arya/state.io/build",
+  "command": "/bin/x86_64-linux-gnu-gcc-9  -I/usr/include/SDL2  -g   -std=gnu99 -o CMakeFiles/state.dir/src/main.c.o   -c /home/arya/state.io/src/main.c",
+  "file": "/home/arya/state.io/src/main.c"
+}
+]
