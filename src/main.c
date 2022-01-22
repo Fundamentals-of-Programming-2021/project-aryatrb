@@ -28,7 +28,7 @@ struct politic_side{
     int number_of_troopers;
 };
 struct kyber_cristal{
-    SDL_Surface * kyber_photo;
+    SDL_Surface *kyber_photo;
     int x;
     int y;
 };
@@ -69,16 +69,21 @@ int main() {
     int size_new_game_x = 327,size_new_game_y=37;
     int size_load_game_x = 327,size_load_game_y=37;
     int leaderboard_game_x = 327,leaderboard_game_y=37;
+    int size_credits_x = 327,size_credits_y=37;
     int backbutton_x_y=50;
     int start_game_x = 327 , start_game_y =37;
     int size_of_leaders_x_y=45;
     int size_of_troopers_x_y=20;
-
+    int size_of_kyber_photo_x = 40, size_of_kyber_photo_y=72;
+    int credits_text_x=1100,credits_text_y=1307;
+    int credits_text_loc_y=5;
     SDL_Surface *startbackground = SDL_LoadBMP("assets/background.bmp");
     SDL_Surface *starsbackground = SDL_LoadBMP("assets/stars.bmp");
     SDL_Surface *load_game = SDL_LoadBMP("assets/load_game.bmp");
     SDL_Surface *leaderboard = SDL_LoadBMP("assets/leaderboard.bmp");
     SDL_Surface *new_game = SDL_LoadBMP("assets/new_game.bmp");
+    SDL_Surface *credits_button = SDL_LoadBMP("assets/credits_button.bmp");
+    SDL_Surface *credits_text = SDL_LoadBMP("assets/credits.bmp");
     SDL_Rect load_game_target = {window_width/2 - size_new_game_x/2 , window_height/2 + 205, size_new_game_x, size_new_game_y};
 
     SDL_Surface *new_game_background = SDL_LoadBMP("assets/newgame_background.bmp");
@@ -107,15 +112,17 @@ int main() {
 
     SDL_Surface *kyber_cristal_photos[4];
     kyber_cristal_photos[0] = SDL_LoadBMP("assets/kybers/kyber_blue.bmp");
-    kyber_cristal_photos[0] = SDL_LoadBMP("assets/kybers/kyber_blue.bmp");
-    kyber_cristal_photos[0] = SDL_LoadBMP("assets/kybers/kyber_blue.bmp");
-    kyber_cristal_photos[0] = SDL_LoadBMP("assets/kybers/kyber_blue.bmp");
-    kyber_cristal_photos[0] = SDL_LoadBMP("assets/kybers/kyber_blue.bmp");
+    kyber_cristal_photos[1] = SDL_LoadBMP("assets/kybers/kyber_green.bmp");
+    kyber_cristal_photos[2] = SDL_LoadBMP("assets/kybers/kyber_purple.bmp");
+    kyber_cristal_photos[3] = SDL_LoadBMP("assets/kybers/kyber_red.bmp");
 
     SDL_Surface *soundonphoto = SDL_LoadBMP("assets/soundon.bmp");
     SDL_Rect sound_target = {5 , window_height-40, 35, 35};
 
-
+    time_t t;
+    srand((unsigned) time(&t) );
+    time_t start_time;
+    time(&start_time);
     TTF_Init();
     TTF_Font *number_of_soldiers = TTF_OpenFont("assets/EPISODE1.TTF",14);
 
@@ -126,19 +133,25 @@ int main() {
     int page=0;
     struct cell cells[100][100];
     struct politic_side politic_sides[100];
+    struct kyber_cristal kybers[100];
+    int size_of_kybers=0;
     int size_of_politic_sides=0;
     Mix_PlayMusic(menu_music,-1);
     int is_sound_on=1,size_of_cells=0;
+    int frame=0;
     while (1) {
         int start_ticks = SDL_GetTicks();
         if (handleEvents() == EXIT)
             break;
         SDL_RenderClear(renderer);
+        time_t time_now;
+        time(&time_now);
         if(page==0)
         {
             SDL_Rect new_game_target = {window_width/2 - size_new_game_x/2 , window_height/2 + window_height/2*160/300, size_new_game_x, size_new_game_y};
             SDL_Rect load_game_target = {window_width/2 - size_load_game_x/2 , window_height/2 + window_height/2*205/300, size_load_game_x, size_load_game_y};
             SDL_Rect leaderboard_target = {window_width/2 - leaderboard_game_x/2 , window_height/2 + window_height/2*250/300, leaderboard_game_x, leaderboard_game_y};
+            SDL_Rect credits_target = {180- size_credits_x/2, window_height -50 - size_credits_y/2, size_credits_x, size_credits_y};
 
             SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, startbackground);
             SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
@@ -150,6 +163,8 @@ int main() {
             SDL_RenderCopy(renderer, leaderboard_texture, NULL, &leaderboard_target);
             SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
             SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
+            SDL_Texture *creditstexture = SDL_CreateTextureFromSurface(renderer, credits_button);
+            SDL_RenderCopy(renderer, creditstexture, NULL, &credits_target);
             
 
             int click_x,click_y;
@@ -166,6 +181,10 @@ int main() {
                 leaderboard_game_x=327*1.1, leaderboard_game_y=37*1.1;
             else
                 leaderboard_game_x=327, leaderboard_game_y=37;
+            if(click_x>credits_target.x+60 && click_x<credits_target.x+credits_target.w - 60 && click_y>credits_target.y && click_y<credits_target.y+credits_target.h)
+                size_credits_x=327*1.1, size_credits_y=37*1.1;
+            else
+                size_credits_x=327, size_credits_y=37;
             SDL_WaitEvent(&ev);
             if(ev.type==SDL_QUIT)
                 break;
@@ -194,6 +213,10 @@ int main() {
                             soundonphoto = SDL_LoadBMP("assets/soundon.bmp");
                         }
                     }
+                    else if(click_x>credits_target.x+60 && click_x<credits_target.x+credits_target.w - 60 && click_y>credits_target.y && click_y<credits_target.y+credits_target.h)
+                    {
+                        page=4;
+                    }
             }
             char* buffer = malloc(sizeof(char) * 50);
             sprintf(buffer, "sfff %d %d %d %d %d\n", click_x, click_y,page,ev.button.x,ev.button.y);
@@ -205,6 +228,7 @@ int main() {
             SDL_DestroyTexture(loadgame_texture);
             SDL_DestroyTexture(leaderboard_texture);
             SDL_DestroyTexture(soundtexture);
+            SDL_DestroyTexture(creditstexture);
         }
         else if(page==1)
         {
@@ -284,7 +308,7 @@ int main() {
                         }
                         int planets[5] = {0};
                         planets[0]=1;
-                        for(int i=0;i<number_of_enemies * 4;i++)
+                        for(int i=0;i<number_of_enemies*4;i++)
                         {
                             while(1)
                             {
@@ -366,12 +390,71 @@ int main() {
             SDL_DestroyTexture(backbuttontexture);
             SDL_DestroyTexture(startgametexture);
         }
-        else if (page==10)
+        else if(page==4)
         {
-            
             int click_x,click_y;
             SDL_GetMouseState(&click_x,&click_y);
+            if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
+                backbutton_x_y=50 * 1.2;
+            else
+                backbutton_x_y=50;
+            
             SDL_WaitEvent(&ev);
+            if(ev.type==SDL_QUIT)
+                break;
+            if(ev.type==SDL_KEYDOWN && ev.key.keysym.sym==SDLK_UP && credits_text_loc_y<5)
+            {
+                credits_text_loc_y+=5;
+            }
+            else if(ev.type==SDL_KEYDOWN && ev.key.keysym.sym==SDLK_DOWN && credits_text_loc_y>5-(credits_text_y-window_height))
+            {
+                credits_text_loc_y-=5;
+            }
+            else if(ev.type==SDL_MOUSEBUTTONDOWN && ev.button.button==SDL_BUTTON_LEFT)
+            {
+                    click_x=ev.button.x;
+                    click_y=ev.button.y;
+                    if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
+                    {
+                        if(is_sound_on==1)
+                        {
+                            is_sound_on=0;
+                            Mix_PauseMusic();
+                            soundonphoto = SDL_LoadBMP("assets/soundoff.bmp");
+                        }
+                        else
+                        {
+                            is_sound_on=1;
+                            Mix_ResumeMusic();
+                            soundonphoto = SDL_LoadBMP("assets/soundon.bmp");
+                        }
+                    }
+                    else if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
+                        page=0;
+            }
+            SDL_Rect backbutton_target = {50 - backbutton_x_y/2 , 50 - backbutton_x_y/2, backbutton_x_y, backbutton_x_y};
+            SDL_Rect credits_text_target = {window_width/2 - credits_text_x/2 , credits_text_loc_y, credits_text_x, credits_text_y};
+            SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, new_game_background);
+            SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
+            SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
+            SDL_RenderCopy(renderer, backbuttontexture, NULL, &backbutton_target);
+            SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
+            SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
+            SDL_Texture *creditstext_texture = SDL_CreateTextureFromSurface(renderer, credits_text);
+            SDL_RenderCopy(renderer, creditstext_texture, NULL, &credits_text_target);
+
+            SDL_RenderPresent(renderer);
+            SDL_DestroyTexture(startscreentexture);
+            SDL_DestroyTexture(soundtexture);
+            SDL_DestroyTexture(backbuttontexture);
+        }
+        else if (page==10)
+        {   
+            int click_x,click_y;
+            SDL_GetMouseState(&click_x,&click_y);
+            // SDL_WaitEvent(&ev);
+            SDL_PollEvent(&ev);
+            SDL_Delay(100);
             if(ev.type==SDL_QUIT)
                 break;
             if(ev.type==SDL_MOUSEBUTTONDOWN && ev.button.button==SDL_BUTTON_LEFT)
@@ -398,6 +481,7 @@ int main() {
                     page=0;
                 }
             }
+            
             SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, starsbackground);
             SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
             SDL_Texture *walltexture = SDL_CreateTextureFromSurface(renderer, wall);
@@ -434,6 +518,10 @@ int main() {
                         SDL_Color white = {255,255,255,255};
                         int w,h;
                         TTF_SizeText(number_of_soldiers,"100",&w,&h);
+                        if(difftime(time_now,start_time)>=1)
+                        {
+                            politic_sides[i].number_of_troopers+=difftime(time_now,start_time);
+                        }
                         char test[3];
                         test[0]=politic_sides[i].number_of_troopers/100 + '0';
                         test[1]=(politic_sides[i].number_of_troopers/10)%10 + '0';
@@ -445,21 +533,59 @@ int main() {
                         SDL_Surface *textsurface = TTF_RenderText_Solid(number_of_soldiers,test, white);
                         SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
                         SDL_RenderCopy(renderer,text_texture,NULL,&leader_target);
+                        SDL_DestroyTexture(text_texture);
 
                     }
                 }   
             }
+            int rand_to_do_kyber = rand()%150;
+            if(rand_to_do_kyber==0)
+            {
+                int rand_two_side_first = rand()%size_of_politic_sides;
+                while(politic_sides[rand_two_side_first].number_of_troopers==-1)
+                    rand_two_side_first = rand()%size_of_politic_sides;
+                int rand_two_side_second = rand()%size_of_politic_sides;
+                while(rand_two_side_first==rand_two_side_second || politic_sides[rand_two_side_second].player_id==-1)
+                    rand_two_side_second = rand()%size_of_politic_sides;
+                int first_center_x = cells[politic_sides[rand_two_side_first].cells_x[0]][politic_sides[rand_two_side_first].cells_y[0]].x+ size_of_each_cell_x/2 - size_of_kyber_photo_x/2;
+                int first_center_y = cells[politic_sides[rand_two_side_first].cells_x[0]][politic_sides[rand_two_side_first].cells_y[0]].y + size_of_each_cell_y/2 - size_of_kyber_photo_y/2;
+                int second_center_x = cells[politic_sides[rand_two_side_second].cells_x[0]][politic_sides[rand_two_side_second].cells_y[0]].x + size_of_each_cell_x/2 - size_of_kyber_photo_x/2;
+                int second_center_y = cells[politic_sides[rand_two_side_second].cells_x[0]][politic_sides[rand_two_side_second].cells_y[0]].y + size_of_each_cell_y/2 - size_of_kyber_photo_y/2;
+                int dist_rand = rand()%70 + 15;
+                kybers[size_of_kybers].x = (first_center_x* dist_rand + second_center_x*(100-dist_rand))/100;
+                kybers[size_of_kybers].y = (first_center_y* dist_rand + second_center_y*(100-dist_rand))/100;
+                kybers[size_of_kybers].kyber_photo = kyber_cristal_photos[rand()%4];
+                size_of_kybers++;
+                char* buffer = malloc(sizeof(char) * 50);
+                sprintf(buffer, "%d %d\n", first_center_x, second_center_x);
+                printf("%s", buffer);
+                // stringRGBA(renderer, 5, 5, buffer, 0, 0, 200, 255);
+            }
+            for(int i=0; i<size_of_kybers;i++)
+            {
+                SDL_Rect kyber_target = {kybers[i].x, kybers[i].y, size_of_kyber_photo_x, size_of_kyber_photo_y};
+                SDL_Texture *kybertexture = SDL_CreateTextureFromSurface(renderer, kybers[i].kyber_photo);
+                SDL_RenderCopy(renderer, kybertexture, NULL, &kyber_target);
+                SDL_DestroyTexture(kybertexture);
+            }
             SDL_RenderPresent(renderer);
             SDL_DestroyTexture(startscreentexture);
+            SDL_DestroyTexture(walltexture);
+            SDL_DestroyTexture(wallflippedtexture);
+            SDL_DestroyTexture(backtomenutexture);
+            SDL_DestroyTexture(soundtexture);
             for(int i=0;i<size_of_politic_sides;i++)
             {
                 for(int j=0;j<politic_sides[i].size_of_cells;j++)
-                {
                     SDL_DestroyTexture(startgametexture[politic_sides[i].cells_x[j]][politic_sides[i].cells_y[j]]);
-                }
                 SDL_DestroyTexture(leaders_faces_texture[i]);
+                SDL_DestroyTexture(temp_troopers_textures[i]);
             }
+
         }
+        if(difftime(time_now,start_time)>=1)
+            time(&start_time);
+        frame++;
         while (SDL_GetTicks() - start_ticks < 1000 / FPS);
     }
     Mix_FreeMusic(menu_music);
