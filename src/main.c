@@ -84,6 +84,7 @@ int main() {
     SDL_Surface *new_game = SDL_LoadBMP("assets/new_game.bmp");
     SDL_Surface *credits_button = SDL_LoadBMP("assets/credits_button.bmp");
     SDL_Surface *credits_text = SDL_LoadBMP("assets/credits.bmp");
+    SDL_Surface *padmegrave2 = SDL_LoadBMP("assets/padmegrave2.bmp");
     SDL_Rect load_game_target = {window_width/2 - size_new_game_x/2 , window_height/2 + 205, size_new_game_x, size_new_game_y};
 
     SDL_Surface *new_game_background = SDL_LoadBMP("assets/newgame_background.bmp");
@@ -215,6 +216,7 @@ int main() {
                     }
                     else if(click_x>credits_target.x+60 && click_x<credits_target.x+credits_target.w - 60 && click_y>credits_target.y && click_y<credits_target.y+credits_target.h)
                     {
+                        credits_text_loc_y=5;
                         page=4;
                     }
             }
@@ -434,7 +436,7 @@ int main() {
             }
             SDL_Rect backbutton_target = {50 - backbutton_x_y/2 , 50 - backbutton_x_y/2, backbutton_x_y, backbutton_x_y};
             SDL_Rect credits_text_target = {window_width/2 - credits_text_x/2 , credits_text_loc_y, credits_text_x, credits_text_y};
-            SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, new_game_background);
+            SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, padmegrave2);
             SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
             SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
             SDL_RenderCopy(renderer, backbuttontexture, NULL, &backbutton_target);
