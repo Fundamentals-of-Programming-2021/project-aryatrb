@@ -81,6 +81,7 @@ int main() {
     int size_credits_x = 327*window_width/1335,size_credits_y=37*window_height/801;
     int backbutton_x_y=50;
     int start_game_x = 327*window_width/1335 , start_game_y =37*window_height/801;
+    int generatemap_x = 327*window_width/1335 , generatemap_y =37*window_height/801;
     int size_of_leaders_x_y=45;
     int size_of_troopers_x_y=20;
     int size_of_kyber_photo_x = 40, size_of_kyber_photo_y=72;
@@ -110,6 +111,7 @@ int main() {
     SDL_Surface *new_game_background = SDL_LoadBMP("assets/newgame_background.bmp");
     SDL_Surface *backbutton = SDL_LoadBMP("assets/backbutton.bmp");
     SDL_Surface *startgame = SDL_LoadBMP("assets/startgame.bmp");
+    SDL_Surface *generatemap = SDL_LoadBMP("assets/generatemap.bmp");
     SDL_Surface *updownbutton = SDL_LoadBMP("assets/updown.bmp");
     SDL_Rect updownbutton_target = {loc_number_of_enemies_x + number_of_enemies_w + 10, loc_number_of_enemies_y, 40, 60};
     SDL_Rect updownbutton_sec_target = {loc_number_of_enemies_x + per_user_w + 10, loc_number_of_enemies_y + per_user_h + 10, 40, 60};
@@ -266,6 +268,7 @@ int main() {
         {
             SDL_Rect backbutton_target = {50 - backbutton_x_y/2 , 50 - backbutton_x_y/2, backbutton_x_y, backbutton_x_y};
             SDL_Rect start_game_target = {window_width - 150*window_width/1335 -start_game_x/2 , window_height - 50*window_height/801 - start_game_y/2, start_game_x, start_game_y};
+            SDL_Rect generate_map_target = {250*window_width/1335 - generatemap_x/2, window_height - 50*window_height/801 - start_game_y/2, generatemap_x, generatemap_y};
             SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, new_game_background);
             SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
             SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
@@ -280,6 +283,8 @@ int main() {
             SDL_RenderCopy(renderer, updownbutton_texture, NULL, &updownbutton_target);
             SDL_Texture *updownbutton_sec_texture = SDL_CreateTextureFromSurface(renderer, updownbutton);
             SDL_RenderCopy(renderer, updownbutton_sec_texture, NULL, &updownbutton_sec_target);
+            SDL_Texture *generatemap_texture = SDL_CreateTextureFromSurface(renderer, generatemap);
+            SDL_RenderCopy(renderer, generatemap_texture, NULL, &generate_map_target);
             char test[22] = "number of enemies: 00";
             test[19]=number_of_enemies/10 + '0';
             test[20]=number_of_enemies%10 + '0';
@@ -303,7 +308,7 @@ int main() {
             text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
             SDL_RenderCopy(renderer,text_texture,NULL,&per_user_target);
             SDL_DestroyTexture(text_texture);
-
+            
             SDL_Rect username_target = {loc_number_of_enemies_x, loc_number_of_enemies_y + 2* (number_of_enemies_h + 10), per_user_w, per_user_h};
             textsurface = TTF_RenderText_Solid(details_page,test3, white);
             text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
@@ -312,6 +317,9 @@ int main() {
             text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
             SDL_RenderCopy(renderer,text_texture,NULL,&username_target);
             SDL_DestroyTexture(text_texture);
+
+            // FILE *mapsave = fopen("assets/save/files_details.txt", "r");
+            
 
             int click_x,click_y;
             SDL_GetMouseState(&click_x,&click_y);
@@ -324,12 +332,17 @@ int main() {
                 start_game_x=327*window_width/1335 * 1.1, start_game_y= 37*window_height/801 * 1.1;
             else
                 start_game_x=327*window_width/1335, start_game_y= 37*window_height/801;
+            if(click_x>generate_map_target.x && click_x<generate_map_target.x + generate_map_target.w 
+                && click_y>generate_map_target.y && click_y<generate_map_target.y + generate_map_target.h)
+                generatemap_x = 327*window_width/1335 * 1.1, generatemap_y= 37*window_height/801 * 1.1;
+            else
+                generatemap_x=327*window_width/1335, generatemap_y= 37*window_height/801;
             SDL_WaitEvent(&ev);
             if(ev.type==SDL_QUIT)
                 break;
             if(ev.type==SDL_KEYDOWN && writing_mode==1)
             {
-                if(ev.key.keysym.sym==SDLK_BACKSPACE || ev.key.keysym.sym==SDLK_DELETE)
+                if((ev.key.keysym.sym==SDLK_BACKSPACE || ev.key.keysym.sym==SDLK_DELETE) && size_of_text_username>0)
                 {
                     size_of_text_username--;
                     test3[size_of_text_username]='.';
@@ -368,8 +381,8 @@ int main() {
                 }
                 else if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
                     page=0;
-                if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
-                && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h)
+                else if(click_x>generate_map_target.x && click_x<generate_map_target.x + generate_map_target.w 
+                && click_y>generate_map_target.y && click_y<generate_map_target.y + generate_map_target.h)
                 {
                     for(int j = 0;j<number_of_cells_y;j++)
                     {
@@ -473,6 +486,10 @@ int main() {
                             }
                         }
                     }
+                }
+                else if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
+                && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h)
+                {                    
                     page=10;
                 }
                 else if(click_x>closebutton_target.x && click_x<closebutton_target.x + closebutton_target.w 
