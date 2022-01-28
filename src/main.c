@@ -7,6 +7,7 @@
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
+// #include "variables.h"
 struct cell{
     int x;
     int y;
@@ -17,8 +18,8 @@ struct cell{
     int is_occupied;
 };
 struct politic_side{
-    int cells_x[100];
-    int cells_y[100];
+    int cells_x[7];
+    int cells_y[7];
     int size_of_cells;
     int player_id;
     SDL_Surface *leader_face;
@@ -30,14 +31,6 @@ struct kyber_cristal{
     int x;
     int y;
 };
-const int EXIT = 12345;
-int handleEvents() {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT)
-            return EXIT;
-    }
-}
 
 void check_to_create_politic_side(struct politic_side politic_sides[], struct cell cells[][100], int temp_x, int temp_y,int size_of_politic_sides, SDL_Surface *temp_photo,int a, int b)
 {
@@ -93,6 +86,8 @@ int main() {
     TTF_SizeText(details_page,"number of enemies: 00",&number_of_enemies_w,&number_of_enemies_h);
     int per_user_w, per_user_h;
     TTF_SizeText(details_page,"number of systems per player: 00",&per_user_w,&per_user_h);
+    int mapsel_w, mapsel_h;
+    TTF_SizeText(details_page,"there are 00 maps. select one of them:",&mapsel_w,&mapsel_h);
 
     SDL_Surface *startbackground = SDL_LoadBMP("assets/background.bmp");
     SDL_Surface *starsbackground = SDL_LoadBMP("assets/stars.bmp");
@@ -101,6 +96,7 @@ int main() {
     SDL_Surface *new_game = SDL_LoadBMP("assets/new_game.bmp");
     SDL_Surface *credits_button = SDL_LoadBMP("assets/credits_button.bmp");
     SDL_Surface *credits_text = SDL_LoadBMP("assets/credits.bmp");
+    SDL_Surface *padmegrave1 = SDL_LoadBMP("assets/padmegrave1.bmp");
     SDL_Surface *padmegrave2 = SDL_LoadBMP("assets/padmegrave2.bmp");
     SDL_Rect load_game_target = {window_width/2 - size_new_game_x/2 , window_height/2 + 205, size_new_game_x, size_new_game_y};
 
@@ -147,7 +143,7 @@ int main() {
     SDL_Rect sound_target = {5 , window_height-40, 35, 35};
 
     time_t t;
-    srand((unsigned) time(&t) );
+    srand((unsigned) time(&t));
     time_t start_time;
     time(&start_time);
 
@@ -166,13 +162,14 @@ int main() {
     int is_sound_on=1,size_of_cells=0;
     int frame=0;
     char test3[33] = "............................";
+    char mapselect[33] = "............................";
 
-    int writing_mode=0,size_of_text_username=0;
-
+    int writing_mode_username=0,size_of_text_username=0;
+    int writing_mode_map_select=0,size_of_text_mapselect=0;
+    int selected_map_num=0;
+    int mapnumsel=0;
     while (1) {
         int start_ticks = SDL_GetTicks();
-        if (handleEvents() == EXIT)
-            break;
         SDL_RenderClear(renderer);
         time_t time_now;
         time(&time_now);
@@ -226,7 +223,17 @@ int main() {
                     if(click_x>window_width/2 - size_new_game_x/2 && click_x<window_width/2 + size_new_game_x/2 && click_y>window_height/2 + window_height/2*160/300 && click_y<window_height/2 + window_height/2*160/300 + size_new_game_y)
                         page=1;
                     else if(click_x>window_width/2 - size_load_game_x/2  && click_x<window_width/2 + size_load_game_x/2  && click_y>window_height/2 + window_height/2*205/300 && click_y<window_height/2 + window_height/2*205/300 + size_load_game_y)
+                    {
                         page=2;
+                        char teemp[1000];
+                        FILE *mapsave = fopen("assets/save/files_details.txt", "r+");
+                        while(1)
+                        {
+                            if(fscanf(mapsave,"assets/save/maps/map%d.txt\n",&mapnumsel)==EOF)
+                                break;
+                        }
+                        fclose(mapsave);
+                    }
                     else if(click_x>window_width/2 - leaderboard_game_x/2 && click_x<window_width/2 + leaderboard_game_x/2 && click_y>window_height/2 + window_height/2*250/300 && click_y<window_height/2 + window_height/2*250/300 + leaderboard_game_y)
                         page=3;
                     else if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
@@ -254,7 +261,6 @@ int main() {
                          && click_y>closebutton_target.y && click_y<closebutton_target.y + closebutton_target.h)
                         break;
             }
-
             SDL_RenderPresent(renderer);
             SDL_DestroyTexture(startscreentexture);
             SDL_DestroyTexture(newgame_texture);
@@ -268,7 +274,7 @@ int main() {
         {
             SDL_Rect backbutton_target = {50 - backbutton_x_y/2 , 50 - backbutton_x_y/2, backbutton_x_y, backbutton_x_y};
             SDL_Rect start_game_target = {window_width - 150*window_width/1335 -start_game_x/2 , window_height - 50*window_height/801 - start_game_y/2, start_game_x, start_game_y};
-            SDL_Rect generate_map_target = {250*window_width/1335 - generatemap_x/2, window_height - 50*window_height/801 - start_game_y/2, generatemap_x, generatemap_y};
+            // SDL_Rect generate_map_target = {250*window_width/1335 - generatemap_x/2, window_height - 50*window_height/801 - start_game_y/2, generatemap_x, generatemap_y};
             SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, new_game_background);
             SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
             SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
@@ -283,8 +289,8 @@ int main() {
             SDL_RenderCopy(renderer, updownbutton_texture, NULL, &updownbutton_target);
             SDL_Texture *updownbutton_sec_texture = SDL_CreateTextureFromSurface(renderer, updownbutton);
             SDL_RenderCopy(renderer, updownbutton_sec_texture, NULL, &updownbutton_sec_target);
-            SDL_Texture *generatemap_texture = SDL_CreateTextureFromSurface(renderer, generatemap);
-            SDL_RenderCopy(renderer, generatemap_texture, NULL, &generate_map_target);
+            // SDL_Texture *generatemap_texture = SDL_CreateTextureFromSurface(renderer, generatemap);
+            // SDL_RenderCopy(renderer, generatemap_texture, NULL, &generate_map_target);
             char test[22] = "number of enemies: 00";
             test[19]=number_of_enemies/10 + '0';
             test[20]=number_of_enemies%10 + '0';
@@ -318,8 +324,6 @@ int main() {
             SDL_RenderCopy(renderer,text_texture,NULL,&username_target);
             SDL_DestroyTexture(text_texture);
 
-            // FILE *mapsave = fopen("assets/save/files_details.txt", "r");
-            
 
             int click_x,click_y;
             SDL_GetMouseState(&click_x,&click_y);
@@ -332,20 +336,23 @@ int main() {
                 start_game_x=327*window_width/1335 * 1.1, start_game_y= 37*window_height/801 * 1.1;
             else
                 start_game_x=327*window_width/1335, start_game_y= 37*window_height/801;
-            if(click_x>generate_map_target.x && click_x<generate_map_target.x + generate_map_target.w 
-                && click_y>generate_map_target.y && click_y<generate_map_target.y + generate_map_target.h)
-                generatemap_x = 327*window_width/1335 * 1.1, generatemap_y= 37*window_height/801 * 1.1;
-            else
-                generatemap_x=327*window_width/1335, generatemap_y= 37*window_height/801;
+            // if(click_x>generate_map_target.x && click_x<generate_map_target.x + generate_map_target.w 
+            //     && click_y>generate_map_target.y && click_y<generate_map_target.y + generate_map_target.h)
+            //     generatemap_x = 327*window_width/1335 * 1.1, generatemap_y= 37*window_height/801 * 1.1;
+            // else
+            //     generatemap_x=327*window_width/1335, generatemap_y= 37*window_height/801;
             SDL_WaitEvent(&ev);
             if(ev.type==SDL_QUIT)
                 break;
-            if(ev.type==SDL_KEYDOWN && writing_mode==1)
+            if(ev.type==SDL_KEYDOWN && writing_mode_username==1)
             {
-                if((ev.key.keysym.sym==SDLK_BACKSPACE || ev.key.keysym.sym==SDLK_DELETE) && size_of_text_username>0)
+                if((ev.key.keysym.sym==SDLK_BACKSPACE || ev.key.keysym.sym==SDLK_DELETE))
                 {
-                    size_of_text_username--;
-                    test3[size_of_text_username]='.';
+                    if(size_of_text_username>0)
+                    {
+                        size_of_text_username--;
+                        test3[size_of_text_username]='.';
+                    } 
                 }
                 else
                 {
@@ -355,16 +362,10 @@ int main() {
             }
             else if(ev.type==SDL_MOUSEBUTTONDOWN && ev.button.button==SDL_BUTTON_LEFT)
             {
-                writing_mode=0;
+                writing_mode_username=0;
                 click_x=ev.button.x;
                 click_y=ev.button.y;
-                /*if(click_x>window_width/2 - 100 && click_x<window_width/2 + 100 && click_y>465 && click_y<490)
-                    page=1;
-                else if(click_x>window_width/2 - 100 && click_x<window_width/2 + 100 && click_y>510 && click_y<535)
-                    page=2;
-                else if(click_x>window_width/2 - 130 && click_x<window_width/2 + 130 && click_y>555 && click_y<580)
-                    page=3;
-                else */if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
+                if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
                 {
                     if(is_sound_on==1)
                     {
@@ -381,21 +382,38 @@ int main() {
                 }
                 else if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
                     page=0;
-                else if(click_x>generate_map_target.x && click_x<generate_map_target.x + generate_map_target.w 
-                && click_y>generate_map_target.y && click_y<generate_map_target.y + generate_map_target.h)
+                else if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
+                && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h)
                 {
+                    char teemp[1000];
+                    FILE *mapsave = fopen("assets/save/files_details.txt", "r+");
+                    int mapnum=0;
+                    while(1)
+                    {
+                        if(fscanf(mapsave,"assets/save/maps/map%d.txt\n",&mapnum)==EOF)
+                        break;
+                    }
+                    mapnum++;
+                    fprintf(mapsave, "assets/save/maps/map%d.txt\n", mapnum);
+                    fclose(mapsave);
+                    char path[100] = "assets/save/maps/map";
+                    if(mapnum<10)
+                    path[20]= mapnum+ '0';
+                    else
+                    {
+                        path[20] = mapnum/10 + '0';
+                        path[21] = mapnum%10 + '0';
+                    }
+                    FILE *mapwrite = fopen(path, "w");
+                    fprintf(mapwrite, "%d\n%d\n", number_of_enemies,number_of_politic_sides_per_user);
                     for(int j = 0;j<number_of_cells_y;j++)
                     {
                         for(int i=0;i<number_of_cells_x;i++)
                         {
                             if(j%2==0)
-                            {
                                 cells[i][j].x=(i)*size_of_each_cell_x*3/2;
-                            }
                             else
-                            {
                                 cells[i][j].x=(i-1)*size_of_each_cell_x*3/2+ size_of_each_cell_x*3/4;
-                            }
                             if((j%2==1 && i==0)|| (j%2==0 && i==number_of_cells_x-1) || rand()%2==0)
                                 cells[i][j].is_territoy=0;
                             else
@@ -479,17 +497,24 @@ int main() {
                                     check_to_create_politic_side(politic_sides,cells,temp_x,temp_y,size_of_politic_sides,temp_photo,+1,+1);
                                     check_to_create_politic_side(politic_sides,cells,temp_x,temp_y,size_of_politic_sides,temp_photo,+1,1);
                                 }
-                                Mix_PauseMusic();
-                                Mix_PlayMusic(game_music,-1);
                                 size_of_politic_sides++;
                                 politic_sides_of_user++;
                             }
                         }
                     }
-                }
-                else if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
-                && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h)
-                {                    
+                    for(int j = 0;j<number_of_cells_y;j++)
+                        for(int i=0;i<number_of_cells_x;i++)
+                            fprintf(mapwrite,"%d %d %d %d %d %d\n",cells[i][j].x, cells[i][j].y, cells[i][j].is_territoy, cells[i][j].id,cells[i][j].does_it_have_military,cells[i][j].is_occupied);
+                    fprintf(mapwrite,"\n");
+                    for(int i=0;i<=size_of_politic_sides;i++)
+                    {
+                            fprintf(mapwrite,"%d %d %d\n", politic_sides[i].player_id,politic_sides[i].size_of_cells,politic_sides[i].number_of_troopers);
+                            for(int j=0;j<politic_sides[i].size_of_cells;j++)
+                                fprintf(mapwrite,"%d %d\n",politic_sides[i].cells_x[j],politic_sides[i].cells_y[j]);
+                            fprintf(mapwrite,"\n");
+                    }
+                    Mix_PauseMusic();
+                    Mix_PlayMusic(game_music,-1);  
                     page=10;
                 }
                 else if(click_x>closebutton_target.x && click_x<closebutton_target.x + closebutton_target.w 
@@ -509,7 +534,7 @@ int main() {
                         number_of_politic_sides_per_user--;
                 else if(click_x>username_target.x && click_x<username_target.x + username_target.w
                         && click_y>username_target.y + username_target.h/2 && click_y<username_target.y + username_target.h)
-                        writing_mode=1;
+                        writing_mode_username=1;
             }
             // char* buffer = malloc(sizeof(char) * 50);
             // sprintf(buffer, "sfff %d %d %d %d %d\n", click_x, click_y,page,ev.button.x,ev.button.y);
@@ -523,6 +548,99 @@ int main() {
             SDL_DestroyTexture(startgametexture);
             SDL_DestroyTexture(closebutton_texture);
             SDL_DestroyTexture(updownbutton_texture);
+        }
+        else if(page==2)
+        {
+            SDL_Rect backbutton_target = {50 - backbutton_x_y/2 , 50 - backbutton_x_y/2, backbutton_x_y, backbutton_x_y};
+            SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, padmegrave1);
+            SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
+            SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
+            SDL_RenderCopy(renderer, backbuttontexture, NULL, &backbutton_target);
+            SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
+            SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
+            SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
+            SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target); 
+
+
+            char test[60] = "there are 00 maps. select one of them:";
+            test[10]=mapnumsel/10 + '0';
+            test[11]=mapnumsel%10 + '0';
+            SDL_Rect enemies_target = {loc_number_of_enemies_x, loc_number_of_enemies_y, mapsel_w, mapsel_h};
+            SDL_Surface *textsurface = TTF_RenderText_Solid(details_page,test, white);
+            SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
+            SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
+            textsurface = TTF_RenderText_Solid(details_page_outline,test, black);
+            text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
+            SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
+            SDL_DestroyTexture(text_texture);
+
+            SDL_Rect username_target = {loc_number_of_enemies_x, loc_number_of_enemies_y + 2* (number_of_enemies_h + 10), per_user_w, per_user_h};
+            textsurface = TTF_RenderText_Solid(details_page,mapselect, white);
+            text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
+            SDL_RenderCopy(renderer,text_texture,NULL,&username_target);
+            textsurface = TTF_RenderText_Solid(details_page_outline,mapselect, black);
+            text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
+            SDL_RenderCopy(renderer,text_texture,NULL,&username_target);
+            SDL_DestroyTexture(text_texture);
+
+            int click_x,click_y;
+            SDL_GetMouseState(&click_x,&click_y);
+            if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
+                backbutton_x_y=50 * 1.2;
+            else
+                backbutton_x_y=50;
+            SDL_WaitEvent(&ev);
+            if(ev.type==SDL_QUIT)
+                break;
+            if(ev.type==SDL_KEYDOWN && writing_mode_map_select==1)
+            {
+                if((ev.key.keysym.sym==SDLK_BACKSPACE || ev.key.keysym.sym==SDLK_DELETE))
+                {
+                    if(size_of_text_mapselect>0)
+                    {
+                        size_of_text_mapselect--;
+                        mapselect[size_of_text_mapselect]='.';
+                    }
+                }
+                else
+                {
+                    mapselect[size_of_text_mapselect]= ev.key.keysym.sym;
+                    size_of_text_mapselect++;
+                }
+            }
+            else if(ev.type==SDL_MOUSEBUTTONDOWN && ev.button.button==SDL_BUTTON_LEFT)
+            {
+                writing_mode_map_select=0;
+                click_x=ev.button.x;
+                click_y=ev.button.y;
+                if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
+                {
+                    if(is_sound_on==1)
+                    {
+                        is_sound_on=0;
+                        Mix_PauseMusic();
+                        soundonphoto = SDL_LoadBMP("assets/soundoff.bmp");
+                    }
+                    else
+                    {
+                        is_sound_on=1;
+                        Mix_ResumeMusic();
+                        soundonphoto = SDL_LoadBMP("assets/soundon.bmp");
+                    }
+                }
+                else if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
+                    page=0;
+                else if(click_x>closebutton_target.x && click_x<closebutton_target.x + closebutton_target.w 
+                        && click_y>closebutton_target.y && click_y<closebutton_target.y + closebutton_target.h)
+                    break;
+                else if(click_x>username_target.x && click_x<username_target.x + username_target.w
+                        && click_y>username_target.y + username_target.h/2 && click_y<username_target.y + username_target.h)
+                        writing_mode_map_select=1;
+            }
+            SDL_RenderPresent(renderer);
+            SDL_DestroyTexture(startscreentexture);
+            SDL_DestroyTexture(soundtexture);
+            SDL_DestroyTexture(backbuttontexture);
         }
         else if(page==4)
         {

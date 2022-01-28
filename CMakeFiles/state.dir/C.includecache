@@ -25,6 +25,10 @@ SDL_ttf.h
 -
 SDL2/SDL2_gfxPrimitives.h
 -
+variables.h
+/home/arya/state.io/src/variables.h
+
+/home/arya/state.io/src/variables.h
 
 /usr/include/SDL2/SDL.h
 SDL_main.h

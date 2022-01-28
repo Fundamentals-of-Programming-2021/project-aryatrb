@@ -3,6 +3,7 @@
 
 CMakeFiles/state.dir/src/main.c.o
  /home/arya/state.io/src/main.c
+ /home/arya/state.io/src/variables.h
  /usr/include/SDL2/SDL.h
  /usr/include/SDL2/SDL_assert.h
  /usr/include/SDL2/SDL_atomic.h
