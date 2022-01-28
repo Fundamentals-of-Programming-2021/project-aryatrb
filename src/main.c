@@ -7,139 +7,46 @@
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
-// #include "variables.h"
-struct cell{
-    int x;
-    int y;
-    int is_territoy;
-    SDL_Surface *photo;
-    int id;
-    int does_it_have_military;
-    int is_occupied;
-};
-struct politic_side{
-    int cells_x[7];
-    int cells_y[7];
-    int size_of_cells;
-    int player_id;
-    SDL_Surface *leader_face;
-    SDL_Surface *trooper;
-    int number_of_troopers;
-};
-struct kyber_cristal{
-    SDL_Surface *kyber_photo;
-    int x;
-    int y;
-};
+#include "variables.h"
 
-void check_to_create_politic_side(struct politic_side politic_sides[], struct cell cells[][100], int temp_x, int temp_y,int size_of_politic_sides, SDL_Surface *temp_photo,int a, int b)
+
+
+int main() 
 {
-    if(cells[temp_x+a][temp_y+b].is_territoy==1 && cells[temp_x+a][temp_y+b].is_occupied!=1)
-    {
-        politic_sides[size_of_politic_sides].cells_x[politic_sides[size_of_politic_sides].size_of_cells] = temp_x+a;
-        politic_sides[size_of_politic_sides].cells_y[politic_sides[size_of_politic_sides].size_of_cells] = temp_y+b;
-        politic_sides[size_of_politic_sides].size_of_cells++;
-        cells[temp_x+a][temp_y+b].photo = temp_photo;
-        cells[temp_x+a][temp_y+b].is_occupied=1;
-    }
-}
-
-int main() {
-    int number_of_enemies=4;
-    int number_of_politic_sides_per_user=1;
     srand(time(NULL));
     SDL_DisplayMode DM;
     SDL_GetCurrentDisplayMode(0,&DM);
-    int window_width;
-    int window_height;
     TTF_Init();
-    TTF_Font *number_of_soldiers = TTF_OpenFont("assets/EPISODE1.TTF",14);
-    TTF_Font *details_page = TTF_OpenFont("assets/Starjedi.ttf",40);
-    TTF_Font *details_page_outline = TTF_OpenFont("assets/Starjedi.ttf",40);
+    window = SDL_CreateWindow("State.io: A Star Wars Story", 20, 20, window_width, window_height, SDL_WINDOW_OPENGL);
+    SDL_SetWindowFullscreen(window,SDL_WINDOW_FULLSCREEN_DESKTOP);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    number_of_soldiers = TTF_OpenFont("assets/EPISODE1.TTF",14);
+    details_page = TTF_OpenFont("assets/Starjedi.ttf",40);
+    details_page_outline = TTF_OpenFont("assets/Starjedi.ttf",40);
     TTF_SetFontOutline(details_page_outline,1);
-    SDL_Color white= {255,255,255,255};
-    SDL_Color black = {0,0,0,0};
 	SDL_Init(SDL_INIT_EVERYTHING);
 	SDL_Window* window = SDL_CreateWindow("State.io: A Star Wars Story", 20, 20, window_width, window_height, SDL_WINDOW_OPENGL);
     SDL_SetWindowFullscreen(window,SDL_WINDOW_FULLSCREEN_DESKTOP);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_GetRendererOutputSize(renderer,&window_width,&window_height);
-    int size_of_each_cell_x=81,size_of_each_cell_y=70 ,number_of_cells_x=window_width/size_of_each_cell_x*3/4 - 1, number_of_cells_y = (window_height-40-size_of_each_cell_y/2)*2/size_of_each_cell_y - 1;
-
+    load_variables();
+    loadimages();
     int begining_of_time = SDL_GetTicks();
-    const double FPS = 30;
-    int size_new_game_x = 327*window_width/1335,size_new_game_y=37*window_height/801;
-    int size_load_game_x = 327*window_width/1335,size_load_game_y=37*window_height/801;
-    int leaderboard_game_x = 327*window_width/1335,leaderboard_game_y=37*window_height/801;
-    int size_credits_x = 327*window_width/1335,size_credits_y=37*window_height/801;
-    int backbutton_x_y=50;
-    int start_game_x = 327*window_width/1335 , start_game_y =37*window_height/801;
-    int generatemap_x = 327*window_width/1335 , generatemap_y =37*window_height/801;
-    int size_of_leaders_x_y=45;
-    int size_of_troopers_x_y=20;
-    int size_of_kyber_photo_x = 40, size_of_kyber_photo_y=72;
-    int credits_text_x=1100*window_width/1335,credits_text_y=1307*window_height/801;
-    int credits_text_loc_y=5;
-    int size_of_closebutton_x_y = 20;
-    int loc_number_of_enemies_x = window_width*0.1, loc_number_of_enemies_y = window_height*0.1;
-    int number_of_enemies_w, number_of_enemies_h;
     TTF_SizeText(details_page,"number of enemies: 00",&number_of_enemies_w,&number_of_enemies_h);
-    int per_user_w, per_user_h;
     TTF_SizeText(details_page,"number of systems per player: 00",&per_user_w,&per_user_h);
-    int mapsel_w, mapsel_h;
     TTF_SizeText(details_page,"there are 00 maps. select one of them:",&mapsel_w,&mapsel_h);
-
-    SDL_Surface *startbackground = SDL_LoadBMP("assets/background.bmp");
-    SDL_Surface *starsbackground = SDL_LoadBMP("assets/stars.bmp");
-    SDL_Surface *load_game = SDL_LoadBMP("assets/load_game.bmp");
-    SDL_Surface *leaderboard = SDL_LoadBMP("assets/leaderboard.bmp");
-    SDL_Surface *new_game = SDL_LoadBMP("assets/new_game.bmp");
-    SDL_Surface *credits_button = SDL_LoadBMP("assets/credits_button.bmp");
-    SDL_Surface *credits_text = SDL_LoadBMP("assets/credits.bmp");
-    SDL_Surface *padmegrave1 = SDL_LoadBMP("assets/padmegrave1.bmp");
-    SDL_Surface *padmegrave2 = SDL_LoadBMP("assets/padmegrave2.bmp");
     SDL_Rect load_game_target = {window_width/2 - size_new_game_x/2 , window_height/2 + 205, size_new_game_x, size_new_game_y};
 
-    SDL_Surface *closebutton = SDL_LoadBMP("assets/closebutton.bmp");
     SDL_Rect closebutton_target = {window_width - 10 - size_of_closebutton_x_y, 10, size_of_closebutton_x_y, size_of_closebutton_x_y};
 
 
-    SDL_Surface *new_game_background = SDL_LoadBMP("assets/newgame_background.bmp");
-    SDL_Surface *backbutton = SDL_LoadBMP("assets/backbutton.bmp");
-    SDL_Surface *startgame = SDL_LoadBMP("assets/startgame.bmp");
-    SDL_Surface *generatemap = SDL_LoadBMP("assets/generatemap.bmp");
-    SDL_Surface *updownbutton = SDL_LoadBMP("assets/updown.bmp");
     SDL_Rect updownbutton_target = {loc_number_of_enemies_x + number_of_enemies_w + 10, loc_number_of_enemies_y, 40, 60};
     SDL_Rect updownbutton_sec_target = {loc_number_of_enemies_x + per_user_w + 10, loc_number_of_enemies_y + per_user_h + 10, 40, 60};
 
 
-    SDL_Surface *wall = SDL_LoadBMP("assets/wall.bmp");
     SDL_Rect wall_target = {0, window_height - 40, window_width, 40};
-    SDL_Surface *wallflipped = SDL_LoadBMP("assets/wallflipped.bmp");
     SDL_Rect wallflipped_target = {0, 0, window_width, size_of_each_cell_y/2};
-    SDL_Surface *backtomenu = SDL_LoadBMP("assets/backtomenu.bmp");
     SDL_Rect backtomenu_target = {60, window_height - 35, 60, 30};
-    SDL_Surface *faces[5];
-    faces[0] = SDL_LoadBMP("assets/faces/vader.bmp");
-    faces[1] = SDL_LoadBMP("assets/faces/boba.bmp");
-    faces[2] = SDL_LoadBMP("assets/faces/tano.bmp");
-    faces[3] = SDL_LoadBMP("assets/faces/luke.bmp");
-    faces[4] = SDL_LoadBMP("assets/faces/maul.bmp");
-
-    SDL_Surface *troopers[5];
-    troopers[0] = SDL_LoadBMP("assets/troopers/stormtrooper.bmp");
-    troopers[1] = SDL_LoadBMP("assets/troopers/deathtrooper.bmp");
-    troopers[2] = SDL_LoadBMP("assets/troopers/ahsokatrooper.bmp");
-    troopers[3] = SDL_LoadBMP("assets/troopers/clonetrooper.bmp");
-    troopers[4] = SDL_LoadBMP("assets/troopers/mandalorian.bmp");
-
-    SDL_Surface *kyber_cristal_photos[4];
-    kyber_cristal_photos[0] = SDL_LoadBMP("assets/kybers/kyber_blue.bmp");
-    kyber_cristal_photos[1] = SDL_LoadBMP("assets/kybers/kyber_green.bmp");
-    kyber_cristal_photos[2] = SDL_LoadBMP("assets/kybers/kyber_purple.bmp");
-    kyber_cristal_photos[3] = SDL_LoadBMP("assets/kybers/kyber_red.bmp");
-
-    SDL_Surface *soundonphoto = SDL_LoadBMP("assets/soundon.bmp");
     SDL_Rect sound_target = {5 , window_height-40, 35, 35};
 
     time_t t;
@@ -151,23 +58,10 @@ int main() {
     Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048);
     Mix_Music *menu_music = Mix_LoadMUS("assets/menu.mp3");
     Mix_Music *game_music = Mix_LoadMUS("assets/Anakins_Symphony.mp3");
-    SDL_Event ev;
-    int page=0;
-    struct cell cells[100][100];
-    struct politic_side politic_sides[100];
-    struct kyber_cristal kybers[100];
-    int size_of_kybers=0;
-    int size_of_politic_sides=0;
+
     Mix_PlayMusic(menu_music,-1);
-    int is_sound_on=1,size_of_cells=0;
-    int frame=0;
     char test3[33] = "............................";
     char mapselect[33] = "............................";
-
-    int writing_mode_username=0,size_of_text_username=0;
-    int writing_mode_map_select=0,size_of_text_mapselect=0;
-    int selected_map_num=0;
-    int mapnumsel=0;
     while (1) {
         int start_ticks = SDL_GetTicks();
         SDL_RenderClear(renderer);
@@ -175,25 +69,12 @@ int main() {
         time(&time_now);
         if(page==0)
         {
+
             SDL_Rect new_game_target = {window_width/2 - size_new_game_x/2 , window_height/2 + window_height/2*160/300, size_new_game_x, size_new_game_y};
             SDL_Rect load_game_target = {window_width/2 - size_load_game_x/2 , window_height/2 + window_height/2*205/300, size_load_game_x, size_load_game_y};
             SDL_Rect leaderboard_target = {window_width/2 - leaderboard_game_x/2 , window_height/2 + window_height/2*250/300, leaderboard_game_x, leaderboard_game_y};
             SDL_Rect credits_target = {180- size_credits_x/2, window_height -50 - size_credits_y/2, size_credits_x, size_credits_y};
 
-            SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, startbackground);
-            SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-            SDL_Texture *newgame_texture = SDL_CreateTextureFromSurface(renderer, new_game);
-            SDL_RenderCopy(renderer, newgame_texture, NULL, &new_game_target);
-            SDL_Texture *loadgame_texture = SDL_CreateTextureFromSurface(renderer, load_game);
-            SDL_RenderCopy(renderer, loadgame_texture, NULL, &load_game_target);
-            SDL_Texture *leaderboard_texture = SDL_CreateTextureFromSurface(renderer, leaderboard);
-            SDL_RenderCopy(renderer, leaderboard_texture, NULL, &leaderboard_target);
-            SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
-            SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
-            SDL_Texture *creditstexture = SDL_CreateTextureFromSurface(renderer, credits_button);
-            SDL_RenderCopy(renderer, creditstexture, NULL, &credits_target);
-            SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
-            SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target);
 
             int click_x,click_y;
             SDL_GetMouseState(&click_x,&click_y);
@@ -228,10 +109,8 @@ int main() {
                         char teemp[1000];
                         FILE *mapsave = fopen("assets/save/files_details.txt", "r+");
                         while(1)
-                        {
                             if(fscanf(mapsave,"assets/save/maps/map%d.txt\n",&mapnumsel)==EOF)
                                 break;
-                        }
                         fclose(mapsave);
                     }
                     else if(click_x>window_width/2 - leaderboard_game_x/2 && click_x<window_width/2 + leaderboard_game_x/2 && click_y>window_height/2 + window_height/2*250/300 && click_y<window_height/2 + window_height/2*250/300 + leaderboard_game_y)
@@ -261,69 +140,16 @@ int main() {
                          && click_y>closebutton_target.y && click_y<closebutton_target.y + closebutton_target.h)
                         break;
             }
-            SDL_RenderPresent(renderer);
-            SDL_DestroyTexture(startscreentexture);
-            SDL_DestroyTexture(newgame_texture);
-            SDL_DestroyTexture(loadgame_texture);
-            SDL_DestroyTexture(leaderboard_texture);
-            SDL_DestroyTexture(soundtexture);
-            SDL_DestroyTexture(creditstexture);
-            SDL_DestroyTexture(closebutton_texture);
+            rendercpypage0(renderer,new_game_target,load_game_target,leaderboard_target,sound_target,credits_target,closebutton_target);
+
         }
         else if(page==1)
         {
             SDL_Rect backbutton_target = {50 - backbutton_x_y/2 , 50 - backbutton_x_y/2, backbutton_x_y, backbutton_x_y};
             SDL_Rect start_game_target = {window_width - 150*window_width/1335 -start_game_x/2 , window_height - 50*window_height/801 - start_game_y/2, start_game_x, start_game_y};
-            // SDL_Rect generate_map_target = {250*window_width/1335 - generatemap_x/2, window_height - 50*window_height/801 - start_game_y/2, generatemap_x, generatemap_y};
-            SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, new_game_background);
-            SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-            SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
-            SDL_RenderCopy(renderer, backbuttontexture, NULL, &backbutton_target);
-            SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
-            SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
-            SDL_Texture *startgametexture = SDL_CreateTextureFromSurface(renderer, startgame);
-            SDL_RenderCopy(renderer, startgametexture, NULL, &start_game_target);
-            SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
-            SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target);
-            SDL_Texture *updownbutton_texture = SDL_CreateTextureFromSurface(renderer, updownbutton);
-            SDL_RenderCopy(renderer, updownbutton_texture, NULL, &updownbutton_target);
-            SDL_Texture *updownbutton_sec_texture = SDL_CreateTextureFromSurface(renderer, updownbutton);
-            SDL_RenderCopy(renderer, updownbutton_sec_texture, NULL, &updownbutton_sec_target);
-            // SDL_Texture *generatemap_texture = SDL_CreateTextureFromSurface(renderer, generatemap);
-            // SDL_RenderCopy(renderer, generatemap_texture, NULL, &generate_map_target);
-            char test[22] = "number of enemies: 00";
-            test[19]=number_of_enemies/10 + '0';
-            test[20]=number_of_enemies%10 + '0';
             SDL_Rect enemies_target = {loc_number_of_enemies_x, loc_number_of_enemies_y, number_of_enemies_w, number_of_enemies_h};
-            SDL_Surface *textsurface = TTF_RenderText_Solid(details_page,test, white);
-            SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-            SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-            textsurface = TTF_RenderText_Solid(details_page_outline,test, black);
-            text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-            SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-            SDL_DestroyTexture(text_texture);
-
-            char test2[33] = "number of systems per player: 00";
-            test2[30]=number_of_politic_sides_per_user/10 + '0';
-            test2[31]=number_of_politic_sides_per_user%10 + '0';
             SDL_Rect per_user_target = {loc_number_of_enemies_x, loc_number_of_enemies_y + number_of_enemies_h + 10, per_user_w, per_user_h};
-            textsurface = TTF_RenderText_Solid(details_page,test2, white);
-            text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-            SDL_RenderCopy(renderer,text_texture,NULL,&per_user_target);
-            textsurface = TTF_RenderText_Solid(details_page_outline,test2, black);
-            text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-            SDL_RenderCopy(renderer,text_texture,NULL,&per_user_target);
-            SDL_DestroyTexture(text_texture);
-            
             SDL_Rect username_target = {loc_number_of_enemies_x, loc_number_of_enemies_y + 2* (number_of_enemies_h + 10), per_user_w, per_user_h};
-            textsurface = TTF_RenderText_Solid(details_page,test3, white);
-            text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-            SDL_RenderCopy(renderer,text_texture,NULL,&username_target);
-            textsurface = TTF_RenderText_Solid(details_page_outline,test3, black);
-            text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-            SDL_RenderCopy(renderer,text_texture,NULL,&username_target);
-            SDL_DestroyTexture(text_texture);
-
 
             int click_x,click_y;
             SDL_GetMouseState(&click_x,&click_y);
@@ -336,11 +162,6 @@ int main() {
                 start_game_x=327*window_width/1335 * 1.1, start_game_y= 37*window_height/801 * 1.1;
             else
                 start_game_x=327*window_width/1335, start_game_y= 37*window_height/801;
-            // if(click_x>generate_map_target.x && click_x<generate_map_target.x + generate_map_target.w 
-            //     && click_y>generate_map_target.y && click_y<generate_map_target.y + generate_map_target.h)
-            //     generatemap_x = 327*window_width/1335 * 1.1, generatemap_y= 37*window_height/801 * 1.1;
-            // else
-            //     generatemap_x=327*window_width/1335, generatemap_y= 37*window_height/801;
             SDL_WaitEvent(&ev);
             if(ev.type==SDL_QUIT)
                 break;
@@ -536,52 +357,13 @@ int main() {
                         && click_y>username_target.y + username_target.h/2 && click_y<username_target.y + username_target.h)
                         writing_mode_username=1;
             }
-            // char* buffer = malloc(sizeof(char) * 50);
-            // sprintf(buffer, "sfff %d %d %d %d %d\n", click_x, click_y,page,ev.button.x,ev.button.y);
-            // printf("%s", buffer);
-            // stringRGBA(renderer, 5, 5, buffer, 0, 0, 200, 255);
-
-            SDL_RenderPresent(renderer);
-            SDL_DestroyTexture(startscreentexture);
-            SDL_DestroyTexture(soundtexture);
-            SDL_DestroyTexture(backbuttontexture);
-            SDL_DestroyTexture(startgametexture);
-            SDL_DestroyTexture(closebutton_texture);
-            SDL_DestroyTexture(updownbutton_texture);
+            rendercpypage1(test3,renderer,per_user_target,username_target,backbutton_target,start_game_target,enemies_target,sound_target,closebutton_target,updownbutton_target,updownbutton_sec_target);
         }
         else if(page==2)
         {
             SDL_Rect backbutton_target = {50 - backbutton_x_y/2 , 50 - backbutton_x_y/2, backbutton_x_y, backbutton_x_y};
-            SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, padmegrave1);
-            SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-            SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
-            SDL_RenderCopy(renderer, backbuttontexture, NULL, &backbutton_target);
-            SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
-            SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
-            SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
-            SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target); 
-
-
-            char test[60] = "there are 00 maps. select one of them:";
-            test[10]=mapnumsel/10 + '0';
-            test[11]=mapnumsel%10 + '0';
             SDL_Rect enemies_target = {loc_number_of_enemies_x, loc_number_of_enemies_y, mapsel_w, mapsel_h};
-            SDL_Surface *textsurface = TTF_RenderText_Solid(details_page,test, white);
-            SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-            SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-            textsurface = TTF_RenderText_Solid(details_page_outline,test, black);
-            text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-            SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-            SDL_DestroyTexture(text_texture);
-
             SDL_Rect username_target = {loc_number_of_enemies_x, loc_number_of_enemies_y + 2* (number_of_enemies_h + 10), per_user_w, per_user_h};
-            textsurface = TTF_RenderText_Solid(details_page,mapselect, white);
-            text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-            SDL_RenderCopy(renderer,text_texture,NULL,&username_target);
-            textsurface = TTF_RenderText_Solid(details_page_outline,mapselect, black);
-            text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-            SDL_RenderCopy(renderer,text_texture,NULL,&username_target);
-            SDL_DestroyTexture(text_texture);
 
             int click_x,click_y;
             SDL_GetMouseState(&click_x,&click_y);
@@ -602,7 +384,7 @@ int main() {
                         mapselect[size_of_text_mapselect]='.';
                     }
                 }
-                else
+                else if (ev.key.keysym.sym>='0' && ev.key.keysym.sym<='9')
                 {
                     mapselect[size_of_text_mapselect]= ev.key.keysym.sym;
                     size_of_text_mapselect++;
@@ -637,10 +419,7 @@ int main() {
                         && click_y>username_target.y + username_target.h/2 && click_y<username_target.y + username_target.h)
                         writing_mode_map_select=1;
             }
-            SDL_RenderPresent(renderer);
-            SDL_DestroyTexture(startscreentexture);
-            SDL_DestroyTexture(soundtexture);
-            SDL_DestroyTexture(backbuttontexture);
+            rendercpypage2(renderer,mapselect,backbutton_target,enemies_target,username_target,sound_target,closebutton_target);
         }
         else if(page==4)
         {
@@ -654,13 +433,9 @@ int main() {
             if(ev.type==SDL_QUIT)
                 break;
             if(ev.type==SDL_KEYDOWN && ev.key.keysym.sym==SDLK_UP && credits_text_loc_y<5)
-            {
                 credits_text_loc_y+=5;
-            }
             else if(ev.type==SDL_KEYDOWN && ev.key.keysym.sym==SDLK_DOWN && credits_text_loc_y>5-(credits_text_y-window_height))
-            {
                 credits_text_loc_y-=5;
-            }
             else if(ev.type==SDL_MOUSEBUTTONDOWN && ev.button.button==SDL_BUTTON_LEFT)
             {
                     click_x=ev.button.x;
@@ -685,19 +460,7 @@ int main() {
             }
             SDL_Rect backbutton_target = {50 - backbutton_x_y/2 , 50 - backbutton_x_y/2, backbutton_x_y, backbutton_x_y};
             SDL_Rect credits_text_target = {window_width/2 - credits_text_x/2 , credits_text_loc_y, credits_text_x, credits_text_y};
-            SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, padmegrave2);
-            SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-            SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
-            SDL_RenderCopy(renderer, backbuttontexture, NULL, &backbutton_target);
-            SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
-            SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
-            SDL_Texture *creditstext_texture = SDL_CreateTextureFromSurface(renderer, credits_text);
-            SDL_RenderCopy(renderer, creditstext_texture, NULL, &credits_text_target);
-
-            SDL_RenderPresent(renderer);
-            SDL_DestroyTexture(startscreentexture);
-            SDL_DestroyTexture(soundtexture);
-            SDL_DestroyTexture(backbuttontexture);
+            rendercpypage4(backbutton_target,credits_text_target,sound_target);
         }
         else if (page==10)
         {   
