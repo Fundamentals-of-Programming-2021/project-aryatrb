@@ -7,6 +7,20 @@
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
+struct troop{
+    int current_x;
+    int current_y;
+    int half_dest_x;
+    int half_dest_y;
+    int dest_x;
+    int dest_y;
+    int player_id;
+    int did_pass_half;
+    int did_end;
+    int is_dest_right;
+    int till_half_a;
+    int till_end_a;
+};
 struct cell{
     int x;
     int y;
@@ -39,6 +53,7 @@ void check_to_create_politic_side(struct politic_side politic_sides[], struct ce
         politic_sides[size_of_politic_sides].size_of_cells++;
         cells[temp_x+a][temp_y+b].photo = temp_photo;
         cells[temp_x+a][temp_y+b].is_occupied=1;
+        cells[temp_x+a][temp_y+b].id=size_of_politic_sides;
     }
 }
 
@@ -69,8 +84,14 @@ int mapsel_w, mapsel_h;
 int mapseltype_w,mapseltype_h;
 int usernametype_w,usernametype_h;
 const double FPS = 30;
-int size_of_each_cell_x=81,size_of_each_cell_y=70 ,number_of_cells_x, number_of_cells_y;
-    
+int size_of_each_cell_x=162,size_of_each_cell_y=140 ,number_of_cells_x, number_of_cells_y;
+int first_click_x=-10,first_click_y=-10;
+int second_click_x, second_click_y;
+int is_first_clicked=0;
+struct troop moving_troopers[2000];
+int size_of_moving_troopers=0;
+int dist_from_mid=10;
+int dist_moving_trooper_per_sec=30;
 
 int number_of_enemies=4;
 int number_of_politic_sides_per_user=1;
@@ -125,8 +146,8 @@ void load_variables()
     backbutton_x_y=50;
     start_game_x = 327*window_width/1335 , start_game_y =37*window_height/801;
     generatemap_x = 327*window_width/1335 , generatemap_y =37*window_height/801;
-    size_of_leaders_x_y=45;
-    size_of_troopers_x_y=20;
+    size_of_leaders_x_y=45*size_of_each_cell_x/81;
+    size_of_troopers_x_y=20*size_of_each_cell_x/81;
     size_of_kyber_photo_x = 40, size_of_kyber_photo_y=72;
     credits_text_x=1100*window_width/1335,credits_text_y=1307*window_height/801;
     credits_text_loc_y=5;
@@ -179,12 +200,11 @@ void loadimages()
     kyber_cristal_photos[2] = SDL_LoadBMP("assets/kybers/kyber_purple.bmp");
     kyber_cristal_photos[3] = SDL_LoadBMP("assets/kybers/kyber_red.bmp");
 
-    
     planets_photos[0] = SDL_LoadBMP("assets/planet_death_star.bmp");
     planets_photos[1] = SDL_LoadBMP("assets/planet_lothal.bmp");
-    planets_photos[2] = SDL_LoadBMP("assets/planet_mustafar.bmp");
+    planets_photos[2] = SDL_LoadBMP("assets/planet_rodia.bmp");
     planets_photos[3] = SDL_LoadBMP("assets/planet_naboo.bmp");
-    planets_photos[4] = SDL_LoadBMP("assets/planet_rodia.bmp");
+    planets_photos[4] = SDL_LoadBMP("assets/planet_mustafar.bmp");
     planets_photos[10] = SDL_LoadBMP("assets/metal.bmp");
 
 
@@ -321,7 +341,111 @@ void rendercpypage4(SDL_Rect backbutton_target, SDL_Rect credits_text_target,SDL
     SDL_DestroyTexture(soundtexture);
     SDL_DestroyTexture(backbuttontexture);
 }
+void rendercpypage10(SDL_Rect wall_target, SDL_Rect wallflipped_target, SDL_Rect backtomenu_target,SDL_Rect sound_target, SDL_Rect closebutton_target,time_t time_now, time_t start_time)
+{
+    SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, starsbackground);
+    SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
+    SDL_Texture *walltexture = SDL_CreateTextureFromSurface(renderer, wall);
+    SDL_RenderCopy(renderer, walltexture, NULL, &wall_target);
+    SDL_Texture *wallflippedtexture = SDL_CreateTextureFromSurface(renderer, wallflipped);
+    SDL_RenderCopy(renderer, wallflippedtexture, NULL, &wallflipped_target);
+    SDL_Texture *backtomenutexture = SDL_CreateTextureFromSurface(renderer, backtomenu);
+    SDL_RenderCopy(renderer, backtomenutexture, NULL, &backtomenu_target);
+    SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
+    SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
+    SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
+    SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target);
 
+    SDL_Texture *startgametexture[100][100];
+    SDL_Texture *leaders_faces_texture[100];
+    SDL_Texture *temp_troopers_textures[200];
+    for(int i=0;i<size_of_politic_sides;i++)
+    {
+        for(int j=0;j<politic_sides[i].size_of_cells;j++)
+        {
+            int x = politic_sides[i].cells_x[j], y = politic_sides[i].cells_y[j];
+            SDL_Rect cell_target = {cells[x][y].x , cells[x][y].y, size_of_each_cell_x, size_of_each_cell_y};
+            startgametexture[x][y] = SDL_CreateTextureFromSurface(renderer, planets_photos[politic_sides[i].player_id]);
+            SDL_RenderCopy(renderer, startgametexture[x][y], NULL, &cell_target);
+            if(j==0)
+            {
+                SDL_Rect leader_target = {cells[x][y].x+ size_of_each_cell_x/2 - size_of_leaders_x_y/2, cells[x][y].y + size_of_each_cell_y*1/10, size_of_leaders_x_y, size_of_leaders_x_y};
+                leaders_faces_texture[i] = SDL_CreateTextureFromSurface(renderer, faces[politic_sides[i].player_id]);
+                SDL_RenderCopy(renderer, leaders_faces_texture[i], NULL, &leader_target);
+                SDL_Rect temp_trooper_target = leader_target;
+                temp_troopers_textures[i] = SDL_CreateTextureFromSurface(renderer, troopers[politic_sides[i].player_id]);
+                temp_trooper_target.w = temp_trooper_target.h = size_of_troopers_x_y;
+                temp_trooper_target.x -=5;
+                SDL_RenderCopy(renderer, temp_troopers_textures[i], NULL, &temp_trooper_target);
+                temp_trooper_target.x+=leader_target.w - temp_trooper_target.w + 10;
+                SDL_RenderCopy(renderer, temp_troopers_textures[i], NULL, &temp_trooper_target);
+                SDL_Color white = {255,255,255,255};
+                int w,h;
+                TTF_SizeText(number_of_soldiers,"100",&w,&h);
+                if(difftime(time_now,start_time)>=1)
+                    politic_sides[i].number_of_troopers+=difftime(time_now,start_time);
+                char test[4];
+                test[0]=politic_sides[i].number_of_troopers/100 + '0';
+                test[1]=(politic_sides[i].number_of_troopers/10)%10 + '0';
+                test[2]=politic_sides[i].number_of_troopers%10 + '0';
+                test[3]= '\0';
+                leader_target.h = h;
+                leader_target.w = w;
+                leader_target.x += size_of_leaders_x_y/2 - w/2;
+                leader_target.y += size_of_leaders_x_y-5;
+                SDL_Surface *textsurface = TTF_RenderText_Solid(number_of_soldiers,test, white);
+                SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
+                SDL_RenderCopy(renderer,text_texture,NULL,&leader_target);
+                SDL_DestroyTexture(text_texture);
+            }
+        }   
+    }
+    int rand_to_do_kyber = rand()%150;
+    for(int i=0; i<size_of_kybers;i++)
+    {
+        SDL_Rect kyber_target = {kybers[i].x, kybers[i].y, size_of_kyber_photo_x, size_of_kyber_photo_y};
+        SDL_Texture *kybertexture = SDL_CreateTextureFromSurface(renderer, kybers[i].kyber_photo);
+        SDL_RenderCopy(renderer, kybertexture, NULL, &kyber_target);
+        SDL_DestroyTexture(kybertexture);
+    }
+    for(int i = 0 ; i<size_of_moving_troopers ; i++)
+    {
+        SDL_Rect movingtrooper_target = {moving_troopers[i].current_x, moving_troopers[i].current_y, size_of_troopers_x_y, size_of_troopers_x_y};
+        SDL_Texture *movingtrooper_texture = SDL_CreateTextureFromSurface(renderer, troopers[moving_troopers[i].player_id]);
+        SDL_RenderCopy(renderer, movingtrooper_texture, NULL, &movingtrooper_target);
+        SDL_DestroyTexture(movingtrooper_texture);
+    }
+    if(rand_to_do_kyber==0)
+    {
+        int rand_two_side_first = rand()%size_of_politic_sides;
+        while(politic_sides[rand_two_side_first].number_of_troopers==-1)
+            rand_two_side_first = rand()%size_of_politic_sides;
+        int rand_two_side_second = rand()%size_of_politic_sides;
+        while(rand_two_side_first==rand_two_side_second || politic_sides[rand_two_side_second].player_id==-1)
+            rand_two_side_second = rand()%size_of_politic_sides;
+        int first_center_x = cells[politic_sides[rand_two_side_first].cells_x[0]][politic_sides[rand_two_side_first].cells_y[0]].x+ size_of_each_cell_x/2 - size_of_kyber_photo_x/2;
+        int first_center_y = cells[politic_sides[rand_two_side_first].cells_x[0]][politic_sides[rand_two_side_first].cells_y[0]].y + size_of_each_cell_y/2 - size_of_kyber_photo_y/2;
+        int second_center_x = cells[politic_sides[rand_two_side_second].cells_x[0]][politic_sides[rand_two_side_second].cells_y[0]].x + size_of_each_cell_x/2 - size_of_kyber_photo_x/2;
+        int second_center_y = cells[politic_sides[rand_two_side_second].cells_x[0]][politic_sides[rand_two_side_second].cells_y[0]].y + size_of_each_cell_y/2 - size_of_kyber_photo_y/2;
+        int dist_rand = rand()%70 + 15;
+        kybers[size_of_kybers].x = (first_center_x* dist_rand + second_center_x*(100-dist_rand))/100;
+        kybers[size_of_kybers].y = (first_center_y* dist_rand + second_center_y*(100-dist_rand))/100;
+        kybers[size_of_kybers].kyber_photo = kyber_cristal_photos[rand()%4];
+        size_of_kybers++;
+    }
+    SDL_DestroyTexture(startscreentexture);
+    SDL_DestroyTexture(walltexture);
+    SDL_DestroyTexture(wallflippedtexture);
+    SDL_DestroyTexture(backtomenutexture);
+    SDL_DestroyTexture(soundtexture);
+    for(int i=0;i<size_of_politic_sides;i++)
+    {
+        for(int j=0;j<politic_sides[i].size_of_cells;j++)
+            SDL_DestroyTexture(startgametexture[politic_sides[i].cells_x[j]][politic_sides[i].cells_y[j]]);
+        SDL_DestroyTexture(leaders_faces_texture[i]);
+        SDL_DestroyTexture(temp_troopers_textures[i]);
+    }
+}
 void soundchange()
 {
     if(is_sound_on==1)
@@ -345,4 +469,21 @@ void findtotalofsaves()
         if(fscanf(mapsave,"assets/save/maps/map%d.txt\n",&mapnumsel)==EOF)
             break;
     fclose(mapsave);
+}
+int findclickedcell(int click_x, int click_y, int *ret_x, int *ret_y)
+{
+    for(int j=0;j<number_of_cells_y;j++)
+        for(int i=0;i<number_of_cells_x;i++)
+            if(click_x>cells[i][j].x && click_x<cells[i][j].x + size_of_each_cell_x
+            && click_y>cells[i][j].y && click_y<cells[i][j].y + size_of_each_cell_y)
+            {
+                if(cells[i][j].does_it_have_military==1 && i!=first_click_x && j!=first_click_y)
+                {
+                    *ret_x=i;
+                    *ret_y=j;
+                    return 1;
+                }
+            }
+    return 0;
+    
 }

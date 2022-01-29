@@ -8,6 +8,7 @@
 #include <SDL_ttf.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include "variables.h"
+#include "math.h"
 
 
 
@@ -166,6 +167,7 @@ int main()
                     else if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
                     && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h)
                     {
+                        size_of_politic_sides=0;
                         FILE *mapsave = fopen("assets/save/files_details.txt", "r+");
                         int mapnum=0;
                         while(1)
@@ -186,12 +188,11 @@ int main()
                             path[21] = mapnum%10 + '0';
                             path[22] = '\0';
                         }
-                        
-                        FILE *mapwrite = fopen(path, "w");
                         for(int j = 0;j<number_of_cells_y;j++)
                         {
                             for(int i=0;i<number_of_cells_x;i++)
                             {
+
                                 if(j%2==0)
                                     cells[i][j].x=(i)*size_of_each_cell_x*3/2;
                                 else
@@ -256,6 +257,8 @@ int main()
                                     politic_sides[size_of_politic_sides].size_of_cells=1;
                                     politic_sides[size_of_politic_sides].cells_x[0] = temp_x, politic_sides[size_of_politic_sides].cells_y[0] = temp_y;
                                     cells[temp_x][temp_y].photo=temp_photo;
+                                    cells[temp_x][temp_y].id=size_of_politic_sides;
+                                    cells[temp_x][temp_y].does_it_have_military=1;
                                     check_to_create_politic_side(politic_sides,cells,temp_x,temp_y,size_of_politic_sides,temp_photo,0,1);
                                     check_to_create_politic_side(politic_sides,cells,temp_x,temp_y,size_of_politic_sides,temp_photo,0,-1);
                                     check_to_create_politic_side(politic_sides,cells,temp_x,temp_y,size_of_politic_sides,temp_photo,0,2);
@@ -275,6 +278,7 @@ int main()
                                 }
                             }
                         }
+                        FILE *mapwrite = fopen(path, "w");
                         fprintf(mapwrite, "%d\n%d\n%d\n", number_of_enemies,number_of_politic_sides_per_user,size_of_politic_sides);
                         for(int j = 0;j<number_of_cells_y;j++)
                             for(int i=0;i<number_of_cells_x;i++)
@@ -282,10 +286,10 @@ int main()
                         fprintf(mapwrite,"\n");
                         for(int i=0;i<=size_of_politic_sides;i++)
                         {
-                                fprintf(mapwrite,"%d %d %d\n", politic_sides[i].player_id,politic_sides[i].size_of_cells,politic_sides[i].number_of_troopers);
-                                for(int j=0;j<politic_sides[i].size_of_cells;j++)
-                                    fprintf(mapwrite,"%d %d\n",politic_sides[i].cells_x[j],politic_sides[i].cells_y[j]);
-                                fprintf(mapwrite,"\n");
+                            fprintf(mapwrite,"%d %d %d\n", politic_sides[i].player_id,politic_sides[i].size_of_cells,politic_sides[i].number_of_troopers);
+                            for(int j=0;j<politic_sides[i].size_of_cells;j++)
+                                fprintf(mapwrite,"%d %d\n",politic_sides[i].cells_x[j],politic_sides[i].cells_y[j]);
+                            fprintf(mapwrite,"\n");
                         }
                         fclose(mapwrite);
                         Mix_PauseMusic();
@@ -312,7 +316,6 @@ int main()
                             writing_mode_username=1;
                 }
             }
-
             if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
                 backbutton_x_y=50 * 1.2;
             else
@@ -395,9 +398,9 @@ int main()
                             fscanf(loadedmap,"%d %d %d %d %d %d",&cells[i][j].x, &cells[i][j].y, &cells[i][j].is_territoy, &cells[i][j].id, &cells[i][j].does_it_have_military, &cells[i][j].is_occupied);
                     for(int i=0;i<=size_of_politic_sides;i++)
                     {
-                            fscanf(loadedmap,"%d %d %d\n", &politic_sides[i].player_id, &politic_sides[i].size_of_cells, &politic_sides[i].number_of_troopers);
-                            for(int j=0;j<politic_sides[i].size_of_cells;j++)
-                                fscanf(loadedmap,"%d %d\n", &politic_sides[i].cells_x[j], &politic_sides[i].cells_y[j]);
+                        fscanf(loadedmap,"%d %d %d\n", &politic_sides[i].player_id, &politic_sides[i].size_of_cells, &politic_sides[i].number_of_troopers);
+                        for(int j=0;j<politic_sides[i].size_of_cells;j++)
+                            fscanf(loadedmap,"%d %d\n", &politic_sides[i].cells_x[j], &politic_sides[i].cells_y[j]);
                     }
                     fclose(loadedmap);
                     Mix_PauseMusic();
@@ -444,125 +447,22 @@ int main()
         }
         else if (page==10)
         {   
-
-            SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, starsbackground);
-            SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-            SDL_Texture *walltexture = SDL_CreateTextureFromSurface(renderer, wall);
-            SDL_RenderCopy(renderer, walltexture, NULL, &wall_target);
-            SDL_Texture *wallflippedtexture = SDL_CreateTextureFromSurface(renderer, wallflipped);
-            SDL_RenderCopy(renderer, wallflippedtexture, NULL, &wallflipped_target);
-            SDL_Texture *backtomenutexture = SDL_CreateTextureFromSurface(renderer, backtomenu);
-            SDL_RenderCopy(renderer, backtomenutexture, NULL, &backtomenu_target);
-            SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
-            SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
-            SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
-            SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target);
-
-            SDL_Texture *startgametexture[100][100];
-            SDL_Texture *leaders_faces_texture[100];
-            SDL_Texture *temp_troopers_textures[200];
-            for(int i=0;i<size_of_politic_sides;i++)
-            {
-                for(int j=0;j<politic_sides[i].size_of_cells;j++)
-                {
-                    int x = politic_sides[i].cells_x[j], y = politic_sides[i].cells_y[j];
-                    SDL_Rect cell_target = {cells[x][y].x , cells[x][y].y, size_of_each_cell_x, size_of_each_cell_y};
-                    startgametexture[x][y] = SDL_CreateTextureFromSurface(renderer, planets_photos[politic_sides[i].player_id]);
-                    SDL_RenderCopy(renderer, startgametexture[x][y], NULL, &cell_target);
-                    if(j==0)
-                    {
-                        SDL_Rect leader_target = {cells[x][y].x+ size_of_each_cell_x/2 - size_of_leaders_x_y/2, cells[x][y].y + size_of_each_cell_y*1/10, size_of_leaders_x_y, size_of_leaders_x_y};
-                        leaders_faces_texture[i] = SDL_CreateTextureFromSurface(renderer, faces[politic_sides[i].player_id]);
-                        SDL_RenderCopy(renderer, leaders_faces_texture[i], NULL, &leader_target);
-                        SDL_Rect temp_trooper_target = leader_target;
-                        temp_troopers_textures[i] = SDL_CreateTextureFromSurface(renderer, troopers[politic_sides[i].player_id]);
-                        temp_trooper_target.w = temp_trooper_target.h = size_of_troopers_x_y;
-                        temp_trooper_target.x -=5;
-                        SDL_RenderCopy(renderer, temp_troopers_textures[i], NULL, &temp_trooper_target);
-                        temp_trooper_target.x+=leader_target.w - temp_trooper_target.w + 10;
-                        SDL_RenderCopy(renderer, temp_troopers_textures[i], NULL, &temp_trooper_target);
-                        SDL_Color white = {255,255,255,255};
-                        int w,h;
-                        TTF_SizeText(number_of_soldiers,"100",&w,&h);
-                        if(difftime(time_now,start_time)>=1)
-                        {
-                            politic_sides[i].number_of_troopers+=difftime(time_now,start_time);
-                        }
-                        char test[4];
-                        test[0]=politic_sides[i].number_of_troopers/100 + '0';
-                        test[1]=(politic_sides[i].number_of_troopers/10)%10 + '0';
-                        test[2]=politic_sides[i].number_of_troopers%10 + '0';
-                        test[3]= '\0';
-                        leader_target.h = h;
-                        leader_target.w = w;
-                        leader_target.x += size_of_leaders_x_y/2 - w/2;
-                        leader_target.y += size_of_leaders_x_y-5;
-                        SDL_Surface *textsurface = TTF_RenderText_Solid(number_of_soldiers,test, white);
-                        SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-                        SDL_RenderCopy(renderer,text_texture,NULL,&leader_target);
-                        SDL_DestroyTexture(text_texture);
-                        // char* buffer = malloc(sizeof(char) * 50);
-                        // sprintf(buffer, "%s\n", test);
-                        // printf("%s", buffer);
-                        // stringRGBA(renderer, 5, 5, buffer, 0, 0, 200, 255);
-                    }
-                }   
-            }
-            int rand_to_do_kyber = rand()%150;
-            if(rand_to_do_kyber==0)
-            {
-                int rand_two_side_first = rand()%size_of_politic_sides;
-                while(politic_sides[rand_two_side_first].number_of_troopers==-1)
-                    rand_two_side_first = rand()%size_of_politic_sides;
-                int rand_two_side_second = rand()%size_of_politic_sides;
-                while(rand_two_side_first==rand_two_side_second || politic_sides[rand_two_side_second].player_id==-1)
-                    rand_two_side_second = rand()%size_of_politic_sides;
-                int first_center_x = cells[politic_sides[rand_two_side_first].cells_x[0]][politic_sides[rand_two_side_first].cells_y[0]].x+ size_of_each_cell_x/2 - size_of_kyber_photo_x/2;
-                int first_center_y = cells[politic_sides[rand_two_side_first].cells_x[0]][politic_sides[rand_two_side_first].cells_y[0]].y + size_of_each_cell_y/2 - size_of_kyber_photo_y/2;
-                int second_center_x = cells[politic_sides[rand_two_side_second].cells_x[0]][politic_sides[rand_two_side_second].cells_y[0]].x + size_of_each_cell_x/2 - size_of_kyber_photo_x/2;
-                int second_center_y = cells[politic_sides[rand_two_side_second].cells_x[0]][politic_sides[rand_two_side_second].cells_y[0]].y + size_of_each_cell_y/2 - size_of_kyber_photo_y/2;
-                int dist_rand = rand()%70 + 15;
-                kybers[size_of_kybers].x = (first_center_x* dist_rand + second_center_x*(100-dist_rand))/100;
-                kybers[size_of_kybers].y = (first_center_y* dist_rand + second_center_y*(100-dist_rand))/100;
-                kybers[size_of_kybers].kyber_photo = kyber_cristal_photos[rand()%4];
-                size_of_kybers++;
-            }
-            for(int i=0; i<size_of_kybers;i++)
-            {
-                SDL_Rect kyber_target = {kybers[i].x, kybers[i].y, size_of_kyber_photo_x, size_of_kyber_photo_y};
-                SDL_Texture *kybertexture = SDL_CreateTextureFromSurface(renderer, kybers[i].kyber_photo);
-                SDL_RenderCopy(renderer, kybertexture, NULL, &kyber_target);
-                SDL_DestroyTexture(kybertexture);
-            }
-            SDL_DestroyTexture(startscreentexture);
-            SDL_DestroyTexture(walltexture);
-            SDL_DestroyTexture(wallflippedtexture);
-            SDL_DestroyTexture(backtomenutexture);
-            SDL_DestroyTexture(soundtexture);
-            for(int i=0;i<size_of_politic_sides;i++)
-            {
-                for(int j=0;j<politic_sides[i].size_of_cells;j++)
-                    SDL_DestroyTexture(startgametexture[politic_sides[i].cells_x[j]][politic_sides[i].cells_y[j]]);
-                SDL_DestroyTexture(leaders_faces_texture[i]);
-                SDL_DestroyTexture(temp_troopers_textures[i]);
-            }
-            // char* buffer = malloc(sizeof(char) * 50);
-            // sprintf(buffer, "%d %d | %d %d |  | %d %d |\n", click_x, click_y,closebutton_target.x,closebutton_target.x + closebutton_target.w ,closebutton_target.y, closebutton_target.y + closebutton_target.h);
-            // printf("%s", buffer);
-            // stringRGBA(renderer, 5, 5, buffer, 0, 0, 200, 255);
-            SDL_RenderPresent(renderer);
+            rendercpypage10(wall_target,wallflipped_target,backtomenu_target,sound_target,closebutton_target,time_now,start_time);
             int click_x,click_y;
-            if(SDL_WaitEventTimeout(&ev, 100)==1)
+            SDL_GetMouseState(&click_x,&click_y);
+            // char* buffer = malloc(sizeof(char) * 50);
+            //             sprintf(buffer, "%d %d %d %d\n",click_x,click_y ,second_click_x, second_click_y);
+            //             printf("%s", buffer);
+            //             stringRGBA(renderer, 5, 5, buffer, 0, 0, 200, 255);
+            if(SDL_WaitEventTimeout(&ev, 50)==1)
             {
+                
                 if(ev.type==SDL_QUIT)
                     break;
                 if(ev.type==SDL_MOUSEBUTTONDOWN && ev.button.button==SDL_BUTTON_LEFT)
                 {
                     click_x=ev.button.x;
                     click_y=ev.button.y;
-                    // char* buffer = malloc(sizeof(char) * 50);
-                    // sprintf(buffer, "%d %d | %d %d |  | %d %d |\n", click_x, click_y,closebutton_target.x,closebutton_target.x + closebutton_target.w ,closebutton_target.y, closebutton_target.y + closebutton_target.h);
-                    // printf("%s", buffer);
                     if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
                         soundchange();
                     else if (click_x>backtomenu_target.x && click_x<backtomenu_target.x + backtomenu_target.w  
@@ -575,8 +475,91 @@ int main()
                     else if(click_x>closebutton_target.x && click_x<closebutton_target.x + closebutton_target.w 
                         && click_y>closebutton_target.y && click_y<closebutton_target.y + closebutton_target.h)
                         break;
+                    else if(click_y>40 && click_y<window_height-40 && is_first_clicked==0)
+                    {
+                        is_first_clicked=findclickedcell(click_x,click_y,&first_click_x,&first_click_y);
+                    }
+                    else if(click_y>40 && click_y<window_height-40 && is_first_clicked==1)
+                    {
+                        if(findclickedcell(click_x,click_y,&second_click_x,&second_click_y))
+                        {
+                            for(int i=0;i<politic_sides[cells[first_click_x][first_click_y].id].number_of_troopers;i++)
+                            {
+
+                                moving_troopers[size_of_moving_troopers].did_end=0;
+                                moving_troopers[size_of_moving_troopers].did_pass_half=0;
+                                moving_troopers[size_of_moving_troopers].current_x=cells[first_click_x][first_click_y].x + size_of_each_cell_x/2 - size_of_troopers_x_y/2;
+                                moving_troopers[size_of_moving_troopers].current_y=cells[first_click_x][first_click_y].y + size_of_each_cell_y/2 - size_of_troopers_x_y/2;
+                                moving_troopers[size_of_moving_troopers].dest_x = cells[second_click_x][second_click_y].x + size_of_each_cell_x/2 - size_of_troopers_x_y/2;
+                                moving_troopers[size_of_moving_troopers].dest_y = cells[second_click_x][second_click_y].y + size_of_each_cell_y/2 - size_of_troopers_x_y/2;
+                                moving_troopers[size_of_moving_troopers].half_dest_x = (moving_troopers[size_of_moving_troopers].dest_x + moving_troopers[size_of_moving_troopers].current_x)/2;
+                                moving_troopers[size_of_moving_troopers].half_dest_y = (moving_troopers[size_of_moving_troopers].dest_y + moving_troopers[size_of_moving_troopers].current_y)/2;
+                                if(size_of_moving_troopers%3==0)
+                                {
+                                    moving_troopers[size_of_moving_troopers].half_dest_y += (moving_troopers[size_of_moving_troopers].current_x - moving_troopers[size_of_moving_troopers].dest_x)*dist_from_mid/(moving_troopers[size_of_moving_troopers].dest_y - moving_troopers[size_of_moving_troopers].current_y);
+                                    moving_troopers[size_of_moving_troopers].half_dest_x += dist_from_mid;
+                                }
+                                else if(size_of_moving_troopers%3==2)
+                                {
+                                    moving_troopers[size_of_moving_troopers].half_dest_y -= (moving_troopers[size_of_moving_troopers].current_x - moving_troopers[size_of_moving_troopers].dest_x)*dist_from_mid/(moving_troopers[size_of_moving_troopers].dest_y - moving_troopers[size_of_moving_troopers].current_y);
+                                    moving_troopers[size_of_moving_troopers].half_dest_x -= dist_from_mid;
+                                }
+                                int m = (moving_troopers[i].half_dest_x - moving_troopers[i].current_x);
+                                int n = (moving_troopers[i].half_dest_y - moving_troopers[i].current_y);
+                                moving_troopers[size_of_moving_troopers].till_half_a = dist_moving_trooper_per_sec*m/sqrt(m*m+n*n);
+                                m= (moving_troopers[i].dest_x - moving_troopers[i].half_dest_x);
+                                n= (moving_troopers[i].dest_y - moving_troopers[i].half_dest_y);
+                                moving_troopers[size_of_moving_troopers].till_end_a = dist_moving_trooper_per_sec*m/sqrt(m*m+n*n);
+                                if(moving_troopers[size_of_moving_troopers].dest_x>moving_troopers[size_of_moving_troopers].current_x)
+                                    moving_troopers[size_of_moving_troopers].is_dest_right=1;
+                                else
+                                    moving_troopers[size_of_moving_troopers].is_dest_right=0;
+                                moving_troopers[size_of_moving_troopers].player_id = politic_sides[cells[first_click_x][first_click_y].id].player_id;
+                                size_of_moving_troopers++;
+                            }
+                            is_first_clicked=0;
+                        }
+                    }
                 }
             }
+            if(difftime(time_now,start_time)>=0.1)
+            {
+                for(int i = 0 ; i<size_of_moving_troopers; i++)
+                {
+                    if(moving_troopers[i].did_end==1)
+                        continue;
+                    if(moving_troopers[i].did_pass_half==0)
+                    {
+                        int a_temp = moving_troopers[i].till_half_a;
+                        int x_zero = moving_troopers[i].current_x;
+                        int x_one = moving_troopers[i].half_dest_x;
+                        int y_zero = moving_troopers[i].current_y;
+                        int y_one = moving_troopers[i].half_dest_y;
+                        moving_troopers[i].current_y = ((y_one*a_temp) + y_zero*(x_one - x_zero - a_temp))/(x_one-x_zero);
+                        moving_troopers[i].current_x += a_temp; 
+                        if(abs(moving_troopers[i].current_x - moving_troopers[i].dest_x)<abs(moving_troopers[i].half_dest_x - moving_troopers[i].dest_x))
+                            moving_troopers[i].did_pass_half=1;
+                    }
+                    else
+                    {
+                        int a_temp = moving_troopers[i].till_end_a;
+                        int x_zero = moving_troopers[i].current_x;
+                        int x_one = moving_troopers[i].dest_x;
+                        int y_zero = moving_troopers[i].current_y;
+                        int y_one = moving_troopers[i].dest_y;
+                        // char* buffer = malloc(sizeof(char) * 50);
+                        // sprintf(buffer, "%d %d %d %d\n",moving_troopers[i].dest_x, moving_troopers[i].dest_y, );
+                        // printf("%s", buffer);
+                        moving_troopers[i].current_y = ((y_one*a_temp) + y_zero*(x_one - x_zero - a_temp))/(x_one-x_zero);
+                        moving_troopers[i].current_x += a_temp; 
+                        if(abs(moving_troopers[i].current_x - moving_troopers[i].dest_x)< dist_from_mid)
+                            moving_troopers[i].did_end=1;
+                    }
+                    
+                }
+            }
+        SDL_RenderPresent(renderer);
+
         }
         if(difftime(time_now,start_time)>=1)
             time(&start_time);
