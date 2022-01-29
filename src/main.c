@@ -34,8 +34,6 @@ int main()
     TTF_SizeText(details_page,"there are 00 maps. select one of them:",&mapsel_w,&mapsel_h);
     TTF_SizeText(details_page,"............................",&mapseltype_w,&mapseltype_h);
     TTF_SizeText(details_page,"............................",&usernametype_w,&usernametype_h);
-    SDL_Rect load_game_target = {window_width/2 - size_new_game_x/2 , window_height/2 + 205, size_new_game_x, size_new_game_y};
-
     SDL_Rect closebutton_target = {window_width - 10 - size_of_closebutton_x_y, 10, size_of_closebutton_x_y, size_of_closebutton_x_y};
 
     SDL_Rect updownbutton_target = {loc_number_of_enemies_x + number_of_enemies_w + 10, loc_number_of_enemies_y, 40, 60};
@@ -49,7 +47,9 @@ int main()
     time_t t;
     srand((unsigned) time(&t));
     time_t start_time;
+    time_t start_time_troop;
     time(&start_time);
+    time(&start_time_troop);
 
     Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048);
     Mix_Music *menu_music = Mix_LoadMUS("assets/menu.mp3");
@@ -59,6 +59,12 @@ int main()
     char test3[33] = "............................";
     char mapselect[33] = "............................";
     int gamerunning=1;
+    SDL_Rect new_game_target = {window_width/2 - size_new_game_x/2 , window_height/2 + window_height/2*160/300, size_new_game_x, size_new_game_y};
+    SDL_Rect load_game_target = {window_width/2 - size_load_game_x/2 , window_height/2 + window_height/2*205/300, size_load_game_x, size_load_game_y};
+    SDL_Rect leaderboard_target = {window_width/2 - leaderboard_game_x/2 , window_height/2 + window_height/2*250/300, leaderboard_game_x, leaderboard_game_y};
+    SDL_Rect credits_target = {180- size_credits_x/2, window_height -50 - size_credits_y/2, size_credits_x, size_credits_y};
+    SDL_Rect start_game_target = {window_width - 150*window_width/1335 -start_game_x/2 , window_height - 50*window_height/801 - start_game_y/2, start_game_x, start_game_y};
+    
     while (1) 
     {
         int start_ticks = SDL_GetTicks();
@@ -67,73 +73,74 @@ int main()
         time(&time_now);
         if(page==0)
         {
-            SDL_Rect new_game_target = {window_width/2 - size_new_game_x/2 , window_height/2 + window_height/2*160/300, size_new_game_x, size_new_game_y};
-            SDL_Rect load_game_target = {window_width/2 - size_load_game_x/2 , window_height/2 + window_height/2*205/300, size_load_game_x, size_load_game_y};
-            SDL_Rect leaderboard_target = {window_width/2 - leaderboard_game_x/2 , window_height/2 + window_height/2*250/300, leaderboard_game_x, leaderboard_game_y};
-            SDL_Rect credits_target = {180- size_credits_x/2, window_height -50 - size_credits_y/2, size_credits_x, size_credits_y};
             rendercpypage0(new_game_target,load_game_target,leaderboard_target,sound_target,credits_target,closebutton_target);
             int click_x,click_y;
-            SDL_GetMouseState(&click_x,&click_y);
+            SDL_PumpEvents();
+            SDL_FlushEvents(SDL_FIRSTEVENT,SDL_LASTEVENT);
             if(SDL_WaitEvent(&ev)==1)
             {
+                SDL_GetMouseState(&click_x,&click_y);
                 if(ev.type==SDL_QUIT)
                     break;
                 else if(ev.type==SDL_MOUSEBUTTONDOWN && ev.button.button==SDL_BUTTON_LEFT)
                 {
-                        click_x=ev.button.x;
-                        click_y=ev.button.y;
-                        if(click_x>window_width/2 - size_new_game_x/2 && click_x<window_width/2 + size_new_game_x/2 && click_y>window_height/2 + window_height/2*160/300 && click_y<window_height/2 + window_height/2*160/300 + size_new_game_y)
-                            page=1;
-                        else if(click_x>window_width/2 - size_load_game_x/2  && click_x<window_width/2 + size_load_game_x/2  && click_y>window_height/2 + window_height/2*205/300 && click_y<window_height/2 + window_height/2*205/300 + size_load_game_y)
-                        {
-                            page=2;
-                            char mapselect[33] = "............................";
-                            size_of_text_mapselect=0;
-                            findtotalofsaves();
-                        }
-                        else if(click_x>window_width/2 - leaderboard_game_x/2 && click_x<window_width/2 + leaderboard_game_x/2 && click_y>window_height/2 + window_height/2*250/300 && click_y<window_height/2 + window_height/2*250/300 + leaderboard_game_y)
-                            page=3;
-                        else if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
-                            soundchange();
-                        else if(click_x>credits_target.x+60 && click_x<credits_target.x+credits_target.w - 60 &&
-                                click_y>credits_target.y && click_y<credits_target.y+credits_target.h)
-                        {
-                            credits_text_loc_y=5;
-                            page=4;
-                        }
-                        else if(click_x>closebutton_target.x && click_x<closebutton_target.x + closebutton_target.w 
-                            && click_y>closebutton_target.y && click_y<closebutton_target.y + closebutton_target.h)
-                            break;
+                    click_x=ev.button.x;
+                    click_y=ev.button.y;
+                    if(click_x>window_width/2 - size_new_game_x/2 && click_x<window_width/2 + size_new_game_x/2 && click_y>window_height/2 + window_height/2*160/300 && click_y<window_height/2 + window_height/2*160/300 + size_new_game_y)
+                    {
+                        page=1;
+                        continue;
+                    }    
+                    else if(click_x>window_width/2 - size_load_game_x/2  && click_x<window_width/2 + size_load_game_x/2  && click_y>window_height/2 + window_height/2*205/300 && click_y<window_height/2 + window_height/2*205/300 + size_load_game_y)
+                    {
+                        page=2;
+                        char mapselect[33] = "............................";
+                        size_of_text_mapselect=0;
+                        findtotalofsaves();
+                    }
+                    else if(click_x>window_width/2 - leaderboard_game_x/2 && click_x<window_width/2 + leaderboard_game_x/2 && click_y>window_height/2 + window_height/2*250/300 && click_y<window_height/2 + window_height/2*250/300 + leaderboard_game_y)
+                        page=3;
+                    else if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
+                        soundchange();
+                    else if(click_x>credits_target.x+60 && click_x<credits_target.x+credits_target.w - 60 &&
+                            click_y>credits_target.y && click_y<credits_target.y+credits_target.h)
+                    {
+                        credits_text_loc_y=5;
+                        page=4;
+                    }
+                    else if(click_x>closebutton_target.x && click_x<closebutton_target.x + closebutton_target.w 
+                        && click_y>closebutton_target.y && click_y<closebutton_target.y + closebutton_target.h)
+                        break;
                 }
+                if(click_x>window_width/2 - size_new_game_x/2 && click_x<window_width/2 + size_new_game_x/2 && click_y>window_height/2 + window_height/2*160/300 && click_y<window_height/2 + window_height/2*160/300 + size_new_game_y)
+                    size_new_game_x=327*window_width/1335*1.1,size_new_game_y=37*window_height/801*1.1;
+                else
+                    size_new_game_x=327*window_width/1335, size_new_game_y=37*window_height/801;
+                if(click_x>window_width/2 - size_load_game_x/2  && click_x<window_width/2 + size_load_game_x/2  && click_y>window_height/2 + window_height/2*205/300 && click_y<window_height/2 + window_height/2*205/300 + size_load_game_y)
+                    size_load_game_x=327*window_width/1335*1.1, size_load_game_y=37*window_height/801*1.1;
+                else
+                    size_load_game_x=327*window_width/1335, size_load_game_y=37*window_height/801;
+                if(click_x>window_width/2 - leaderboard_game_x/2 && click_x<window_width/2 + leaderboard_game_x/2 && click_y>window_height/2 + window_height/2*250/300 && click_y<window_height/2 + window_height/2*250/300 + leaderboard_game_y)
+                    leaderboard_game_x=327*window_width/1335*1.1, leaderboard_game_y=37*window_height/801*1.1;
+                else
+                    leaderboard_game_x=327*window_width/1335, leaderboard_game_y=37*window_height/801;
+                if(click_x>credits_target.x+60 && click_x<credits_target.x+credits_target.w - 60 && click_y>credits_target.y && click_y<credits_target.y+credits_target.h)
+                    size_credits_x=327*window_width/1335*1.1, size_credits_y=37*window_height/801*1.1;
+                else
+                    size_credits_x=327*window_width/1335, size_credits_y=37*window_height/801;
             }
-            if(click_x>window_width/2 - size_new_game_x/2 && click_x<window_width/2 + size_new_game_x/2 && click_y>window_height/2 + window_height/2*160/300 && click_y<window_height/2 + window_height/2*160/300 + size_new_game_y)
-                size_new_game_x=327*window_width/1335*1.1,size_new_game_y=37*window_height/801*1.1;
-            else
-                size_new_game_x=327*window_width/1335, size_new_game_y=37*window_height/801;
-            if(click_x>window_width/2 - size_load_game_x/2  && click_x<window_width/2 + size_load_game_x/2  && click_y>window_height/2 + window_height/2*205/300 && click_y<window_height/2 + window_height/2*205/300 + size_load_game_y)
-                size_load_game_x=327*window_width/1335*1.1, size_load_game_y=37*window_height/801*1.1;
-            else
-                size_load_game_x=327*window_width/1335, size_load_game_y=37*window_height/801;
-            if(click_x>window_width/2 - leaderboard_game_x/2 && click_x<window_width/2 + leaderboard_game_x/2 && click_y>window_height/2 + window_height/2*250/300 && click_y<window_height/2 + window_height/2*250/300 + leaderboard_game_y)
-                leaderboard_game_x=327*window_width/1335*1.1, leaderboard_game_y=37*window_height/801*1.1;
-            else
-                leaderboard_game_x=327*window_width/1335, leaderboard_game_y=37*window_height/801;
-            if(click_x>credits_target.x+60 && click_x<credits_target.x+credits_target.w - 60 && click_y>credits_target.y && click_y<credits_target.y+credits_target.h)
-                size_credits_x=327*window_width/1335*1.1, size_credits_y=37*window_height/801*1.1;
-            else
-                size_credits_x=327*window_width/1335, size_credits_y=37*window_height/801;
-
         }
         else if(page==1)
         {
             SDL_Rect backbutton_target = {50 - backbutton_x_y/2 , 50 - backbutton_x_y/2, backbutton_x_y, backbutton_x_y};
-            SDL_Rect start_game_target = {window_width - 150*window_width/1335 -start_game_x/2 , window_height - 50*window_height/801 - start_game_y/2, start_game_x, start_game_y};
             SDL_Rect enemies_target = {loc_number_of_enemies_x, loc_number_of_enemies_y, number_of_enemies_w, number_of_enemies_h};
             SDL_Rect per_user_target = {loc_number_of_enemies_x, loc_number_of_enemies_y + number_of_enemies_h + 10, per_user_w, per_user_h};
             SDL_Rect username_target = {loc_number_of_enemies_x, loc_number_of_enemies_y + 2* (number_of_enemies_h + 10), usernametype_w, usernametype_h};
             rendercpypage1(test3, per_user_target,username_target,backbutton_target,start_game_target,enemies_target,sound_target,closebutton_target,updownbutton_target,updownbutton_sec_target);
             int click_x,click_y;
             SDL_GetMouseState(&click_x,&click_y);
+            SDL_PumpEvents();
+            SDL_FlushEvents(SDL_FIRSTEVENT,SDL_LASTEVENT);
             if(SDL_WaitEvent(&ev)==1)
             {
                 if(ev.type==SDL_QUIT)
@@ -328,6 +335,8 @@ int main()
         }
         else if(page==2)
         {
+            SDL_PumpEvents();
+            SDL_FlushEvents(SDL_FIRSTEVENT,SDL_LASTEVENT);
             SDL_WaitEvent(&ev);
             SDL_Rect backbutton_target = {50 - backbutton_x_y/2 , 50 - backbutton_x_y/2, backbutton_x_y, backbutton_x_y};
             SDL_Rect enemies_target = {loc_number_of_enemies_x, loc_number_of_enemies_y, mapsel_w, mapsel_h};
@@ -454,9 +463,10 @@ int main()
             //             sprintf(buffer, "%d %d %d %d\n",click_x,click_y ,second_click_x, second_click_y);
             //             printf("%s", buffer);
             //             stringRGBA(renderer, 5, 5, buffer, 0, 0, 200, 255);
-            if(SDL_WaitEventTimeout(&ev, 50)==1)
+            SDL_PumpEvents();
+            SDL_FlushEvents(SDL_FIRSTEVENT,SDL_LASTEVENT);
+            if(SDL_WaitEventTimeout(&ev,50)==1)
             {
-                
                 if(ev.type==SDL_QUIT)
                     break;
                 if(ev.type==SDL_MOUSEBUTTONDOWN && ev.button.button==SDL_BUTTON_LEFT)
@@ -478,37 +488,42 @@ int main()
                     else if(click_y>40 && click_y<window_height-40 && is_first_clicked==0)
                     {
                         is_first_clicked=findclickedcell(click_x,click_y,&first_click_x,&first_click_y);
+                                                char* buffer = malloc(sizeof(char) * 50);
+                            sprintf(buffer, "first%d\n",is_first_clicked);
+                            printf("%s", buffer);
+                        // stringRGBA(renderer, 5, 5, buffer, 0, 0, 200, 255);
                     }
                     else if(click_y>40 && click_y<window_height-40 && is_first_clicked==1)
                     {
+                        char* buffer = malloc(sizeof(char) * 50);
+                            sprintf(buffer, "%d\n",is_first_clicked);
+                            printf("%s", buffer);
                         if(findclickedcell(click_x,click_y,&second_click_x,&second_click_y))
                         {
+ 
                             for(int i=0;i<politic_sides[cells[first_click_x][first_click_y].id].number_of_troopers;i++)
                             {
-
                                 moving_troopers[size_of_moving_troopers].did_end=0;
-                                moving_troopers[size_of_moving_troopers].did_pass_half=0;
                                 moving_troopers[size_of_moving_troopers].current_x=cells[first_click_x][first_click_y].x + size_of_each_cell_x/2 - size_of_troopers_x_y/2;
                                 moving_troopers[size_of_moving_troopers].current_y=cells[first_click_x][first_click_y].y + size_of_each_cell_y/2 - size_of_troopers_x_y/2;
                                 moving_troopers[size_of_moving_troopers].dest_x = cells[second_click_x][second_click_y].x + size_of_each_cell_x/2 - size_of_troopers_x_y/2;
                                 moving_troopers[size_of_moving_troopers].dest_y = cells[second_click_x][second_click_y].y + size_of_each_cell_y/2 - size_of_troopers_x_y/2;
-                                moving_troopers[size_of_moving_troopers].half_dest_x = (moving_troopers[size_of_moving_troopers].dest_x + moving_troopers[size_of_moving_troopers].current_x)/2;
-                                moving_troopers[size_of_moving_troopers].half_dest_y = (moving_troopers[size_of_moving_troopers].dest_y + moving_troopers[size_of_moving_troopers].current_y)/2;
                                 if(size_of_moving_troopers%3==0)
                                 {
-                                    moving_troopers[size_of_moving_troopers].half_dest_y += (moving_troopers[size_of_moving_troopers].current_x - moving_troopers[size_of_moving_troopers].dest_x)*dist_from_mid/(moving_troopers[size_of_moving_troopers].dest_y - moving_troopers[size_of_moving_troopers].current_y);
-                                    moving_troopers[size_of_moving_troopers].half_dest_x += dist_from_mid;
+                                    moving_troopers[size_of_moving_troopers].current_x -= size_of_troopers_x_y/2;
+                                    moving_troopers[size_of_moving_troopers].current_y -= size_of_troopers_x_y/2;
+                                    moving_troopers[size_of_moving_troopers].dest_x -= size_of_troopers_x_y/2;
+                                    moving_troopers[size_of_moving_troopers].dest_y -= size_of_troopers_x_y/2;
                                 }
                                 else if(size_of_moving_troopers%3==2)
                                 {
-                                    moving_troopers[size_of_moving_troopers].half_dest_y -= (moving_troopers[size_of_moving_troopers].current_x - moving_troopers[size_of_moving_troopers].dest_x)*dist_from_mid/(moving_troopers[size_of_moving_troopers].dest_y - moving_troopers[size_of_moving_troopers].current_y);
-                                    moving_troopers[size_of_moving_troopers].half_dest_x -= dist_from_mid;
+                                    moving_troopers[size_of_moving_troopers].current_x += size_of_troopers_x_y/2;
+                                    moving_troopers[size_of_moving_troopers].current_y += size_of_troopers_x_y/2;
+                                    moving_troopers[size_of_moving_troopers].dest_x += size_of_troopers_x_y/2;
+                                    moving_troopers[size_of_moving_troopers].dest_y += size_of_troopers_x_y/2;
                                 }
-                                int m = (moving_troopers[i].half_dest_x - moving_troopers[i].current_x);
-                                int n = (moving_troopers[i].half_dest_y - moving_troopers[i].current_y);
-                                moving_troopers[size_of_moving_troopers].till_half_a = dist_moving_trooper_per_sec*m/sqrt(m*m+n*n);
-                                m= (moving_troopers[i].dest_x - moving_troopers[i].half_dest_x);
-                                n= (moving_troopers[i].dest_y - moving_troopers[i].half_dest_y);
+                                int m= (moving_troopers[i].dest_x - moving_troopers[i].current_x);
+                                int n= (moving_troopers[i].dest_y - moving_troopers[i].current_y);
                                 moving_troopers[size_of_moving_troopers].till_end_a = dist_moving_trooper_per_sec*m/sqrt(m*m+n*n);
                                 if(moving_troopers[size_of_moving_troopers].dest_x>moving_troopers[size_of_moving_troopers].current_x)
                                     moving_troopers[size_of_moving_troopers].is_dest_right=1;
@@ -517,50 +532,36 @@ int main()
                                 moving_troopers[size_of_moving_troopers].player_id = politic_sides[cells[first_click_x][first_click_y].id].player_id;
                                 size_of_moving_troopers++;
                             }
+                                                       char* buffer = malloc(sizeof(char) * 50);
+                            sprintf(buffer, "%d %d %d\n",is_first_clicked, second_click_x, second_click_y);
+                            printf("%s", buffer);
                             is_first_clicked=0;
                         }
                     }
                 }
             }
-            if(difftime(time_now,start_time)>=0.1)
+            if(difftime(time_now,start_time_troop)>=0.3)
             {
                 for(int i = 0 ; i<size_of_moving_troopers; i++)
                 {
                     if(moving_troopers[i].did_end==1)
                         continue;
-                    if(moving_troopers[i].did_pass_half==0)
-                    {
-                        int a_temp = moving_troopers[i].till_half_a;
-                        int x_zero = moving_troopers[i].current_x;
-                        int x_one = moving_troopers[i].half_dest_x;
-                        int y_zero = moving_troopers[i].current_y;
-                        int y_one = moving_troopers[i].half_dest_y;
-                        moving_troopers[i].current_y = ((y_one*a_temp) + y_zero*(x_one - x_zero - a_temp))/(x_one-x_zero);
-                        moving_troopers[i].current_x += a_temp; 
-                        if(abs(moving_troopers[i].current_x - moving_troopers[i].dest_x)<abs(moving_troopers[i].half_dest_x - moving_troopers[i].dest_x))
-                            moving_troopers[i].did_pass_half=1;
-                    }
-                    else
-                    {
-                        int a_temp = moving_troopers[i].till_end_a;
-                        int x_zero = moving_troopers[i].current_x;
-                        int x_one = moving_troopers[i].dest_x;
-                        int y_zero = moving_troopers[i].current_y;
-                        int y_one = moving_troopers[i].dest_y;
-                        // char* buffer = malloc(sizeof(char) * 50);
-                        // sprintf(buffer, "%d %d %d %d\n",moving_troopers[i].dest_x, moving_troopers[i].dest_y, );
-                        // printf("%s", buffer);
-                        moving_troopers[i].current_y = ((y_one*a_temp) + y_zero*(x_one - x_zero - a_temp))/(x_one-x_zero);
-                        moving_troopers[i].current_x += a_temp; 
-                        if(abs(moving_troopers[i].current_x - moving_troopers[i].dest_x)< dist_from_mid)
-                            moving_troopers[i].did_end=1;
-                    }
-                    
+        
+                    int a_temp = moving_troopers[i].till_end_a*difftime(time_now,start_time_troop);
+                    int x_zero = moving_troopers[i].current_x;
+                    int x_one = moving_troopers[i].dest_x;
+                    int y_zero = moving_troopers[i].current_y;
+                    int y_one = moving_troopers[i].dest_y;
+                    moving_troopers[i].current_y = ((y_one*a_temp) + y_zero*(x_one - x_zero - a_temp))/(x_one-x_zero);
+                    moving_troopers[i].current_x += a_temp; 
+                    if(abs(moving_troopers[i].current_x - moving_troopers[i].dest_x)< dist_moving_trooper_per_sec*3/5)
+                        moving_troopers[i].did_end=1;
                 }
             }
-        SDL_RenderPresent(renderer);
-
+            SDL_RenderPresent(renderer);
         }
+        if(difftime(time_now,start_time_troop)>=0.3)
+            time(&start_time_troop);
         if(difftime(time_now,start_time)>=1)
             time(&start_time);
         frame++;

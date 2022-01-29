@@ -91,7 +91,7 @@ int is_first_clicked=0;
 struct troop moving_troopers[2000];
 int size_of_moving_troopers=0;
 int dist_from_mid=10;
-int dist_moving_trooper_per_sec=30;
+int dist_moving_trooper_per_sec=70;
 
 int number_of_enemies=4;
 int number_of_politic_sides_per_user=1;
@@ -146,8 +146,8 @@ void load_variables()
     backbutton_x_y=50;
     start_game_x = 327*window_width/1335 , start_game_y =37*window_height/801;
     generatemap_x = 327*window_width/1335 , generatemap_y =37*window_height/801;
-    size_of_leaders_x_y=45*size_of_each_cell_x/81;
-    size_of_troopers_x_y=20*size_of_each_cell_x/81;
+    size_of_leaders_x_y=45*(size_of_each_cell_x/81);
+    size_of_troopers_x_y=20*(size_of_each_cell_x/81);
     size_of_kyber_photo_x = 40, size_of_kyber_photo_y=72;
     credits_text_x=1100*window_width/1335,credits_text_y=1307*window_height/801;
     credits_text_loc_y=5;
@@ -212,6 +212,22 @@ void loadimages()
 }
 void rendercpypage0(SDL_Rect new_game_target,SDL_Rect load_game_target,SDL_Rect leaderboard_target,SDL_Rect sound_target,SDL_Rect credits_target,SDL_Rect closebutton_target)
 {
+    new_game_target.x = window_width/2 - size_new_game_x/2;
+    new_game_target.y = window_height/2 + window_height/2*160/300;
+    new_game_target.w = size_new_game_x;
+    new_game_target.h = size_new_game_y;
+    load_game_target.x = window_width/2 - size_load_game_x/2;
+    load_game_target.y = window_height/2 + window_height/2*205/300;
+    load_game_target.w = size_load_game_x;
+    load_game_target.h = size_load_game_y;
+    leaderboard_target.x = window_width/2 - leaderboard_game_x/2;
+    leaderboard_target.y = window_height/2 + window_height/2*250/300;
+    leaderboard_target.w = leaderboard_game_x;
+    leaderboard_target.h = leaderboard_game_y;
+    credits_target.x = 180- size_credits_x/2;
+    credits_target.y = window_height -50 - size_credits_y/2;
+    credits_target.w = size_credits_x;
+    credits_target.h = size_credits_y;
     SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, startbackground);
     SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
     SDL_Texture *newgame_texture = SDL_CreateTextureFromSurface(renderer, new_game);
