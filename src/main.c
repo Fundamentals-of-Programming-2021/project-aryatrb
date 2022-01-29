@@ -17,9 +17,6 @@ int main()
     SDL_DisplayMode DM;
     SDL_GetCurrentDisplayMode(0,&DM);
     TTF_Init();
-    window = SDL_CreateWindow("State.io: A Star Wars Story", 20, 20, window_width, window_height, SDL_WINDOW_OPENGL);
-    SDL_SetWindowFullscreen(window,SDL_WINDOW_FULLSCREEN_DESKTOP);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     number_of_soldiers = TTF_OpenFont("assets/EPISODE1.TTF",14);
     details_page = TTF_OpenFont("assets/Starjedi.ttf",40);
     details_page_outline = TTF_OpenFont("assets/Starjedi.ttf",40);
@@ -27,8 +24,7 @@ int main()
 	SDL_Init(SDL_INIT_EVERYTHING);
 	SDL_Window* window = SDL_CreateWindow("State.io: A Star Wars Story", 20, 20, window_width, window_height, SDL_WINDOW_OPENGL);
     SDL_SetWindowFullscreen(window,SDL_WINDOW_FULLSCREEN_DESKTOP);
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    SDL_GetRendererOutputSize(renderer,&window_width,&window_height);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     load_variables();
     loadimages();
     int begining_of_time = SDL_GetTicks();
@@ -39,10 +35,8 @@ int main()
 
     SDL_Rect closebutton_target = {window_width - 10 - size_of_closebutton_x_y, 10, size_of_closebutton_x_y, size_of_closebutton_x_y};
 
-
     SDL_Rect updownbutton_target = {loc_number_of_enemies_x + number_of_enemies_w + 10, loc_number_of_enemies_y, 40, 60};
     SDL_Rect updownbutton_sec_target = {loc_number_of_enemies_x + per_user_w + 10, loc_number_of_enemies_y + per_user_h + 10, 40, 60};
-
 
     SDL_Rect wall_target = {0, window_height - 40, window_width, 40};
     SDL_Rect wallflipped_target = {0, 0, window_width, size_of_each_cell_y/2};
@@ -62,20 +56,18 @@ int main()
     Mix_PlayMusic(menu_music,-1);
     char test3[33] = "............................";
     char mapselect[33] = "............................";
-    while (1) {
+    while (1) 
+    {
         int start_ticks = SDL_GetTicks();
         SDL_RenderClear(renderer);
         time_t time_now;
         time(&time_now);
         if(page==0)
         {
-
             SDL_Rect new_game_target = {window_width/2 - size_new_game_x/2 , window_height/2 + window_height/2*160/300, size_new_game_x, size_new_game_y};
             SDL_Rect load_game_target = {window_width/2 - size_load_game_x/2 , window_height/2 + window_height/2*205/300, size_load_game_x, size_load_game_y};
             SDL_Rect leaderboard_target = {window_width/2 - leaderboard_game_x/2 , window_height/2 + window_height/2*250/300, leaderboard_game_x, leaderboard_game_y};
             SDL_Rect credits_target = {180- size_credits_x/2, window_height -50 - size_credits_y/2, size_credits_x, size_credits_y};
-
-
             int click_x,click_y;
             SDL_GetMouseState(&click_x,&click_y);
             if(click_x>window_width/2 - size_new_game_x/2 && click_x<window_width/2 + size_new_game_x/2 && click_y>window_height/2 + window_height/2*160/300 && click_y<window_height/2 + window_height/2*160/300 + size_new_game_y)
@@ -140,8 +132,7 @@ int main()
                          && click_y>closebutton_target.y && click_y<closebutton_target.y + closebutton_target.h)
                         break;
             }
-            rendercpypage0(renderer,new_game_target,load_game_target,leaderboard_target,sound_target,credits_target,closebutton_target);
-
+            rendercpypage0(new_game_target,load_game_target,leaderboard_target,sound_target,credits_target,closebutton_target);
         }
         else if(page==1)
         {
@@ -357,7 +348,7 @@ int main()
                         && click_y>username_target.y + username_target.h/2 && click_y<username_target.y + username_target.h)
                         writing_mode_username=1;
             }
-            rendercpypage1(test3,renderer,per_user_target,username_target,backbutton_target,start_game_target,enemies_target,sound_target,closebutton_target,updownbutton_target,updownbutton_sec_target);
+            rendercpypage1(test3, per_user_target,username_target,backbutton_target,start_game_target,enemies_target,sound_target,closebutton_target,updownbutton_target,updownbutton_sec_target);
         }
         else if(page==2)
         {
@@ -419,7 +410,7 @@ int main()
                         && click_y>username_target.y + username_target.h/2 && click_y<username_target.y + username_target.h)
                         writing_mode_map_select=1;
             }
-            rendercpypage2(renderer,mapselect,backbutton_target,enemies_target,username_target,sound_target,closebutton_target);
+            rendercpypage2(mapselect,backbutton_target,enemies_target,username_target,sound_target,closebutton_target);
         }
         else if(page==4)
         {
@@ -605,7 +596,6 @@ int main()
                 SDL_DestroyTexture(leaders_faces_texture[i]);
                 SDL_DestroyTexture(temp_troopers_textures[i]);
             }
-
         }
         if(difftime(time_now,start_time)>=1)
             time(&start_time);

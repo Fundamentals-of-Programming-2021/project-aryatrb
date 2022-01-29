@@ -70,10 +70,8 @@ const double FPS = 30;
 int size_of_each_cell_x=81,size_of_each_cell_y=70 ,number_of_cells_x, number_of_cells_y;
     
 
-
 int number_of_enemies=4;
 int number_of_politic_sides_per_user=1;
-
 
 
 SDL_Surface *startbackground;
@@ -99,9 +97,6 @@ SDL_Surface *wall;
 SDL_Surface *wallflipped;
 SDL_Surface *backtomenu;
 
-SDL_Window* window;
-SDL_Renderer* renderer;
-
 SDL_Event ev;
 int page=0;
 struct cell cells[100][100];
@@ -115,8 +110,11 @@ int writing_mode_username=0,size_of_text_username=0;
 int writing_mode_map_select=0,size_of_text_mapselect=0;
 int selected_map_num=0;
 int mapnumsel=0;
+
+SDL_Renderer* renderer;
 void load_variables()
 {
+    SDL_GetRendererOutputSize(renderer,&window_width,&window_height);
     size_new_game_x = 327*window_width/1335,size_new_game_y=37*window_height/801;
     size_load_game_x = 327*window_width/1335,size_load_game_y=37*window_height/801;
     leaderboard_game_x = 327*window_width/1335,leaderboard_game_y=37*window_height/801;
@@ -136,6 +134,7 @@ void load_variables()
 
 void loadimages()
 {
+    
     startbackground = SDL_LoadBMP("assets/background.bmp");
     starsbackground = SDL_LoadBMP("assets/stars.bmp");
     load_game = SDL_LoadBMP("assets/load_game.bmp");
@@ -177,7 +176,7 @@ void loadimages()
     kyber_cristal_photos[3] = SDL_LoadBMP("assets/kybers/kyber_red.bmp");
 
 }
-void rendercpypage0(SDL_Renderer* renderer,SDL_Rect new_game_target,SDL_Rect load_game_target,SDL_Rect leaderboard_target,SDL_Rect sound_target,SDL_Rect credits_target,SDL_Rect closebutton_target)
+void rendercpypage0(SDL_Rect new_game_target,SDL_Rect load_game_target,SDL_Rect leaderboard_target,SDL_Rect sound_target,SDL_Rect credits_target,SDL_Rect closebutton_target)
 {
     SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, startbackground);
     SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
@@ -202,7 +201,7 @@ void rendercpypage0(SDL_Renderer* renderer,SDL_Rect new_game_target,SDL_Rect loa
     SDL_DestroyTexture(creditstexture);
     SDL_DestroyTexture(closebutton_texture);
 }
-void rendercpypage1(char test3[],SDL_Renderer* renderer, SDL_Rect per_user_target, SDL_Rect username_target, SDL_Rect backbutton_target, SDL_Rect start_game_target, SDL_Rect enemies_target, SDL_Rect sound_target,SDL_Rect closebutton_target ,SDL_Rect updownbutton_target, SDL_Rect updownbutton_sec_target)
+void rendercpypage1(char test3[], SDL_Rect per_user_target, SDL_Rect username_target, SDL_Rect backbutton_target, SDL_Rect start_game_target, SDL_Rect enemies_target, SDL_Rect sound_target,SDL_Rect closebutton_target ,SDL_Rect updownbutton_target, SDL_Rect updownbutton_sec_target)
 {
 
     SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, new_game_background);
@@ -257,7 +256,7 @@ void rendercpypage1(char test3[],SDL_Renderer* renderer, SDL_Rect per_user_targe
     SDL_DestroyTexture(closebutton_texture);
     SDL_DestroyTexture(updownbutton_texture);
 }
-void rendercpypage2(SDL_Renderer *renderer, char mapselect[],SDL_Rect backbutton_target, SDL_Rect enemies_target, SDL_Rect username_target, SDL_Rect sound_target, SDL_Rect closebutton_target)
+void rendercpypage2(char mapselect[],SDL_Rect backbutton_target, SDL_Rect enemies_target, SDL_Rect username_target, SDL_Rect sound_target, SDL_Rect closebutton_target)
 {
     SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, padmegrave1);
     SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
