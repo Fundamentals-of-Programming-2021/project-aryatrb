@@ -1,1 +1,6 @@
 assets/save/maps/map1.txt
+assets/save/maps/map2.txt
+assets/save/maps/map3.txt
+assets/save/maps/map4.txt
+assets/save/maps/map5.txt
+assets/save/maps/map6.txt

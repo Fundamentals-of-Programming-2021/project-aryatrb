@@ -66,6 +66,8 @@ int loc_number_of_enemies_x, loc_number_of_enemies_y;
 int number_of_enemies_w, number_of_enemies_h;
 int per_user_w, per_user_h;
 int mapsel_w, mapsel_h;
+int mapseltype_w,mapseltype_h;
+int usernametype_w,usernametype_h;
 const double FPS = 30;
 int size_of_each_cell_x=81,size_of_each_cell_y=70 ,number_of_cells_x, number_of_cells_y;
     
@@ -90,8 +92,9 @@ SDL_Surface *backbutton;
 SDL_Surface *startgame;
 SDL_Surface *generatemap;
 SDL_Surface *updownbutton;
-SDL_Surface *faces[5];
-SDL_Surface *troopers[5];
+SDL_Surface *faces[15];
+SDL_Surface *troopers[15];
+SDL_Surface *planets_photos[15];
 SDL_Surface *kyber_cristal_photos[4];
 SDL_Surface *wall;
 SDL_Surface *wallflipped;
@@ -163,6 +166,7 @@ void loadimages()
     faces[2] = SDL_LoadBMP("assets/faces/tano.bmp");
     faces[3] = SDL_LoadBMP("assets/faces/luke.bmp");
     faces[4] = SDL_LoadBMP("assets/faces/maul.bmp");
+    faces[10] = SDL_LoadBMP("assets/faces/r2d2.bmp");
 
     troopers[0] = SDL_LoadBMP("assets/troopers/stormtrooper.bmp");
     troopers[1] = SDL_LoadBMP("assets/troopers/deathtrooper.bmp");
@@ -174,6 +178,16 @@ void loadimages()
     kyber_cristal_photos[1] = SDL_LoadBMP("assets/kybers/kyber_green.bmp");
     kyber_cristal_photos[2] = SDL_LoadBMP("assets/kybers/kyber_purple.bmp");
     kyber_cristal_photos[3] = SDL_LoadBMP("assets/kybers/kyber_red.bmp");
+
+    
+    planets_photos[0] = SDL_LoadBMP("assets/planet_death_star.bmp");
+    planets_photos[1] = SDL_LoadBMP("assets/planet_lothal.bmp");
+    planets_photos[2] = SDL_LoadBMP("assets/planet_mustafar.bmp");
+    planets_photos[3] = SDL_LoadBMP("assets/planet_naboo.bmp");
+    planets_photos[4] = SDL_LoadBMP("assets/planet_rodia.bmp");
+    planets_photos[10] = SDL_LoadBMP("assets/metal.bmp");
+
+
 
 }
 void rendercpypage0(SDL_Rect new_game_target,SDL_Rect load_game_target,SDL_Rect leaderboard_target,SDL_Rect sound_target,SDL_Rect credits_target,SDL_Rect closebutton_target)
@@ -256,7 +270,7 @@ void rendercpypage1(char test3[], SDL_Rect per_user_target, SDL_Rect username_ta
     SDL_DestroyTexture(closebutton_texture);
     SDL_DestroyTexture(updownbutton_texture);
 }
-void rendercpypage2(char mapselect[],SDL_Rect backbutton_target, SDL_Rect enemies_target, SDL_Rect username_target, SDL_Rect sound_target, SDL_Rect closebutton_target)
+void rendercpypage2(char mapselect[],SDL_Rect start_game_target,SDL_Rect backbutton_target, SDL_Rect enemies_target, SDL_Rect username_target, SDL_Rect sound_target, SDL_Rect closebutton_target)
 {
     SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, padmegrave1);
     SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
@@ -266,13 +280,11 @@ void rendercpypage2(char mapselect[],SDL_Rect backbutton_target, SDL_Rect enemie
     SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
     SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
     SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target); 
+    SDL_Texture *startgametexture = SDL_CreateTextureFromSurface(renderer, startgame);
+    SDL_RenderCopy(renderer, startgametexture, NULL, &start_game_target);
     char test[60] = "there are 00 maps. select one of them:";
     test[10]=mapnumsel/10 + '0';
     test[11]=mapnumsel%10 + '0';
-            //         char* buffer = malloc(sizeof(char) * 50);
-            // sprintf(buffer, "sss \n");
-            // printf("%s", buffer);
-            // stringRGBA(renderer, 5, 5, buffer, 0, 0, 200, 255);
     SDL_Surface *textsurface = TTF_RenderText_Solid(details_page,test, white);
     SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
     SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
@@ -280,15 +292,15 @@ void rendercpypage2(char mapselect[],SDL_Rect backbutton_target, SDL_Rect enemie
     text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
     SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
     SDL_DestroyTexture(text_texture);
-
     textsurface = TTF_RenderText_Solid(details_page,mapselect, white);
     text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
     SDL_RenderCopy(renderer,text_texture,NULL,&username_target);
     textsurface = TTF_RenderText_Solid(details_page_outline,mapselect, black);
     text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
     SDL_RenderCopy(renderer,text_texture,NULL,&username_target);
-    SDL_DestroyTexture(text_texture);
     SDL_RenderPresent(renderer);
+    SDL_DestroyTexture(text_texture);
+    SDL_DestroyTexture(startgametexture);
     SDL_DestroyTexture(startscreentexture);
     SDL_DestroyTexture(soundtexture);
     SDL_DestroyTexture(backbuttontexture);
@@ -308,4 +320,29 @@ void rendercpypage4(SDL_Rect backbutton_target, SDL_Rect credits_text_target,SDL
     SDL_DestroyTexture(startscreentexture);
     SDL_DestroyTexture(soundtexture);
     SDL_DestroyTexture(backbuttontexture);
+}
+
+void soundchange()
+{
+    if(is_sound_on==1)
+    {
+        is_sound_on=0;
+        Mix_PauseMusic();
+        soundonphoto = SDL_LoadBMP("assets/soundoff.bmp");
+    }
+    else
+    {
+        is_sound_on=1;
+        Mix_ResumeMusic();
+        soundonphoto = SDL_LoadBMP("assets/soundon.bmp");
+    }
+}
+void findtotalofsaves()
+{
+    char teemp[1000];
+    FILE *mapsave = fopen("assets/save/files_details.txt", "r+");
+    while(1)
+        if(fscanf(mapsave,"assets/save/maps/map%d.txt\n",&mapnumsel)==EOF)
+            break;
+    fclose(mapsave);
 }
