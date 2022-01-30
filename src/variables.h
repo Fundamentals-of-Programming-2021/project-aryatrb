@@ -91,7 +91,9 @@ int is_first_clicked=0;
 struct troop moving_troopers[2000];
 int size_of_moving_troopers=0;
 int dist_from_mid=10;
-int dist_moving_trooper_per_sec=70;
+int dist_moving_trooper_per_sec=15;
+int start_ticks;
+
 
 int number_of_enemies=4;
 int number_of_politic_sides_per_user=1;
@@ -253,7 +255,11 @@ void rendercpypage0(SDL_Rect new_game_target,SDL_Rect load_game_target,SDL_Rect 
 }
 void rendercpypage1(char test3[], SDL_Rect per_user_target, SDL_Rect username_target, SDL_Rect backbutton_target, SDL_Rect start_game_target, SDL_Rect enemies_target, SDL_Rect sound_target,SDL_Rect closebutton_target ,SDL_Rect updownbutton_target, SDL_Rect updownbutton_sec_target)
 {
-
+    start_game_target.x = window_width - 150*window_width/1335 -start_game_x/2;
+    start_game_target.y = window_height - 50*window_height/801 - start_game_y/2;
+    start_game_target.w = start_game_x;
+    start_game_target.h = start_game_y;
+    
     SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, new_game_background);
     SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
     SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
@@ -308,6 +314,16 @@ void rendercpypage1(char test3[], SDL_Rect per_user_target, SDL_Rect username_ta
 }
 void rendercpypage2(char mapselect[],SDL_Rect start_game_target,SDL_Rect backbutton_target, SDL_Rect enemies_target, SDL_Rect username_target, SDL_Rect sound_target, SDL_Rect closebutton_target)
 {
+    start_game_target.x = window_width - 150*window_width/1335 -start_game_x/2;
+    start_game_target.y = window_height - 50*window_height/801 - start_game_y/2;
+    start_game_target.w = start_game_x;
+    start_game_target.h = start_game_y;
+
+    username_target.x = loc_number_of_enemies_x;
+    username_target.y = loc_number_of_enemies_y + 2* (number_of_enemies_h + 10);
+    username_target.w = mapseltype_w;
+    username_target.h = mapseltype_h;
+
     SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, padmegrave1);
     SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
     SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
@@ -486,7 +502,7 @@ void findtotalofsaves()
             break;
     fclose(mapsave);
 }
-int findclickedcell(int click_x, int click_y, int *ret_x, int *ret_y)
+int findclickedcell(int click_x, int click_y, int *ret_x, int *ret_y, int id_is_zero)
 {
     for(int j=0;j<number_of_cells_y;j++)
         for(int i=0;i<number_of_cells_x;i++)
@@ -495,9 +511,12 @@ int findclickedcell(int click_x, int click_y, int *ret_x, int *ret_y)
             {
                 if(cells[i][j].does_it_have_military==1 && i!=first_click_x && j!=first_click_y)
                 {
-                    *ret_x=i;
-                    *ret_y=j;
-                    return 1;
+                    if((id_is_zero==1 && politic_sides[cells[i][j].id].player_id==0) || id_is_zero==0)
+                    {
+                        *ret_x=i;
+                        *ret_y=j;
+                        return 1;
+                    }
                 }
             }
     return 0;

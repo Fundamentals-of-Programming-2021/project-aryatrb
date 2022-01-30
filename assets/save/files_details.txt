@@ -41,3 +41,12 @@ assets/save/maps/map40.txt
 assets/save/maps/map41.txt
 assets/save/maps/map42.txt
 assets/save/maps/map43.txt
+assets/save/maps/map44.txt
+assets/save/maps/map45.txt
+assets/save/maps/map46.txt
+assets/save/maps/map47.txt
+assets/save/maps/map48.txt
+assets/save/maps/map49.txt
+assets/save/maps/map50.txt
+assets/save/maps/map51.txt
+assets/save/maps/map52.txt
