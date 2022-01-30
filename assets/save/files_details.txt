@@ -50,3 +50,4 @@ assets/save/maps/map49.txt
 assets/save/maps/map50.txt
 assets/save/maps/map51.txt
 assets/save/maps/map52.txt
+assets/save/maps/map53.txt

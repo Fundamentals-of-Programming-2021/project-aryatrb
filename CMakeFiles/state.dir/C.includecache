@@ -29,6 +29,8 @@ variables.h
 /home/arya/state.io/src/variables.h
 math.h
 /home/arya/state.io/src/math.h
+sys/timeb.h
+-
 
 /home/arya/state.io/src/variables.h
 stdio.h
@@ -48,6 +50,8 @@ SDL_mixer.h
 SDL_ttf.h
 -
 SDL2/SDL2_gfxPrimitives.h
+-
+sys/time.h
 -
 
 /usr/include/SDL2/SDL.h
