@@ -36,7 +36,7 @@ int main()
 
     time_t t;
     srand((unsigned) time(&t));
-    time_t start_time;
+   
     time_t start_time_troop;
     time(&start_time);
     time(&start_time_troop);
@@ -62,7 +62,6 @@ int main()
     while (1) 
     {
         start_ticks = SDL_GetTicks();
-        time_t time_now;
         time(&time_now);
         if(page==0)
         {
@@ -327,6 +326,12 @@ int main()
                         //     printf("%s", buffer);
                         if(findclickedcell(click_x,click_y,&second_click_x,&second_click_y,0))
                         {  
+                            char* buffer = malloc(sizeof(char) * 50);
+                            sprintf(buffer, "%d\n",is_first_clicked);
+                            printf("%s", buffer);
+                            stringRGBA(renderer, 5, 5, buffer, 0, 0, 200, 255);
+                            free(buffer);
+                            politic_sides[cells[first_click_x][first_click_y].politic_side_number].is_sending_troopers=1;
                             create_moving_troopers();
                         }
                     }
