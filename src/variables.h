@@ -94,7 +94,7 @@ int max_troop_in_poliside=150;
 int dist_from_mid=10;
 int dist_moving_trooper_per_sec=5;
 int start_ticks;
-double seconds_until_trooper_is_out = 0.8 * 1000000;
+double seconds_until_trooper_is_out = 0.8;
 int size_of_wall_y=40;
 char test3[33] = "............................";
 char mapselect[33] = "............................";
@@ -753,18 +753,28 @@ void load_the_map()
     }
     fclose(loadedmap);
 }
+
+double count_moving_troopers(double last)
+{
+    if(abs(seconds_until_trooper_is_out * last/3)<1)
+        return last;
+    return last + count_moving_troopers(seconds_until_trooper_is_out * last/3);
+
+}
+
 void create_moving_troopers()
 {
     is_first_clicked=0;
     int q = cells[first_click_x][first_click_y].politic_side_number;
-    int last_sec = (seconds_until_trooper_is_out/1000000 * floor((politic_sides[q].number_of_troopers-1)/3) + politic_sides[q].number_of_troopers+difftime(time_now,start_time));
+    // int last_sec = (seconds_until_trooper_is_out * floor((politic_sides[q].number_of_troopers-1)/3) + politic_sides[q].number_of_troopers+difftime(time_now,start_time));
+    int last_sec = (int)count_moving_troopers((double)politic_sides[q].number_of_troopers);
     for(int i=0;i<last_sec;i++)
     {
         int size_of_moving_troopers = politic_sides[q].number_of_moving_troppers;
         struct timeval tv;
         gettimeofday(&tv,NULL);
         politic_sides[q].troopers[size_of_moving_troopers].time = tv;
-        politic_sides[q].troopers[size_of_moving_troopers].seconds_till_out = seconds_until_trooper_is_out * floor(i/3);
+        politic_sides[q].troopers[size_of_moving_troopers].seconds_till_out = seconds_until_trooper_is_out*1000000 * floor(i/3);
         politic_sides[q].troopers[size_of_moving_troopers].is_out = 0;
         politic_sides[q].troopers[size_of_moving_troopers].did_end=0;
         politic_sides[q].troopers[size_of_moving_troopers].current_x=cells[first_click_x][first_click_y].x + size_of_each_cell_x/2 - size_of_troopers_x_y/2;

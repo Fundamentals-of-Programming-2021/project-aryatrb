@@ -115,3 +115,11 @@ assets/save/maps/map114.txt
 assets/save/maps/map115.txt
 assets/save/maps/map116.txt
 assets/save/maps/map117.txt
+assets/save/maps/map118.txt
+assets/save/maps/map119.txt
+assets/save/maps/map120.txt
+assets/save/maps/map121.txt
+assets/save/maps/map122.txt
+assets/save/maps/map123.txt
+assets/save/maps/map124.txt
+assets/save/maps/map125.txt
