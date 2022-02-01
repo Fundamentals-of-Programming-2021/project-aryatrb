@@ -24,7 +24,7 @@ int main()
     load_variables();
     loadimages();
     int begining_of_time = SDL_GetTicks();
-    SDL_Rect closebutton_target = {window_width - 10 - size_of_closebutton_x_y, 10, size_of_closebutton_x_y, size_of_closebutton_x_y};
+    SDL_Rect closebutton_target = {window_width - 10 - size_of_closebutton_x_y, 25 - size_of_closebutton_x_y, size_of_closebutton_x_y, size_of_closebutton_x_y};
 
     SDL_Rect updownbutton_target = {loc_number_of_enemies_x + number_of_enemies_w + 10*window_width/1920, loc_number_of_enemies_y, 40*window_width/1920, 60*window_width/1920};
     SDL_Rect updownbutton_sec_target = {loc_number_of_enemies_x + per_user_w + 10*window_width/1920, loc_number_of_enemies_y + per_user_h + 10*window_width/1920, 40*window_width/1920, 60*window_width/1920};
@@ -47,7 +47,6 @@ int main()
 
     Mix_PlayMusic(menu_music,-1);
 
-    int gamerunning=1;
     SDL_Rect new_game_target = {window_width/2 - size_new_game_x/2 , window_height/2 + window_height/2*160/300 - size_new_game_y/2, size_new_game_x, size_new_game_y};
     SDL_Rect load_game_target = {window_width/2 - size_load_game_x/2 , window_height/2 + window_height/2*205/300 - size_load_game_y/2, size_load_game_x, size_load_game_y};
     SDL_Rect leaderboard_target = {window_width/2 - leaderboard_game_x/2 , window_height/2 + window_height/2*250/300 - leaderboard_game_y/2, leaderboard_game_x, leaderboard_game_y};
@@ -264,20 +263,18 @@ int main()
                 credits_text_loc_y-=5;
             else if(ev.type==SDL_MOUSEBUTTONDOWN && ev.button.button==SDL_BUTTON_LEFT)
             {
-                    click_x=ev.button.x;
-                    click_y=ev.button.y;
-                    if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
-                        soundchange();
-                    else if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
-                        page=0;
+                click_x=ev.button.x;
+                click_y=ev.button.y;
+                if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
+                    soundchange();
+                else if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
+                    page=0;
             }
             if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
                 backbutton_x_y=50 * 1.2;
             else
                 backbutton_x_y=50;
-            SDL_Rect backbutton_target = {50 - backbutton_x_y/2 , 50 - backbutton_x_y/2, backbutton_x_y, backbutton_x_y};
-            SDL_Rect credits_text_target = {window_width/2 - credits_text_x/2 , credits_text_loc_y, credits_text_x, credits_text_y};
-            rendercpypage4(backbutton_target,credits_text_target,sound_target);
+            rendercpypage4(sound_target);
         }
         else if (page==10)
         {   
@@ -288,10 +285,10 @@ int main()
             //             sprintf(buffer, "%d %d %d %d\n",click_x,click_y ,second_click_x, second_click_y);
             //             printf("%s", buffer);
             //             stringRGBA(renderer, 5, 5, buffer, 0, 0, 200, 255);
-            SDL_PumpEvents();
-            SDL_FlushEvents(SDL_FIRSTEVENT,SDL_LASTEVENT);
-            // SDL_Delay(50);
-            if(SDL_WaitEventTimeout(&ev,50)==1)
+            // SDL_PumpEvents();
+            // SDL_FlushEvents(SDL_FIRSTEVENT,SDL_LASTEVENT);
+            // SDL_Delay(5);
+            while(SDL_PollEvent(&ev))
             {
                 if(ev.type==SDL_QUIT)
                     break;
@@ -308,9 +305,12 @@ int main()
                         Mix_PlayMusic(menu_music,-1);
                         page=0;
                     }
-                    else if(click_x>closebutton_target.x && click_x<closebutton_target.x + closebutton_target.w 
-                        && click_y>closebutton_target.y && click_y<closebutton_target.y + closebutton_target.h)
+                    else if(click_x > closebutton_target.x && click_x < closebutton_target.x + closebutton_target.w 
+                         && click_y > closebutton_target.y && click_y < closebutton_target.y + closebutton_target.h)
+                    {
+                        game_running=0;
                         break;
+                    }
                     else if(click_y>40 && click_y<window_height-40 && is_first_clicked==0)
                     {
                         is_first_clicked=findclickedcell(click_x,click_y,&first_click_x,&first_click_y,1);
@@ -325,7 +325,7 @@ int main()
                         //     sprintf(buffer, "%d\n",is_first_clicked);
                         //     printf("%s", buffer);
                         if(findclickedcell(click_x,click_y,&second_click_x,&second_click_y,0))
-                        {  
+                        { 
                             char* buffer = malloc(sizeof(char) * 50);
                             sprintf(buffer, "%d\n",is_first_clicked);
                             printf("%s", buffer);
@@ -342,6 +342,8 @@ int main()
                 // stringRGBA(renderer, 5, 5, buffer, 0, 0, 200, 255);
                 // free(buffer);
             }
+            if(game_running==0)
+                break;
             moving_troopers_update_location();
             SDL_RenderPresent(renderer);
         }
@@ -350,7 +352,7 @@ int main()
             time(&start_time_troop);
         if(difftime(time_now,start_time)>=1)
             time(&start_time);
-        while (SDL_GetTicks() - start_ticks < 100 / FPS);
+        while (SDL_GetTicks() - start_ticks < 1000 / FPS);
     }
     Mix_FreeMusic(menu_music);
     Mix_FreeMusic(game_music);
