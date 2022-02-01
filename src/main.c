@@ -313,7 +313,7 @@ int main()
                     }
                     else if(click_y>40 && click_y<window_height-40 && is_first_clicked==0)
                     {
-                        is_first_clicked=findclickedcell(click_x,click_y,&first_click_x,&first_click_y,1);
+                        is_first_clicked=findclickedcell(click_x,click_y,&first_click,1);
                             //                     char* buffer = malloc(sizeof(char) * 50);
                             // sprintf(buffer, "first%d\n",is_first_clicked);
                             // printf("%s", buffer);
@@ -324,14 +324,14 @@ int main()
                         // char* buffer = malloc(sizeof(char) * 50);
                         //     sprintf(buffer, "%d\n",is_first_clicked);
                         //     printf("%s", buffer);
-                        if(findclickedcell(click_x,click_y,&second_click_x,&second_click_y,0))
+                        if(findclickedcell(click_x,click_y,&second_click,0))
                         { 
-                            char* buffer = malloc(sizeof(char) * 50);
-                            sprintf(buffer, "%d\n",is_first_clicked);
-                            printf("%s", buffer);
-                            stringRGBA(renderer, 5, 5, buffer, 0, 0, 200, 255);
-                            free(buffer);
-                            politic_sides[cells[first_click_x][first_click_y].politic_side_number].is_sending_troopers=1;
+                            // printf("%d %d\n", first_click,second_click);
+                            // char* buffer = malloc(sizeof(char) * 50);
+                            // sprintf(buffer, "%d\n",is_first_clicked);
+                            // printf("%s", buffer);
+                            // stringRGBA(renderer, 5, 5, buffer, 0, 0, 200, 255);
+                            // free(buffer);
                             create_moving_troopers();
                         }
                     }
