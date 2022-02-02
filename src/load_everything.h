@@ -95,7 +95,7 @@ int max_troop_in_someones_land=50;
 int start_troop_in_someones_land=10;
 
 
-int number_of_enemies=1;
+int number_of_enemies=4;
 int number_of_politic_sides_per_user=1;
 
 

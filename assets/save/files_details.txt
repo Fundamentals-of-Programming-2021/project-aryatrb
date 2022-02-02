@@ -27,3 +27,5 @@ assets/save/maps/map26.txt
 assets/save/maps/map27.txt
 assets/save/maps/map28.txt
 assets/save/maps/map29.txt
+assets/save/maps/map30.txt
+assets/save/maps/map31.txt
