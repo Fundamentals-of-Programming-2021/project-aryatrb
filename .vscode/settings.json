@@ -1,6 +1,11 @@
 {
     "files.associations": {
         "stdlib.h": "c",
-        "variables.h": "c"
+        "variables.h": "c",
+        "time.h": "c",
+        "timeb.h": "c",
+        "sdl2_gfxprimitives.h": "c",
+        "operations_of_the_game.h": "c",
+        "the_pages_themselves.h": "c"
     }
 }

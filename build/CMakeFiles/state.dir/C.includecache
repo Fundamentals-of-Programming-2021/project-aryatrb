@@ -6,33 +6,9 @@
 
 #IncludeRegexTransform: 
 
-/home/arya/state.io/src/main.c
-stdio.h
--
-stdbool.h
--
-stdlib.h
--
-math.h
--
-time.h
--
-SDL2/SDL.h
--
-SDL_mixer.h
--
-SDL_ttf.h
--
-SDL2/SDL2_gfxPrimitives.h
--
-variables.h
-/home/arya/state.io/src/variables.h
-math.h
-/home/arya/state.io/src/math.h
-sys/timeb.h
--
+/home/arya/state.io/src/load_everything.h
 
-/home/arya/state.io/src/variables.h
+/home/arya/state.io/src/main.c
 stdio.h
 -
 stdbool.h
@@ -53,6 +29,22 @@ SDL2/SDL2_gfxPrimitives.h
 -
 sys/time.h
 -
+math.h
+/home/arya/state.io/src/math.h
+load_everything.h
+/home/arya/state.io/src/load_everything.h
+operations_of_the_game.h
+/home/arya/state.io/src/operations_of_the_game.h
+rendercpy.h
+/home/arya/state.io/src/rendercpy.h
+the_pages_themselves.h
+/home/arya/state.io/src/the_pages_themselves.h
+
+/home/arya/state.io/src/operations_of_the_game.h
+
+/home/arya/state.io/src/rendercpy.h
+
+/home/arya/state.io/src/the_pages_themselves.h
 
 /usr/include/SDL2/SDL.h
 SDL_main.h
