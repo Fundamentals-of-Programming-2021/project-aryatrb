@@ -31,6 +31,8 @@ sys/time.h
 -
 math.h
 /home/arya/state.io/src/math.h
+string.h
+/home/arya/state.io/src/string.h
 load_everything.h
 /home/arya/state.io/src/load_everything.h
 operations_of_the_game.h

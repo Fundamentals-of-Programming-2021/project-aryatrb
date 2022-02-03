@@ -9,6 +9,7 @@
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <sys/time.h>
 #include "math.h"
+#include "string.h"
 
 #include "load_everything.h"
 #include "operations_of_the_game.h"

@@ -79,14 +79,14 @@ void page1()
         if((ev.key.keysym.sym==SDLK_BACKSPACE || ev.key.keysym.sym==SDLK_DELETE) && size_of_text_username>0)
         {
             size_of_text_username--;
-            test3[size_of_text_username]='.';
+            username_text[size_of_text_username]='.';
         }
         else
         {
-            test3[size_of_text_username]= ev.key.keysym.sym;
+            username_text[size_of_text_username]= ev.key.keysym.sym;
             size_of_text_username++;
         }
-        TTF_SizeText(details_page,test3,&usernametype_w,&usernametype_h);
+        TTF_SizeText(details_page,username_text,&usernametype_w,&usernametype_h);
     }
     else if(ev.type==SDL_MOUSEBUTTONDOWN && ev.button.button==SDL_BUTTON_LEFT)
     {
@@ -95,18 +95,12 @@ void page1()
         click_y=ev.button.y;
         if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
             soundchange();
-        else if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
+        else if(click_x>backbutton_target.x && click_x<backbutton_target.x+backbutton_target.w &&
+                click_y<backbutton_target.y+backbutton_target.h && click_y>backbutton_target.y)
             page=0;
         else if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
         && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h)
-        {
-            create_cells();
-            assign_politic_sides();
-            save_the_map();
-            Mix_PauseMusic();
-            Mix_PlayMusic(game_music,-1);  
-            page=10;
-        }
+            page1to10();
         else if(click_x>closebutton_target.x && click_x<closebutton_target.x + closebutton_target.w 
                 && click_y>closebutton_target.y && click_y<closebutton_target.y + closebutton_target.h)
         {
@@ -129,7 +123,8 @@ void page1()
                 && click_y>username_target.y + username_target.h/2 && click_y<username_target.y + username_target.h)
                 writing_mode_username=1;
     }
-    if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
+    if(click_x>backbutton_target.x && click_x<backbutton_target.x+backbutton_target.w && 
+       click_y<backbutton_target.y+backbutton_target.h && click_y>backbutton_target.y)
         backbutton_x_y=50 * 1.2;
     else
         backbutton_x_y=50;
@@ -186,10 +181,11 @@ void page2()
         }
         else if(click_x>username_target.x && click_x<username_target.x + username_target.w
                 && click_y>username_target.y + username_target.h/2 && click_y<username_target.y + username_target.h)
-                writing_mode_map_select=1;
+            writing_mode_map_select=1;
         else if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
         && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h)
         {
+            time(&game_start_time);
             load_the_map();
             Mix_PauseMusic();
             Mix_PlayMusic(game_music,-1);  
@@ -210,8 +206,11 @@ void page2()
 void page4()
 {
     rendercpypage4();
+    SDL_PumpEvents();
+    SDL_FlushEvents(SDL_FIRSTEVENT,SDL_LASTEVENT);
     SDL_WaitEvent(&ev);
     int click_x,click_y;
+    SDL_GetMouseState(&click_x,&click_y);
     if(ev.type==SDL_QUIT)
     {
         game_running=0;
@@ -276,13 +275,76 @@ void page10()
                 if(politic_sides[second_click].number_of_moving_troppers!=0)
                     stop_the_moving_troopers__new_destination(first_click);
                 if(temp)
-                    create_moving_troopers();
+                    create_moving_troopers(first_click,second_click);
             }
         }
     }
+    create_kyber();
     moving_troopers_update_location();
+    moving_troopers_without_a_home_update_location();
     update_politic_sides_of_users();
-    if(check_for_winner()==1)
-        printf("eyval");
-    SDL_RenderPresent(renderer);
+    enemy_ai();
+    if(did_win()==1)
+    {   
+        did_win_int = 1;
+        user_score = read_users_score(1);
+        added_score = calculate_score();
+        page=99;  
+    }
+    if(did_lose())
+    {
+        did_win_int = -1;
+        user_score = read_users_score(1);
+        added_score = calculate_score();
+        page=99; 
+    }
 }
+void winpage()
+{
+    SDL_PumpEvents();
+    SDL_FlushEvents(SDL_FIRSTEVENT,SDL_LASTEVENT);
+    rendercpywinpage();
+    SDL_WaitEvent(&ev);
+    int click_x,click_y;
+    SDL_GetMouseState(&click_x,&click_y);
+    if(ev.type==SDL_QUIT)
+    {
+        game_running=0;
+        return;
+    }
+    if(ev.type==SDL_MOUSEBUTTONDOWN && ev.button.button==SDL_BUTTON_LEFT)
+    {
+        click_x=ev.button.x;
+        click_y=ev.button.y;
+        if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
+            soundchange();
+        else if(click_x>backbutton_target.x && click_x<backbutton_target.x+backbutton_target.w && click_y<backbutton_target.y+backbutton_target.h && click_y>backbutton_target.y)
+            page=0;
+        else if(click_x>closebutton_target.x && click_x<closebutton_target.x + closebutton_target.w 
+                && click_y>closebutton_target.y && click_y<closebutton_target.y + closebutton_target.h)
+        {
+            game_running=0;
+            return;
+        }
+    }
+    if(click_x>backbutton_target.x && click_x<backbutton_target.x+backbutton_target.w && click_y<backbutton_target.y+backbutton_target.h && click_y>backbutton_target.y)
+        backbutton_x_y=50*1.2;
+    else
+        backbutton_x_y=50;
+}
+void page1to10()
+{
+    time(&game_start_time);
+    create_cells();
+    assign_politic_sides();
+    save_the_map();
+    first_user_save();
+    Mix_PauseMusic();
+    Mix_PlayMusic(game_music,-1);  
+    page=10;
+    for(int i=0;i<number_of_enemies+1;i++)
+    {
+        movingtrooper_texture[i]=SDL_CreateTextureFromSurface(renderer, troopers[i]);
+    }    
+}
+

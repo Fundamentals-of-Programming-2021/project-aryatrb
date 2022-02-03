@@ -10,6 +10,11 @@ void rendercpypage1();
 void rendercpypage2();
 void rendercpypage4();
 void rendercpypage10();
+void page1to10();
+int calculate_score();
+void winpage();
+void moving_troopers_without_a_home_update_location();
+void make_troopers_without_a_home(int q);
 
 struct troop{
     int current_x;
@@ -40,6 +45,7 @@ struct politic_side{
     int player_id;
     int number_of_troopers;
     int number_of_moving_troppers;
+    int is_moving;
     struct troop troopers[1000];
 };
 struct kyber_cristal{
@@ -47,8 +53,12 @@ struct kyber_cristal{
     int x;
     int y;
 };
+
+struct troop troops_with_no_home[2000];
+int size_of_troops_with_no_home=0;
 int window_width;
 int window_height;
+int user_score;
 int politic_sides_of_user[100] = {0};
 TTF_Font *number_of_soldiers;
 TTF_Font *number_of_soldiers_outline;
@@ -67,6 +77,8 @@ int size_of_leaders_x_y;
 int size_of_troopers_x_y;
 int size_of_kyber_photo_x, size_of_kyber_photo_y;
 int credits_text_x, credits_text_y;
+int doordonot_x,doordonot_y;
+int ifyoudefine_x,ifyoudefine_y;
 int credits_text_loc_y;
 int size_of_closebutton_x_y;
 int loc_number_of_enemies_x, loc_number_of_enemies_y;
@@ -83,17 +95,20 @@ int is_first_clicked=0;
 // struct troop moving_troopers[2000];
 // int size_of_moving_troopers=0;
 int dist_from_mid=10;
-int dist_moving_trooper_per_sec=5;
+int dist_moving_trooper_per_sec=10;
 int start_ticks;
-double seconds_until_trooper_is_out = 0.3;
+double seconds_until_trooper_is_out = 0.18;
 int size_of_wall_y=40;
-char test3[33] = "............................";
+char username_text[33] = "............................";
 char mapselect[33] = "............................";
 int game_running=1;
 int max_troop_no_mans_land=20;
 int max_troop_in_someones_land=50;
 int start_troop_in_someones_land=10;
-
+int rand_start_y;
+int rand_start_x;
+int added_score;
+int did_win_int=0;
 
 int number_of_enemies=4;
 int number_of_politic_sides_per_user=1;
@@ -101,6 +116,8 @@ int number_of_politic_sides_per_user=1;
 
 SDL_Surface *startbackground;
 SDL_Surface *starsbackground;
+SDL_Surface *winbackground;
+SDL_Surface *losebackground;
 SDL_Surface *load_game;
 SDL_Surface *leaderboard;
 SDL_Surface *new_game;
@@ -113,7 +130,6 @@ SDL_Surface *soundonphoto;
 SDL_Surface *new_game_background;
 SDL_Surface *backbutton;
 SDL_Surface *startgame;
-// SDL_Surface *generatemap;
 SDL_Surface *updownbutton;
 SDL_Surface *faces[15];
 SDL_Surface *troopers[15];
@@ -122,6 +138,8 @@ SDL_Surface *kyber_cristal_photos[4];
 SDL_Surface *wall;
 SDL_Surface *wallflipped;
 SDL_Surface *backtomenu;
+SDL_Surface *doordonot;
+SDL_Surface *ifyoudefine;
 
 Mix_Music *menu_music;
 Mix_Music *game_music;
@@ -145,7 +163,7 @@ SDL_Rect backbutton_target;
 SDL_Rect enemies_target;
 SDL_Rect per_user_target;
 SDL_Rect username_target;
-
+SDL_Rect win_page_target;
 
 
 SDL_Event ev;
@@ -161,10 +179,12 @@ int writing_mode_map_select=0,size_of_text_mapselect=0;
 int selected_map_num=0;
 int mapnumsel=0;
 time_t time_now;
-time_t temp_now;
+time_t game_start_time;
 time_t start_time;
 time_t start_time_troop;
+time_t calc_time;
 
+SDL_Texture *movingtrooper_texture[10];
 
 
 SDL_Renderer* renderer;
@@ -191,6 +211,8 @@ void load_everything()
     size_of_troopers_x_y=20*(size_of_each_cell_x/81);
     size_of_kyber_photo_x = 40, size_of_kyber_photo_y=72;
     credits_text_x=1100*window_width/1335,credits_text_y=1307*window_width/1335;
+    doordonot_x = 726*window_width/1335, doordonot_y = 37*window_width/1335;
+    ifyoudefine_x = 801*window_width/1335, ifyoudefine_y = 115*window_width/1335;
     credits_text_loc_y=5;
     size_of_closebutton_x_y = 20;
     loc_number_of_enemies_x = window_width*0.1, loc_number_of_enemies_y = window_height*0.1;
@@ -274,8 +296,8 @@ void load_everything()
     username_target.y = loc_number_of_enemies_y + 2* (number_of_enemies_h + 10);
     username_target.w = usernametype_w;
     username_target.h = usernametype_h;
+
     time(&start_time);
-    time(&temp_now);
     time(&start_time_troop);
     Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048);
     menu_music = Mix_LoadMUS("assets/menu.mp3");
@@ -290,26 +312,36 @@ void loadimages()
     
     if(ratio - 3/2< 0.0000001 && ratio - 3/2> -0.0000001)
     {
+        winbackground = SDL_LoadBMP("assets/vaderrogueone3-2.bmp");
+        losebackground = SDL_LoadBMP("assets/vaderburning3-2.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource3-2.bmp");
         startbackground = SDL_LoadBMP("assets/background3-2.bmp");
     }
     else if(ratio - 4/3 < 0.0001 && ratio - 4/3 > -0.0001)
     {
+        winbackground = SDL_LoadBMP("assets/vaderrogueone4-3.bmp");
+        losebackground = SDL_LoadBMP("assets/vaderburning4-3.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource4-3.bmp");
         startbackground = SDL_LoadBMP("assets/background4-3.bmp");
     }
     else if(ratio - 5/4< 0.0001 && ratio - 5/4> -0.0001)
     {
+        winbackground = SDL_LoadBMP("assets/vaderrogueone5-4.bmp");
+        losebackground = SDL_LoadBMP("assets/vaderburning5-4.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource5-4.bmp");
         startbackground = SDL_LoadBMP("assets/background5-4.bmp");
     }
     else if(ratio - 16/10< 0.0001 && ratio - 16/10> -0.0001)
     {
+        winbackground = SDL_LoadBMP("assets/vaderrogueone16-10.bmp");
+        losebackground = SDL_LoadBMP("assets/vaderburning16-10.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource16-10.bmp");
         startbackground = SDL_LoadBMP("assets/background16-10.bmp");
     }
     else
     {
+        winbackground = SDL_LoadBMP("assets/vaderrogueone16-9.bmp");
+        losebackground = SDL_LoadBMP("assets/vaderburning16-9.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource16-9.bmp");
         startbackground = SDL_LoadBMP("assets/background16-9.bmp");
     }
@@ -323,10 +355,10 @@ void loadimages()
     padmegrave2 = SDL_LoadBMP("assets/padmegrave2.bmp");
     backbutton = SDL_LoadBMP("assets/backbutton.bmp");
     startgame = SDL_LoadBMP("assets/startgame.bmp");
-    // generatemap = SDL_LoadBMP("assets/generatemap.bmp");
     updownbutton = SDL_LoadBMP("assets/updown.bmp");
     soundonphoto = SDL_LoadBMP("assets/soundon.bmp");
-
+    doordonot = SDL_LoadBMP("assets/doordonot.bmp");
+    ifyoudefine = SDL_LoadBMP("assets/ifyoudefine.bmp");
     closebutton = SDL_LoadBMP("assets/closebutton.bmp");
 
 
