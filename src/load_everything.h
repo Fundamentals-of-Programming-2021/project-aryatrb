@@ -15,6 +15,7 @@ int calculate_score();
 void winpage();
 void moving_troopers_without_a_home_update_location();
 void make_troopers_without_a_home(int q);
+double dist_between_two_poliside(int i, int j);
 
 struct troop{
     int current_x;
@@ -44,7 +45,8 @@ struct politic_side{
     int size_of_cells;
     int player_id;
     int number_of_troopers;
-    int number_of_moving_troppers;
+    int id_of_moving_troppers;
+    int number_of_moving_troopers;
     int is_moving;
     struct troop troopers[1000];
 };
@@ -53,6 +55,10 @@ struct kyber_cristal{
     int x;
     int y;
 };
+
+
+int nomansland_playerid=10;
+int main_players_id=0;
 
 struct troop troops_with_no_home[2000];
 int size_of_troops_with_no_home=0;
@@ -299,7 +305,7 @@ void load_everything()
 
     time(&start_time);
     time(&start_time_troop);
-    Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048);
+    Mix_OpenAudio(MIX_DEFAULT_FREQUENCY,MIX_DEFAULT_FORMAT,2,2048);
     menu_music = Mix_LoadMUS("assets/menu.mp3");
     game_music = Mix_LoadMUS("assets/Anakins_Symphony.mp3");
     Mix_PlayMusic(menu_music,-1);
@@ -371,7 +377,7 @@ void loadimages()
     faces[2] = SDL_LoadBMP("assets/faces/tano.bmp");
     faces[3] = SDL_LoadBMP("assets/faces/luke.bmp");
     faces[4] = SDL_LoadBMP("assets/faces/maul.bmp");
-    faces[10] = SDL_LoadBMP("assets/faces/r2d2.bmp");
+    faces[nomansland_playerid] = SDL_LoadBMP("assets/faces/r2d2.bmp");
 
     troopers[0] = SDL_LoadBMP("assets/troopers/stormtrooper.bmp");
     troopers[1] = SDL_LoadBMP("assets/troopers/deathtrooper.bmp");
@@ -389,5 +395,5 @@ void loadimages()
     planets_photos[2] = SDL_LoadBMP("assets/planet_rodia.bmp");
     planets_photos[3] = SDL_LoadBMP("assets/planet_naboo.bmp");
     planets_photos[4] = SDL_LoadBMP("assets/planet_mustafar.bmp");
-    planets_photos[10] = SDL_LoadBMP("assets/metal.bmp");
+    planets_photos[nomansland_playerid] = SDL_LoadBMP("assets/metal.bmp");
 }

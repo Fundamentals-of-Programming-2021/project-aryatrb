@@ -228,7 +228,6 @@ void rendercpypage10()
     SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target);
     SDL_Texture *startgametexture;
     SDL_Texture *leaders_faces_texture;
-    printf("rendercpy line 231\n");
     for(int i=0;i<size_of_politic_sides;i++)
     {
         leaders_faces_texture = SDL_CreateTextureFromSurface(renderer, faces[politic_sides[i].player_id]);
@@ -246,14 +245,14 @@ void rendercpypage10()
                 SDL_Color white = {255,255,255,255};
                 int w,h;
                 TTF_SizeText(number_of_soldiers,"100",&w,&h);
-                if(difftime(time_now,start_time)>=1 && ((politic_sides[i].player_id==10 && politic_sides[i].number_of_troopers<max_troop_no_mans_land) || (politic_sides[i].player_id!=10 && politic_sides[i].number_of_troopers<max_troop_in_someones_land)))
+                if(difftime(time_now,start_time)>=1 && ((politic_sides[i].player_id==nomansland_playerid && politic_sides[i].number_of_troopers<max_troop_no_mans_land) || (politic_sides[i].player_id!=nomansland_playerid && politic_sides[i].number_of_troopers<max_troop_in_someones_land)))
                 {
                     politic_sides[i].number_of_troopers+=difftime(time_now,start_time);
-                    if(politic_sides[i].player_id==10 && politic_sides[i].number_of_troopers>max_troop_no_mans_land)
+                    if(politic_sides[i].player_id==nomansland_playerid && politic_sides[i].number_of_troopers>max_troop_no_mans_land)
                     {
                         politic_sides[i].number_of_troopers = max_troop_no_mans_land;
                     }
-                    if(politic_sides[i].player_id!=10 && politic_sides[i].number_of_troopers>max_troop_in_someones_land)
+                    if(politic_sides[i].player_id!=nomansland_playerid && politic_sides[i].number_of_troopers>max_troop_in_someones_land)
                     {
                         politic_sides[i].number_of_troopers = max_troop_in_someones_land;
                     }
@@ -300,10 +299,10 @@ void rendercpypage10()
     }
     for(int j =0 ;j<size_of_politic_sides;j++)
     {
-        if(politic_sides[j].number_of_moving_troppers==0)
+        if(politic_sides[j].id_of_moving_troppers==0)
             continue;
         // SDL_Texture *movingtrooper_texture = SDL_CreateTextureFromSurface(renderer, troopers[politic_sides[j].troopers[0].player_id]);
-        for(int i = 0 ; i<politic_sides[j].number_of_moving_troppers ; i++)
+        for(int i = 0 ; i<politic_sides[j].id_of_moving_troppers ; i++)
         {
             if(politic_sides[j].troopers[i].is_out==0 || politic_sides[j].troopers[i].did_end==1)
                 continue;

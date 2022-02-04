@@ -187,7 +187,7 @@ void page2()
         {
             time(&game_start_time);
             load_the_map();
-            Mix_PauseMusic();
+            Mix_FadeOutMusic(10000);
             Mix_PlayMusic(game_music,-1);  
             page=10;
         }
@@ -272,8 +272,8 @@ void page10()
             else if(click_y>40 && click_y<window_height-40 && is_first_clicked==1)
             {
                 int temp = findclickedcell(click_x,click_y,&second_click,0);
-                if(politic_sides[second_click].number_of_moving_troppers!=0)
-                    stop_the_moving_troopers__new_destination(first_click);
+                // if(politic_sides[second_click].id_of_moving_troppers!=0)
+                    // stop_the_moving_troopers__new_destination(first_click);
                 if(temp)
                     create_moving_troopers(first_click,second_click);
             }
