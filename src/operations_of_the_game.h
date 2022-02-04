@@ -45,9 +45,8 @@ int findclickedcell(int click_x, int click_y, int *ret, int id_is_zero)
         if(click_x>cells[politic_sides[j].cells_x[0]][politic_sides[j].cells_y[0]].x && click_x<cells[politic_sides[j].cells_x[0]][politic_sides[j].cells_y[0]].x + size_of_each_cell_x
         && click_y>cells[politic_sides[j].cells_x[0]][politic_sides[j].cells_y[0]].y && click_y<cells[politic_sides[j].cells_x[0]][politic_sides[j].cells_y[0]].y + size_of_each_cell_y)
         {
-            if((id_is_zero==1 && politic_sides[j].player_id==0) || id_is_zero==0)
+            if((id_is_zero==1 && politic_sides[j].player_id==main_players_id) || id_is_zero==0)
             {
-                // printf("%d\n", j);
                 *ret=j;
                 return 1;
             }
@@ -55,7 +54,40 @@ int findclickedcell(int click_x, int click_y, int *ret, int id_is_zero)
     }
     return 0;
 }
-
+int check_if_any_enemy_soldier_is_nearby_poli(struct troop *chosen_troop)
+{
+    for(int i=0;i<size_of_politic_sides;i++)
+    {
+        for(int j=0;j<politic_sides[i].id_of_moving_troppers;j++)
+        {
+            if(politic_sides[i].troopers[j].is_out==1 && politic_sides[i].troopers[j].did_end==0 && 
+                politic_sides[i].troopers[j].player_id!=chosen_troop->player_id &&
+                dist_two_point(chosen_troop->current_x, chosen_troop->current_y, politic_sides[i].troopers[j].current_x,politic_sides[i].troopers[j].current_y)
+             <size_of_troopers_x_y*1.5)
+             {
+                 politic_sides[i].troopers[j].did_end=1;
+                 chosen_troop->did_end=1;
+                 return 1;
+             }
+        }
+    }
+    for(int i=0;i<size_of_troops_with_no_home;i++)
+    {
+        if(troops_with_no_home[i].is_out==1 && troops_with_no_home[i].did_end==0 &&
+        dist_two_point(chosen_troop->current_x, chosen_troop->current_y, troops_with_no_home[i].current_x, troops_with_no_home[i].current_y)
+        <size_of_troopers_x_y*1.5)
+        {
+            troops_with_no_home[i].did_end=1;
+            chosen_troop->did_end=1;
+            return 1;
+        }
+    }
+    return 0;
+}
+int dist_two_point(int i_one, int j_one, int i_two, int j_two)
+{
+    return sqrt((i_one-i_two)*(i_one-i_two)+(j_one-j_two)*(j_one-j_two));
+}
 void moving_troopers_update_location()
 {
     struct timeval tv;
@@ -71,13 +103,16 @@ void moving_troopers_update_location()
             }
             if(politic_sides[j].troopers[i].did_end==1 || politic_sides[j].troopers[i].is_out==0)
                 continue;
+            if(check_if_any_enemy_soldier_is_nearby_poli(&politic_sides[j].troopers[i]))
+                continue;
             int m = politic_sides[j].troopers[i].dest_x - politic_sides[j].troopers[i].current_x;
             int sgn_m = sgn(m);
             m = abs(m);
             int n = politic_sides[j].troopers[i].dest_y - politic_sides[j].troopers[i].current_y;
             int sgn_n = sgn(n);
             n = abs(n);
-            // printf("%d %d ------- ", politic_sides[j].troopers[i].current_x, politic_sides[j].troopers[i].current_y);
+            // printf("first %d %d %d %d\n", politic_sides[j].troopers[i].current_x,politic_sides[j].troopers[i].current_y,politic_sides[j].id_of_moving_troppers ,politic_sides[j].troopers[i].till_end_a);
+            
             if(abs(m)>abs(n) && m!=0 && n!=0)
             {
                 // politic_sides[j].troopers[i].current_y = (double)((politic_sides[j].troopers[i].dest_y*politic_sides[j].troopers[i].till_end_a) + politic_sides[j].troopers[i].current_y
@@ -101,6 +136,7 @@ void moving_troopers_update_location()
             // printf("%d %d\n", politic_sides[j].troopers[i].current_x, politic_sides[j].troopers[i].current_y);
             m = politic_sides[j].troopers[i].current_x - politic_sides[j].troopers[i].dest_x;
             n = politic_sides[j].troopers[i].current_y - politic_sides[j].troopers[i].dest_y;
+            // printf("second %d %d %d %d\n", politic_sides[j].troopers[i].current_x,politic_sides[j].troopers[i].current_y,politic_sides[j].id_of_moving_troppers ,politic_sides[j].troopers[i].till_end_a);
             if(sqrt(m*m+n*n) < size_of_each_cell_x*1/5)
             {
                 if(i==politic_sides[j].id_of_moving_troppers-1)
@@ -128,6 +164,8 @@ void moving_troopers_update_location()
                         if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].troopers[i].is_out==0)
                             politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].troopers[i].seconds_till_out=0;
                     politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].id_of_moving_troppers=0;
+                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers=0;
+                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_moving_troopers=0;
                     politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].is_moving=0;
                 }
                 if(politic_sides[j].id_of_moving_troppers<=0)
@@ -148,6 +186,8 @@ void moving_troopers_without_a_home_update_location()
             troops_with_no_home[i].is_out=1;
         }
         if(troops_with_no_home[i].did_end==1 || troops_with_no_home[i].is_out==0)
+            continue;
+        if(check_if_any_enemy_soldier_is_nearby_poli(&troops_with_no_home[i]))
             continue;
         int m = troops_with_no_home[i].dest_x - troops_with_no_home[i].current_x;
         int sgn_m = sgn(m);
@@ -190,6 +230,7 @@ void moving_troopers_without_a_home_update_location()
                 politic_sides[troops_with_no_home[i].enemy_politic_side_number].player_id=troops_with_no_home[i].player_id;
                 make_troopers_without_a_home(troops_with_no_home[i].enemy_politic_side_number);
                 politic_sides[troops_with_no_home[i].enemy_politic_side_number].id_of_moving_troppers=0;
+                politic_sides[troops_with_no_home[i].enemy_politic_side_number].number_of_troopers=0;
                 politic_sides[troops_with_no_home[i].enemy_politic_side_number].number_of_moving_troopers=0;
                 politic_sides[troops_with_no_home[i].enemy_politic_side_number].is_moving=0;
             }
@@ -204,6 +245,8 @@ void make_troopers_without_a_home(int q)
         size_of_troops_with_no_home++;
     }
 }
+
+
 void create_cells()
 {
     number_of_cells_x=0;
@@ -326,7 +369,9 @@ void save_the_map()
     fprintf(mapwrite,"\n");
     for(int i=0;i<=size_of_politic_sides;i++)
     {
-        fprintf(mapwrite,"%d %d %d\n", politic_sides[i].player_id,politic_sides[i].size_of_cells,politic_sides[i].number_of_troopers);
+        fprintf(mapwrite,"%d %d %d %d %d %d\n", politic_sides[i].player_id,politic_sides[i].size_of_cells,politic_sides[i].number_of_troopers,politic_sides[i].number_of_moving_troopers, 
+        politic_sides[i].id_of_moving_troppers, politic_sides[i].is_moving);
+        
         for(int j=0;j<politic_sides[i].size_of_cells;j++)
             fprintf(mapwrite,"%d %d\n",politic_sides[i].cells_x[j],politic_sides[i].cells_y[j]);
         fprintf(mapwrite,"\n");
@@ -376,13 +421,13 @@ void first_user_save()
     fprintf(user_file,"%d\n",a);
     fclose(user_file);
 }
-int read_users_score(int do_add)
+int read_users_score(int do_add, char username_entry_text[])
 {
     char filechar[40];
-    for(int i=0; i<40 && username_text[i]!='.';i++)
+    for(int i=0; i<40 && username_entry_text[i]!='.';i++)
     {
-        filechar[i]=username_text[i];
-        if(i+1==40 || username_text[i+1]=='.')
+        filechar[i]=username_entry_text[i];
+        if(i+1==40 || username_entry_text[i+1]=='.')
         {
             filechar[i+1]='\0';
             break;
@@ -426,10 +471,11 @@ void load_the_map()
             fscanf(loadedmap,"%d %d %d %d %d %d",&cells[i][j].x, &cells[i][j].y, &cells[i][j].is_territoy, &cells[i][j].politic_side_number, &cells[i][j].does_it_have_military, &cells[i][j].is_occupied);
     for(int i=0;i<=size_of_politic_sides;i++)
     {
-        fscanf(loadedmap,"%d %d %d\n", &politic_sides[i].player_id, &politic_sides[i].size_of_cells, &politic_sides[i].number_of_troopers);
+        fscanf(loadedmap,"%d %d %d %d %d %d\n", &politic_sides[i].player_id, &politic_sides[i].size_of_cells, &politic_sides[i].number_of_troopers,&politic_sides[i].number_of_moving_troopers,&politic_sides[i].id_of_moving_troppers,&politic_sides[i].is_moving);
         for(int j=0;j<politic_sides[i].size_of_cells;j++)
             fscanf(loadedmap,"%d %d\n", &politic_sides[i].cells_x[j], &politic_sides[i].cells_y[j]);
     }
+    update_politic_sides_of_users();
     fclose(loadedmap);
 }
 
@@ -437,12 +483,10 @@ void create_moving_troopers(int start_loc, int des_loc)
 {
     if(start_loc==des_loc)
         return;
-    is_first_clicked=0;
     // int last_sec = (seconds_until_trooper_is_out * floor((politic_sides[start_loc].number_of_troopers-1)/3) + politic_sides[start_loc].number_of_troopers+difftime(time_now,start_time));
     int last_sec = politic_sides[start_loc].number_of_troopers - politic_sides[start_loc].number_of_moving_troopers;
     for(int i=0;i<last_sec;i++)
     {
-        
         int size_of_moving_troopers = politic_sides[start_loc].id_of_moving_troppers;
         struct timeval tv;
         gettimeofday(&tv,NULL);
@@ -490,30 +534,12 @@ void create_moving_troopers(int start_loc, int des_loc)
                 politic_sides[start_loc].troopers[size_of_moving_troopers].dest_x -= dist_x;
             }
         }
-        // printf("%d %d\n", politic_sides[start_loc].troopers[size_of_moving_troopers].current_x,politic_sides[start_loc].troopers[size_of_moving_troopers].current_y);
-        // int m= (politic_sides[start_loc].troopers[i].dest_x - politic_sides[start_loc].troopers[i].current_x);
-        // int n= (politic_sides[start_loc].troopers[i].dest_y - politic_sides[start_loc].troopers[i].current_y);
-        // politic_sides[start_loc].troopers[size_of_moving_troopers].till_end_a = ceil(dist_moving_trooper_per_sec*abs(n)/sqrt(m*m+n*n));
-        // if(abs(m)<abs(n))
-            // politic_sides[start_loc].troopers[size_of_moving_troopers].till_end_a = ceil(dist_moving_trooper_per_sec*abs(m)/sqrt(m*m+n*n));
-        // if(m==0 || n==0)
-            politic_sides[start_loc].troopers[size_of_moving_troopers].till_end_a = dist_moving_trooper_per_sec;
-        // printf("--%d--\n",politic_sides[start_loc].troopers[size_of_moving_troopers].till_end_a);
+        politic_sides[start_loc].troopers[size_of_moving_troopers].till_end_a = dist_moving_trooper_per_sec;
         politic_sides[start_loc].troopers[size_of_moving_troopers].player_id = politic_sides[start_loc].player_id;
         politic_sides[start_loc].id_of_moving_troppers++;
         politic_sides[start_loc].number_of_moving_troopers++;
     }
 }
-// void stop_the_moving_troopers__new_destination(int firs_t)
-// {
-//     int new_num_mov_tro=0;
-//     for(int i=0;i<politic_sides[firs_t].id_of_moving_troppers;i++)
-//         if(politic_sides[firs_t].troopers[i].is_out==0)
-//             new_num_mov_tro++;
-    
-//     politic_sides[firs_t].id_of_moving_troppers = 0;
-//     politic_sides[firs_t].number_of_troopers = new_num_mov_tro;
-// }
 int sgn(int a)
 {
     if(a<0)
@@ -532,6 +558,8 @@ void main_while_operation()
             page1();
         else if(page==2)
             page2();
+        else if(page==3)
+            page3();
         else if(page==4)
             page4();
         else if (page==10)
@@ -661,9 +689,10 @@ void enemy_ai()
                 {
                     d++;
                     tot_of_user[j]+= politic_sides[i].number_of_troopers - politic_sides[i].number_of_moving_troopers;
-                    printf("%d %d %d id:%d\n",tot_of_user[j],politic_sides[i].number_of_troopers, politic_sides[i].number_of_moving_troopers,politic_sides[i].player_id);
+                    // printf("%d %d %d id:%d\n",tot_of_user[j],politic_sides[i].number_of_troopers, politic_sides[i].number_of_moving_troopers,politic_sides[i].player_id);
                     for(int k=0;k<size_of_politic_sides;k++)
-                        if(j!=politic_sides[k].player_id
+                        if(j!=politic_sides[k].player_id &&
+                            politic_sides[j].player_id!=nomansland_playerid
                             &&
                                 ((politic_sides[k].is_moving==1 &&  
                                 tot_of_user[j]>10)
@@ -673,10 +702,8 @@ void enemy_ai()
                                     for(int w=0;w<i;w++)
                                         if(politic_sides[w].player_id==j)
                                             create_moving_troopers(w,k);
-                                    return;
                                 }
                 }
-
     for(int j=0;j<size_of_politic_sides;j++)
     {
         int optionss[20] = {0};
@@ -726,4 +753,70 @@ double dist_between_two_poliside(int i, int j)
         +
         (politic_sides[i].cells_y[0] - politic_sides[j].cells_y[0])*
         (politic_sides[i].cells_y[0] - politic_sides[j].cells_y[0]));
+}
+
+void leaderboard_set()
+{
+    char temper_text[100],temp_text[100];
+    FILE *mapsave = fopen("assets/leaderboard/users_list.txt", "r");
+    while(1)
+    {
+        int al;
+        if(fgets(temper_text,100, mapsave)==NULL)
+            break;
+        sscanf(temper_text,"assets/leaderboard/1users_files/%s.txt", temp_text);
+        char ss[40];
+        for(int i=0;i<strlen(temper_text);i++)
+            if(temp_text[i]=='.')
+            {
+                ss[i]='\0';
+                break;
+            }
+            else
+                ss[i]=temp_text[i];
+        strcpy(leaderboard_users[number_of_leaderboard_users].name, ss);
+        leaderboard_users[number_of_leaderboard_users].score = read_users_score(0,ss);
+        number_of_leaderboard_users++;
+        leaderboard_users[number_of_leaderboard_users].rank=number_of_leaderboard_users;
+    }
+    fclose(mapsave);
+    for(int i=0;i<number_of_leaderboard_users;i++)
+    {
+        for(int j=0;j<number_of_leaderboard_users;j++)
+        {
+            if(leaderboard_users[j].score>leaderboard_users[i].score)
+            {
+                struct leaderboard_or_something temp;
+                temp = leaderboard_users[j];
+                leaderboard_users[j]=leaderboard_users[i];
+                leaderboard_users[i]=temp;
+            }
+        }
+    }
+
+}
+
+
+void upboard_setup()
+{
+    total_of_soldiers_in_map=0;
+    for(int i=0;i<size_of_politic_sides;i++)
+    {
+        upboardwidth[politic_sides[i].player_id]+=politic_sides[i].number_of_troopers;
+        for(int j=0;j<politic_sides[i].id_of_moving_troppers;j++)
+        {
+            if(politic_sides[i].troopers[j].is_out==0 || politic_sides[i].troopers[j].did_end==1)
+                continue;
+            upboardwidth[politic_sides[i].player_id]++;
+        }
+    }
+    for(int i=0;i<size_of_troops_with_no_home;i++)
+    {
+        if(troops_with_no_home[i].is_out==0 || troops_with_no_home[i].did_end==1)
+            continue;
+        upboardwidth[troops_with_no_home[i].player_id]++;
+    }
+    for(int i=0;i<number_of_enemies + 1;i++)
+        total_of_soldiers_in_map+= upboardwidth[i];
+    total_of_soldiers_in_map+= upboardwidth[nomansland_playerid];
 }

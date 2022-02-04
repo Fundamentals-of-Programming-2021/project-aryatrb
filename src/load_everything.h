@@ -1,7 +1,9 @@
+
 int sgn(int a);
 void page0();
 void page1();
 void page2();
+void page3();
 void page4();
 void page10();
 void loadimages();
@@ -16,6 +18,10 @@ void winpage();
 void moving_troopers_without_a_home_update_location();
 void make_troopers_without_a_home(int q);
 double dist_between_two_poliside(int i, int j);
+void update_politic_sides_of_users();
+int dist_two_point(int i_one, int j_one, int i_two, int j_two);
+void page2to10();
+void pageto1();
 
 struct troop{
     int current_x;
@@ -55,8 +61,13 @@ struct kyber_cristal{
     int x;
     int y;
 };
-
-
+struct leaderboard_or_something{
+    char name[100];
+    int score;
+    int rank;
+};
+struct leaderboard_or_something leaderboard_users[50];
+int number_of_leaderboard_users=0;
 int nomansland_playerid=10;
 int main_players_id=0;
 
@@ -118,11 +129,13 @@ int did_win_int=0;
 
 int number_of_enemies=4;
 int number_of_politic_sides_per_user=1;
-
+int upboardwidth[15] = {0};
+int total_of_soldiers_in_map;
 
 SDL_Surface *startbackground;
 SDL_Surface *starsbackground;
 SDL_Surface *winbackground;
+SDL_Surface *leaderboardbackground;
 SDL_Surface *losebackground;
 SDL_Surface *load_game;
 SDL_Surface *leaderboard;
@@ -140,6 +153,7 @@ SDL_Surface *updownbutton;
 SDL_Surface *faces[15];
 SDL_Surface *troopers[15];
 SDL_Surface *planets_photos[15];
+SDL_Surface *upboardcolor[15];
 SDL_Surface *kyber_cristal_photos[4];
 SDL_Surface *wall;
 SDL_Surface *wallflipped;
@@ -318,6 +332,7 @@ void loadimages()
     
     if(ratio - 3/2< 0.0000001 && ratio - 3/2> -0.0000001)
     {
+        leaderboardbackground = SDL_LoadBMP("assets/kenobivsmaul3-2.bmp");
         winbackground = SDL_LoadBMP("assets/vaderrogueone3-2.bmp");
         losebackground = SDL_LoadBMP("assets/vaderburning3-2.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource3-2.bmp");
@@ -325,6 +340,7 @@ void loadimages()
     }
     else if(ratio - 4/3 < 0.0001 && ratio - 4/3 > -0.0001)
     {
+        leaderboardbackground = SDL_LoadBMP("assets/kenobivsmaul4-3.bmp");
         winbackground = SDL_LoadBMP("assets/vaderrogueone4-3.bmp");
         losebackground = SDL_LoadBMP("assets/vaderburning4-3.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource4-3.bmp");
@@ -332,6 +348,7 @@ void loadimages()
     }
     else if(ratio - 5/4< 0.0001 && ratio - 5/4> -0.0001)
     {
+        leaderboardbackground = SDL_LoadBMP("assets/kenobivsmaul5-4.bmp");
         winbackground = SDL_LoadBMP("assets/vaderrogueone5-4.bmp");
         losebackground = SDL_LoadBMP("assets/vaderburning5-4.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource5-4.bmp");
@@ -339,6 +356,7 @@ void loadimages()
     }
     else if(ratio - 16/10< 0.0001 && ratio - 16/10> -0.0001)
     {
+        leaderboardbackground = SDL_LoadBMP("assets/kenobivsmaul16-10.bmp");
         winbackground = SDL_LoadBMP("assets/vaderrogueone16-10.bmp");
         losebackground = SDL_LoadBMP("assets/vaderburning16-10.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource16-10.bmp");
@@ -346,6 +364,7 @@ void loadimages()
     }
     else
     {
+        leaderboardbackground = SDL_LoadBMP("assets/kenobivsmaul16-9.bmp");
         winbackground = SDL_LoadBMP("assets/vaderrogueone16-9.bmp");
         losebackground = SDL_LoadBMP("assets/vaderburning16-9.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource16-9.bmp");
@@ -396,4 +415,11 @@ void loadimages()
     planets_photos[3] = SDL_LoadBMP("assets/planet_naboo.bmp");
     planets_photos[4] = SDL_LoadBMP("assets/planet_mustafar.bmp");
     planets_photos[nomansland_playerid] = SDL_LoadBMP("assets/metal.bmp");
+
+    upboardcolor[0]=SDL_LoadBMP("assets/colors/upboardblack.bmp");
+    upboardcolor[1]=SDL_LoadBMP("assets/colors/upboardgreen.bmp");
+    upboardcolor[2]=SDL_LoadBMP("assets/colors/upboardahsoka.bmp");
+    upboardcolor[3]=SDL_LoadBMP("assets/colors/upboardskin.bmp");
+    upboardcolor[4]=SDL_LoadBMP("assets/colors/upboardred.bmp");
+    upboardcolor[nomansland_playerid]=SDL_LoadBMP("assets/colors/upboardwhite.bmp");
 }

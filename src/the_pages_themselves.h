@@ -17,7 +17,7 @@ void page0()
             click_x=ev.button.x;
             click_y=ev.button.y;
             if(click_x>new_game_target.x && click_x<new_game_target.x + new_game_target.w && click_y>new_game_target.y && click_y<new_game_target.y + new_game_target.h)
-                page=1;
+                pageto1();
             else if(click_x>load_game_target.x  && click_x<load_game_target.x + load_game_target.w  && click_y>load_game_target.y && click_y<load_game_target.y + load_game_target.h)
             {
                 page=2;
@@ -26,7 +26,10 @@ void page0()
                 findtotalofsaves();
             }
             else if(click_x>leaderboard_target.x && click_x<leaderboard_target.x + leaderboard_target.w && click_y>leaderboard_target.y && click_y<leaderboard_target.y + leaderboard_target.h)
+            {
+                leaderboard_set();
                 page=3;
+            }
             else if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
                 soundchange();
             else if(click_x>credits_target.x && click_x<credits_target.x+credits_target.w &&
@@ -184,13 +187,7 @@ void page2()
             writing_mode_map_select=1;
         else if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
         && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h)
-        {
-            time(&game_start_time);
-            load_the_map();
-            Mix_FadeOutMusic(10000);
-            Mix_PlayMusic(game_music,-1);  
-            page=10;
-        }
+            page2to10();   
     }
     if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
         backbutton_x_y=50 * 1.2;
@@ -201,8 +198,49 @@ void page2()
         start_game_x=327*window_width/1335 * 1.1, start_game_y= 37*window_width/1335 * 1.1;
     else
         start_game_x=327*window_width/1335, start_game_y= 37*window_width/1335;
-
 }
+
+void page3()
+{
+    rendercpypage3();
+    SDL_PumpEvents();
+    SDL_FlushEvents(SDL_FIRSTEVENT,SDL_LASTEVENT);
+    SDL_WaitEvent(&ev);
+    int click_x,click_y;
+    SDL_GetMouseState(&click_x,&click_y);
+    if(ev.type==SDL_QUIT)
+    {
+        game_running=0;
+        return;
+    }
+    if(ev.type==SDL_KEYDOWN && ev.key.keysym.sym==SDLK_UP && credits_text_loc_y<5)
+        credits_text_loc_y+=5;
+    else if(ev.type==SDL_KEYDOWN && ev.key.keysym.sym==SDLK_DOWN && credits_text_loc_y>5-(credits_text_y-window_height))
+        credits_text_loc_y-=5;
+    else if(ev.type==SDL_MOUSEBUTTONDOWN && ev.button.button==SDL_BUTTON_LEFT)
+    {
+        click_x=ev.button.x;
+        click_y=ev.button.y;
+        if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
+            soundchange();
+        else if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
+        {
+            page=0;
+            
+        }
+        else if(click_x>closebutton_target.x && click_x<closebutton_target.x + closebutton_target.w 
+                && click_y>closebutton_target.y && click_y<closebutton_target.y + closebutton_target.h)
+        {
+            game_running=0;
+            return;
+        }
+    }
+    if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
+        backbutton_x_y=50 * 1.2;
+    else
+        backbutton_x_y=50;
+}
+
 void page4()
 {
     rendercpypage4();
@@ -267,15 +305,14 @@ void page10()
                 game_running=0;
                 return;
             }
-            else if(click_y>40 && click_y<window_height-40 && is_first_clicked==0)
+            else if(click_y>size_of_wall_y && click_y<window_height-size_of_wall_y && is_first_clicked==0)
                 is_first_clicked=findclickedcell(click_x,click_y,&first_click,1);
-            else if(click_y>40 && click_y<window_height-40 && is_first_clicked==1)
+            else if(click_y>size_of_wall_y && click_y<window_height-size_of_wall_y && is_first_clicked==1)
             {
                 int temp = findclickedcell(click_x,click_y,&second_click,0);
-                // if(politic_sides[second_click].id_of_moving_troppers!=0)
-                    // stop_the_moving_troopers__new_destination(first_click);
                 if(temp)
                     create_moving_troopers(first_click,second_click);
+                is_first_clicked=0;
             }
         }
     }
@@ -284,17 +321,17 @@ void page10()
     moving_troopers_without_a_home_update_location();
     update_politic_sides_of_users();
     enemy_ai();
-    if(did_win()==1)
+    if(did_win())
     {   
         did_win_int = 1;
-        user_score = read_users_score(1);
+        user_score = read_users_score(1,username_text);
         added_score = calculate_score();
         page=99;  
     }
     if(did_lose())
     {
         did_win_int = -1;
-        user_score = read_users_score(1);
+        user_score = read_users_score(1,username_text);
         added_score = calculate_score();
         page=99; 
     }
@@ -348,3 +385,25 @@ void page1to10()
     }    
 }
 
+void page2to10()
+{
+    time(&game_start_time);
+    load_the_map();
+    Mix_PausedMusic();
+    Mix_PlayMusic(game_music,-1);  
+    page=10;
+    for(int i=0;i<number_of_enemies+1;i++)
+    {
+        movingtrooper_texture[i]=SDL_CreateTextureFromSurface(renderer, troopers[i]);
+    } 
+}
+
+
+void pageto1()
+{
+    enemies_target.x = loc_number_of_enemies_x;
+    enemies_target.y = loc_number_of_enemies_y;
+    enemies_target.w = number_of_enemies_w;
+    enemies_target.h = number_of_enemies_h;
+    page=1;
+}
