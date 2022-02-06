@@ -22,6 +22,7 @@ void update_politic_sides_of_users();
 int dist_two_point(int i_one, int j_one, int i_two, int j_two);
 void page2to10();
 void pageto1();
+void pageto2();
 
 struct troop{
     int current_x;
@@ -30,7 +31,6 @@ struct troop{
     int dest_y;
     int player_id;
     int did_end;
-    int till_end_a;
     int is_out;
     struct timeval time;
     double seconds_till_out;
@@ -56,21 +56,37 @@ struct politic_side{
     int is_moving;
     struct troop troopers[1000];
 };
+struct player_himself{
+    int player_id;
+    int till_end_a;
+    int does_have_kyber;
+    int create_trooper_rate;
+};
 struct kyber_cristal{
     int type;
     int x;
     int y;
+    int is_on;
+    int is_dead;
+    struct timeval time;
+    double seconds_till_off;
+    int player_id;
 };
 struct leaderboard_or_something{
     char name[100];
     int score;
     int rank;
 };
+struct player_himself players[10];
 struct leaderboard_or_something leaderboard_users[50];
 int number_of_leaderboard_users=0;
 int nomansland_playerid=10;
 int main_players_id=0;
 
+int did_we_even_calculate=0;
+int is_there_any_type_n_kyber[4] ={0};
+
+int global_kyber_user_two;
 struct troop troops_with_no_home[2000];
 int size_of_troops_with_no_home=0;
 int window_width;
@@ -115,6 +131,7 @@ int dist_from_mid=10;
 int dist_moving_trooper_per_sec=10;
 int start_ticks;
 double seconds_until_trooper_is_out = 0.18;
+double kybers_time_till_end[5] = {3000000,3000000,3000000, 3000000, 10000000};
 int size_of_wall_y=40;
 char username_text[33] = "............................";
 char mapselect[33] = "............................";
@@ -154,7 +171,8 @@ SDL_Surface *faces[15];
 SDL_Surface *troopers[15];
 SDL_Surface *planets_photos[15];
 SDL_Surface *upboardcolor[15];
-SDL_Surface *kyber_cristal_photos[4];
+SDL_Surface *kyber_cristal_photos[5];
+SDL_Surface *kyber_cristalon_photos[5];
 SDL_Surface *wall;
 SDL_Surface *wallflipped;
 SDL_Surface *backtomenu;
@@ -205,6 +223,8 @@ time_t start_time_troop;
 time_t calc_time;
 
 SDL_Texture *movingtrooper_texture[10];
+SDL_Texture *kybertexture[5];
+SDL_Texture *kyberontexture[5];
 
 
 SDL_Renderer* renderer;
@@ -404,10 +424,25 @@ void loadimages()
     troopers[3] = SDL_LoadBMP("assets/troopers/clonetrooper.bmp");
     troopers[4] = SDL_LoadBMP("assets/troopers/mandalorian.bmp");
 
+    for(int i=0;i<number_of_enemies+1;i++)
+        movingtrooper_texture[i]=SDL_CreateTextureFromSurface(renderer, troopers[i]);
+
     kyber_cristal_photos[0] = SDL_LoadBMP("assets/kybers/kyber_blue.bmp");
-    kyber_cristal_photos[1] = SDL_LoadBMP("assets/kybers/kyber_green.bmp");
+    kyber_cristal_photos[1] = SDL_LoadBMP("assets/kybers/kyber_red.bmp");
     kyber_cristal_photos[2] = SDL_LoadBMP("assets/kybers/kyber_purple.bmp");
-    kyber_cristal_photos[3] = SDL_LoadBMP("assets/kybers/kyber_red.bmp");
+    kyber_cristal_photos[3] = SDL_LoadBMP("assets/kybers/kyber_green.bmp");
+    kyber_cristal_photos[4] = SDL_LoadBMP("assets/kybers/kyber_orange.bmp");
+    for(int i=0;i<5;i++)
+        kybertexture[i]=SDL_CreateTextureFromSurface(renderer, kyber_cristal_photos[i]);
+
+
+    kyber_cristalon_photos[0] = SDL_LoadBMP("assets/kyberson/kyber_blueon.bmp");
+    kyber_cristalon_photos[1] = SDL_LoadBMP("assets/kyberson/kyber_redon.bmp");
+    kyber_cristalon_photos[2] = SDL_LoadBMP("assets/kyberson/kyber_purpleon.bmp");
+    kyber_cristalon_photos[3] = SDL_LoadBMP("assets/kyberson/kyber_greenon.bmp");
+    kyber_cristalon_photos[4] = SDL_LoadBMP("assets/kyberson/kyber_orangeon.bmp");
+    for(int i=0;i<5;i++)
+        kyberontexture[i]=SDL_CreateTextureFromSurface(renderer, kyber_cristalon_photos[i]);
 
     planets_photos[0] = SDL_LoadBMP("assets/planet_death_star.bmp");
     planets_photos[1] = SDL_LoadBMP("assets/planet_lothal.bmp");
@@ -416,10 +451,10 @@ void loadimages()
     planets_photos[4] = SDL_LoadBMP("assets/planet_mustafar.bmp");
     planets_photos[nomansland_playerid] = SDL_LoadBMP("assets/metal.bmp");
 
-    upboardcolor[0]=SDL_LoadBMP("assets/colors/upboardblack.bmp");
-    upboardcolor[1]=SDL_LoadBMP("assets/colors/upboardgreen.bmp");
-    upboardcolor[2]=SDL_LoadBMP("assets/colors/upboardahsoka.bmp");
-    upboardcolor[3]=SDL_LoadBMP("assets/colors/upboardskin.bmp");
-    upboardcolor[4]=SDL_LoadBMP("assets/colors/upboardred.bmp");
-    upboardcolor[nomansland_playerid]=SDL_LoadBMP("assets/colors/upboardwhite.bmp");
+    upboardcolor[0]=SDL_LoadBMP("assets/sabers/lightsaberred.bmp");
+    upboardcolor[1]=SDL_LoadBMP("assets/sabers/spear.bmp");
+    upboardcolor[2]=SDL_LoadBMP("assets/sabers/lightsaberblue.bmp");
+    upboardcolor[3]=SDL_LoadBMP("assets/sabers/lightsabergreen.bmp");
+    upboardcolor[4]=SDL_LoadBMP("assets/sabers/darksaber.bmp");
+    upboardcolor[nomansland_playerid]=SDL_LoadBMP("assets/sabers/lightsaberwhite.bmp");
 }

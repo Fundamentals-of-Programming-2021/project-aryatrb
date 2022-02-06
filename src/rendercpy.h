@@ -293,23 +293,29 @@ void rendercpypage10()
     SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target);
     SDL_Texture *startgametexture;
     SDL_Texture *leaders_faces_texture;
-    upboard_setup();
     SDL_Rect upboard_target = {window_width*0.2, size_of_wall_y*0.1,window_width*0.6,size_of_wall_y*0.8};
     int k=0;
-    for(int i=0;i<number_of_enemies+1;i++)
+    if(did_we_even_calculate)
     {
-        SDL_Texture *tempture = SDL_CreateTextureFromSurface(renderer, upboardcolor[i]);
+        for(int i=0;i<number_of_enemies+1;i++)
+        {
+            SDL_Texture *tempture = SDL_CreateTextureFromSurface(renderer, upboardcolor[i]);
+            upboard_target.x = window_width*0.2 + window_width*0.6*(double)((double)k/(double)total_of_soldiers_in_map);
+            k+=upboardwidth[i];
+            upboard_target.w= (window_width*0.8) - upboard_target.x;
+            // printf("%d %d\n", upboard_target.x, upboard_target.w);
+            SDL_RenderCopy(renderer, tempture, NULL, &upboard_target);
+            SDL_DestroyTexture(tempture);
+        }
+        SDL_Texture *tempture = SDL_CreateTextureFromSurface(renderer, upboardcolor[nomansland_playerid]);
         upboard_target.x = window_width*0.2 + window_width*0.6*(double)((double)k/(double)total_of_soldiers_in_map);
-        k+=upboardwidth[i];
-        upboard_target.w= (window_width*0.6)*(double)((double)upboardwidth[i]/(double)total_of_soldiers_in_map);
+        k+=upboardwidth[nomansland_playerid];
+        upboard_target.w= (window_width*0.8) - upboard_target.x;
+        // printf("%d %d\n", upboard_target.x, upboard_target.w);
         SDL_RenderCopy(renderer, tempture, NULL, &upboard_target);
         SDL_DestroyTexture(tempture);
     }
-    SDL_Texture *tempture = SDL_CreateTextureFromSurface(renderer, upboardcolor[nomansland_playerid]);
-    k+=upboardwidth[nomansland_playerid];
-    upboard_target.w= (window_width*0.6)*(double)((double)upboardwidth[nomansland_playerid]/(double)total_of_soldiers_in_map);
-    SDL_RenderCopy(renderer, tempture, NULL, &upboard_target);
-    SDL_DestroyTexture(tempture);
+   
     for(int i=0;i<size_of_politic_sides;i++)
     {
         leaders_faces_texture = SDL_CreateTextureFromSurface(renderer, faces[politic_sides[i].player_id]);
@@ -327,9 +333,11 @@ void rendercpypage10()
                 SDL_Color white = {255,255,255,255};
                 int w,h;
                 TTF_SizeText(number_of_soldiers,"100",&w,&h);
-                if(difftime(time_now,start_time)>=1 && ((politic_sides[i].player_id==nomansland_playerid && politic_sides[i].number_of_troopers<max_troop_no_mans_land) || (politic_sides[i].player_id!=nomansland_playerid && politic_sides[i].number_of_troopers<max_troop_in_someones_land)))
+                if(difftime(time_now,start_time)>=1 && politic_sides[i].player_id!=nomansland_playerid &&
+                ((politic_sides[i].player_id==nomansland_playerid && politic_sides[i].number_of_troopers<max_troop_no_mans_land) || (politic_sides[i].player_id!=nomansland_playerid && politic_sides[i].number_of_troopers<max_troop_in_someones_land)))
                 {
-                    politic_sides[i].number_of_troopers+=difftime(time_now,start_time);
+                    spell_type_four(politic_sides[i].player_id);
+                    politic_sides[i].number_of_troopers+=difftime(time_now,start_time) * players[politic_sides[i].player_id].create_trooper_rate;
                     if(politic_sides[i].player_id==nomansland_playerid && politic_sides[i].number_of_troopers>max_troop_no_mans_land)
                     {
                         politic_sides[i].number_of_troopers = max_troop_no_mans_land;
@@ -358,7 +366,6 @@ void rendercpypage10()
                 SDL_RenderCopy(renderer,text_texture,NULL,&leader_target);
                 SDL_DestroyTexture(text_texture);
                 SDL_FreeSurface(textsurface);
-
                 leader_target.y+=2, leader_target.x+=2;
                 TTF_SizeText(number_of_soldiers, test, &leader_target.w, &leader_target.h);
                 textsurface = TTF_RenderText_Solid(number_of_soldiers,test, white);
@@ -374,10 +381,19 @@ void rendercpypage10()
     }
     for(int i=0; i<size_of_kybers;i++)
     {
+        if(kybers[i].is_dead==1)
+            continue;
         SDL_Rect kyber_target = {kybers[i].x, kybers[i].y, size_of_kyber_photo_x, size_of_kyber_photo_y};
-        SDL_Texture *kybertexture = SDL_CreateTextureFromSurface(renderer, kyber_cristal_photos[kybers[i].type]);
-        SDL_RenderCopy(renderer, kybertexture, NULL, &kyber_target);
-        SDL_DestroyTexture(kybertexture);
+        if(kybers[i].is_on==0)
+            SDL_RenderCopy(renderer, kybertexture[kybers[i].type], NULL, &kyber_target);
+        else
+        {
+            kyber_target.w *=2;
+            kyber_target.h *=2;
+            kyber_target.x -=size_of_kyber_photo_x/2;
+            kyber_target.y -=size_of_kyber_photo_y/2;
+            SDL_RenderCopy(renderer, kyberontexture[kybers[i].type], NULL, &kyber_target);
+        }
     }
     for(int j =0 ;j<size_of_politic_sides;j++)
     {

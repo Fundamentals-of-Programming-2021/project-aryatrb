@@ -19,12 +19,7 @@ void page0()
             if(click_x>new_game_target.x && click_x<new_game_target.x + new_game_target.w && click_y>new_game_target.y && click_y<new_game_target.y + new_game_target.h)
                 pageto1();
             else if(click_x>load_game_target.x  && click_x<load_game_target.x + load_game_target.w  && click_y>load_game_target.y && click_y<load_game_target.y + load_game_target.h)
-            {
-                page=2;
-                char mapselect[33] = "............................";
-                size_of_text_mapselect=0;
-                findtotalofsaves();
-            }
+                pageto2();
             else if(click_x>leaderboard_target.x && click_x<leaderboard_target.x + leaderboard_target.w && click_y>leaderboard_target.y && click_y<leaderboard_target.y + leaderboard_target.h)
             {
                 leaderboard_set();
@@ -321,6 +316,10 @@ void page10()
     moving_troopers_without_a_home_update_location();
     update_politic_sides_of_users();
     enemy_ai();
+    upboard_setup();
+    spell_type_two_endcheck();
+    spell_type_three_endcheck();
+    spell_type_five();
     if(did_win())
     {   
         did_win_int = 1;
@@ -379,10 +378,7 @@ void page1to10()
     Mix_PauseMusic();
     Mix_PlayMusic(game_music,-1);  
     page=10;
-    for(int i=0;i<number_of_enemies+1;i++)
-    {
-        movingtrooper_texture[i]=SDL_CreateTextureFromSurface(renderer, troopers[i]);
-    }    
+
 }
 
 void page2to10()
@@ -392,10 +388,6 @@ void page2to10()
     Mix_PausedMusic();
     Mix_PlayMusic(game_music,-1);  
     page=10;
-    for(int i=0;i<number_of_enemies+1;i++)
-    {
-        movingtrooper_texture[i]=SDL_CreateTextureFromSurface(renderer, troopers[i]);
-    } 
 }
 
 
@@ -406,4 +398,14 @@ void pageto1()
     enemies_target.w = number_of_enemies_w;
     enemies_target.h = number_of_enemies_h;
     page=1;
+}
+
+void pageto2()
+{
+    enemies_target.x = loc_number_of_enemies_x;
+    enemies_target.y = loc_number_of_enemies_y;
+    page=2;
+    char mapselect[33] = "............................";
+    size_of_text_mapselect=0;
+    findtotalofsaves();
 }
