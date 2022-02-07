@@ -660,6 +660,8 @@ void pageminusone()
     SDL_Delay(50);
     if(diff>41000000)
     {
+        Mix_PausedMusic();
+        Mix_PlayMusic(menu_music,-1);
         page=0;
         return;
     }
@@ -677,7 +679,6 @@ void pageminusone()
         startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
         int temp=(diff-2000000)*255/3000000;
-        printf("%d\n",temp);
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);

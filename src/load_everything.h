@@ -188,6 +188,7 @@ SDL_Surface *ifyoudefine;
 
 Mix_Music *menu_music;
 Mix_Music *game_music;
+Mix_Music *intro_music;
 
 SDL_Rect closebutton_target;
 
@@ -406,7 +407,8 @@ void load_everything()
     Mix_OpenAudio(MIX_DEFAULT_FREQUENCY,MIX_DEFAULT_FORMAT,2,2048);
     menu_music = Mix_LoadMUS("assets/menu.mp3");
     game_music = Mix_LoadMUS("assets/Anakins_Symphony.mp3");
-    Mix_PlayMusic(menu_music,-1);
+    intro_music =Mix_LoadMUS("assets/intro/intromusic.mp3");
+    Mix_PlayMusic(intro_music,0);
     loadimages();
 }
 

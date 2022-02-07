@@ -767,6 +767,7 @@ void destroy_the_few_things_left()
     SDL_FreeSurface(doordonot);
     Mix_FreeMusic(menu_music);
     Mix_FreeMusic(game_music);
+    Mix_FreeMusic(intro_music);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     Mix_Quit();
