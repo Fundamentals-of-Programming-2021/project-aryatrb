@@ -179,9 +179,7 @@ void spell_type_four(int player_id)
 {
     struct timeval tv;
     if(players[player_id].does_have_kyber==-1 || kybers[players[player_id].does_have_kyber].type!=3)
-    {
         return;
-    }
     gettimeofday(&tv,NULL);
     if((tv.tv_sec - kybers[players[player_id].does_have_kyber].time.tv_sec)*1000000 +
         tv.tv_usec - kybers[players[player_id].does_have_kyber].time.tv_usec
@@ -235,7 +233,6 @@ void moving_troopers_update_location()
                 continue;
             if(check_if_any_enemy_soldier_is_nearby_poli(&politic_sides[j].troopers[i]))
                 continue;
-            printf("bad %d %d\n", i, j);
             spell_type_one(&politic_sides[j].troopers[i]);
             int m = politic_sides[j].troopers[i].dest_x - politic_sides[j].troopers[i].current_x;
             int sgn_m = sgn(m);
@@ -508,22 +505,150 @@ void save_the_map()
     fclose(mapsave);
     FILE *mapwrite = fopen(path, "w");
     fprintf(mapwrite,"%s\n", username_text);
-    fprintf(mapwrite, "%d %d %d %d\n%d\n%d\n%d\n", number_of_cells_x,number_of_cells_y,rand_start_x, rand_start_y, number_of_enemies,number_of_politic_sides_per_user,size_of_politic_sides);
+    fprintf(mapwrite,"%d %d %d %d\n",number_of_nomansland,max_troop_in_someones_land,max_troop_no_mans_land,start_troop_in_someones_land);
+    fprintf(mapwrite, "%d %d %d %d %d %d %d\n", number_of_cells_x,number_of_cells_y,rand_start_x, rand_start_y, number_of_enemies,number_of_politic_sides_per_user,size_of_politic_sides);
     for(int j = 0;j<number_of_cells_y;j++)
         for(int i=0;i<number_of_cells_x;i++)
-            fprintf(mapwrite,"%d %d %d %d %d %d\n",cells[i][j].x, cells[i][j].y, cells[i][j].is_territoy, cells[i][j].politic_side_number,cells[i][j].does_it_have_military,cells[i][j].is_occupied);
-    fprintf(mapwrite,"\n");
-    for(int i=0;i<=size_of_politic_sides;i++)
+            fprintf(mapwrite,"%d %d %d %d %d %d\n", cells[i][j].x,
+                                                    cells[i][j].y,
+                                                    cells[i][j].is_territoy,
+                                                    cells[i][j].politic_side_number,
+                                                    cells[i][j].does_it_have_military,
+                                                    cells[i][j].is_occupied);
+    for(int i=0;i<size_of_politic_sides;i++)
     {
-        fprintf(mapwrite,"%d %d %d %d %d %d\n", politic_sides[i].player_id,politic_sides[i].size_of_cells,politic_sides[i].number_of_troopers,politic_sides[i].number_of_moving_troopers, 
-        politic_sides[i].id_of_moving_troppers, politic_sides[i].is_moving);
+        fprintf(mapwrite,"%d %d %d %d %d %d\n", politic_sides[i].player_id,
+                                                politic_sides[i].size_of_cells,
+                                                politic_sides[i].number_of_troopers,
+                                                politic_sides[i].number_of_moving_troopers, 
+                                                politic_sides[i].id_of_moving_troppers,
+                                                politic_sides[i].is_moving);
         
         for(int j=0;j<politic_sides[i].size_of_cells;j++)
             fprintf(mapwrite,"%d %d\n",politic_sides[i].cells_x[j],politic_sides[i].cells_y[j]);
-        fprintf(mapwrite,"\n");
+        for(int j=0;j<politic_sides[i].id_of_moving_troppers;j++)
+            fprintf(mapwrite,"%d %d %d %d %d %d %d %ld %ld %lf %d %d\n",politic_sides[i].troopers[j].current_x,
+                                                                        politic_sides[i].troopers[j].current_y,
+                                                                        politic_sides[i].troopers[j].dest_x,
+                                                                        politic_sides[i].troopers[j].dest_y,
+                                                                        politic_sides[i].troopers[j].player_id,
+                                                                        politic_sides[i].troopers[j].did_end,
+                                                                        politic_sides[i].troopers[j].is_out,
+                                                                        politic_sides[i].troopers[j].time.tv_sec,
+                                                                        politic_sides[i].troopers[j].time.tv_usec,
+                                                                        politic_sides[i].troopers[j].seconds_till_out,
+                                                                        politic_sides[i].troopers[j].politic_side_number,
+                                                                        politic_sides[i].troopers[j].enemy_politic_side_number);
     }
+    fprintf(mapwrite,"%d\n",size_of_kybers);
+    printf("%d\n",size_of_kybers);
+    for(int i=0;i<size_of_kybers;i++)
+        fprintf(mapwrite,"%d %d %d %d %d %ld %ld %lf %d\n",kybers[i].type,
+                                kybers[i].x,
+                                kybers[i].y,
+                                kybers[i].is_on,
+                                kybers[i].is_dead,
+                                kybers[i].time.tv_sec,
+                                kybers[i].time.tv_usec,
+                                kybers[i].seconds_till_off,
+                                kybers[i].player_id);
+    for(int i=0;i<number_of_enemies+1;i++)
+        fprintf(mapwrite,"%d %d %d %d\n", players[i].player_id,
+                                        players[i].till_end_a,
+                                        players[i].does_have_kyber,
+                                        players[i].create_trooper_rate);                        
+    fprintf(mapwrite,"%d\n",size_of_troops_with_no_home);
+    for(int i=0; i<size_of_troops_with_no_home;i++)
+        fprintf(mapwrite,"%d %d %d %d %d %d %d %ld %ld %lf %d %d\n",  troops_with_no_home[i].current_x,
+                                                                    troops_with_no_home[i].current_y,
+                                                                    troops_with_no_home[i].dest_x,
+                                                                    troops_with_no_home[i].dest_y,
+                                                                    troops_with_no_home[i].player_id,
+                                                                    troops_with_no_home[i].did_end,
+                                                                    troops_with_no_home[i].is_out,
+                                                                    troops_with_no_home[i].time.tv_sec,
+                                                                    troops_with_no_home[i].time.tv_usec,
+                                                                    troops_with_no_home[i].seconds_till_out,
+                                                                    troops_with_no_home[i].politic_side_number,
+                                                                    troops_with_no_home[i].enemy_politic_side_number);
     fclose(mapwrite);
 }
+void load_the_map()
+{
+    int mapseltonum=0;
+    sscanf(mapselect, "%d", &mapseltonum);
+    char path[100];
+    sprintf(path, "assets/save/maps/map%d.txt\n", mapseltonum);
+    FILE *loadedmap = fopen(path, "r");
+    fscanf(loadedmap,"%s\n", username_text);
+    fscanf(loadedmap,"%d %d %d %d\n",&number_of_nomansland,&max_troop_in_someones_land,&max_troop_no_mans_land,&start_troop_in_someones_land);
+    fscanf(loadedmap, "%d %d %d %d %d %d %d",&number_of_cells_x,&number_of_cells_y, &rand_start_x, &rand_start_y, &number_of_enemies, &number_of_politic_sides_per_user, &size_of_politic_sides);
+    for(int j = 0;j<number_of_cells_y;j++)
+        for(int i=0;i<number_of_cells_x;i++)
+            fscanf(loadedmap,"%d %d %d %d %d %d",   &cells[i][j].x, 
+                                                    &cells[i][j].y, 
+                                                    &cells[i][j].is_territoy, 
+                                                    &cells[i][j].politic_side_number, 
+                                                    &cells[i][j].does_it_have_military, 
+                                                    &cells[i][j].is_occupied);
+    for(int i=0;i<size_of_politic_sides;i++)
+    {
+        fscanf(loadedmap,"%d %d %d %d %d %d\n", &politic_sides[i].player_id, 
+                                                &politic_sides[i].size_of_cells, 
+                                                &politic_sides[i].number_of_troopers,
+                                                &politic_sides[i].number_of_moving_troopers,
+                                                &politic_sides[i].id_of_moving_troppers,
+                                                &politic_sides[i].is_moving);
+        for(int j=0;j<politic_sides[i].size_of_cells;j++)
+            fscanf(loadedmap,"%d %d\n", &politic_sides[i].cells_x[j], &politic_sides[i].cells_y[j]);
+        for(int j=0;j<politic_sides[i].id_of_moving_troppers;j++)
+            fscanf(loadedmap,"%d %d %d %d %d %d %d %ld %ld %lf %d %d",  &politic_sides[i].troopers[j].current_x,
+                                                                        &politic_sides[i].troopers[j].current_y,
+                                                                        &politic_sides[i].troopers[j].dest_x,
+                                                                        &politic_sides[i].troopers[j].dest_y,
+                                                                        &politic_sides[i].troopers[j].player_id,
+                                                                        &politic_sides[i].troopers[j].did_end,
+                                                                        &politic_sides[i].troopers[j].is_out,
+                                                                        &politic_sides[i].troopers[j].time.tv_sec,
+                                                                        &politic_sides[i].troopers[j].time.tv_usec,
+                                                                        &politic_sides[i].troopers[j].seconds_till_out,
+                                                                        &politic_sides[i].troopers[j].politic_side_number,
+                                                                        &politic_sides[i].troopers[j].enemy_politic_side_number);
+    }
+    fscanf(loadedmap,"%d\n",&size_of_kybers);
+    for(int i=0;i<size_of_kybers;i++)
+        fscanf(loadedmap,"%d %d %d %d %d %ld %ld %lf %d\n",&kybers[i].type,
+                                                            &kybers[i].x,
+                                                            &kybers[i].y,
+                                                            &kybers[i].is_on,
+                                                            &kybers[i].is_dead,
+                                                            &kybers[i].time.tv_sec,
+                                                            &kybers[i].time.tv_usec,
+                                                            &kybers[i].seconds_till_off,
+                                                            &kybers[i].player_id);
+    for(int i=0;i<number_of_enemies+1;i++)
+        fscanf(loadedmap,"%d %d %d %d", &players[i].player_id,
+                                        &players[i].till_end_a,
+                                        &players[i].does_have_kyber,
+                                        &players[i].create_trooper_rate);
+    fscanf(loadedmap,"%d\n",&size_of_troops_with_no_home);
+    for(int i=0; i<size_of_troops_with_no_home;i++)
+        fscanf(loadedmap,"%d %d %d %d %d %d %d %ld %ld %lf %d %d",  &troops_with_no_home[i].current_x,
+                                                                    &troops_with_no_home[i].current_y,
+                                                                    &troops_with_no_home[i].dest_x,
+                                                                    &troops_with_no_home[i].dest_y,
+                                                                    &troops_with_no_home[i].player_id,
+                                                                    &troops_with_no_home[i].did_end,
+                                                                    &troops_with_no_home[i].is_out,
+                                                                    &troops_with_no_home[i].time.tv_sec,
+                                                                    &troops_with_no_home[i].time.tv_usec,
+                                                                    &troops_with_no_home[i].seconds_till_out,
+                                                                    &troops_with_no_home[i].politic_side_number,
+                                                                    &troops_with_no_home[i].enemy_politic_side_number);
+    update_politic_sides_of_users();
+    fclose(loadedmap);
+}
+
 void first_user_save()
 {
     char temp_text[80], filechar[40],temper_text[100];
@@ -570,10 +695,10 @@ void first_user_save()
 int read_users_score(int do_add, char username_entry_text[])
 {
     char filechar[40];
-    for(int i=0; i<33 && username_entry_text[i]!='.';i++)
+    for(int i=0; i<33 && username_entry_text[i]!=' ';i++)
     {
         filechar[i]=username_entry_text[i];
-        if(i+1==40 || username_entry_text[i+1]=='.')
+        if(i+1==40 || username_entry_text[i+1]==' ')
         {
             filechar[i+1]='\0';
             break;
@@ -601,36 +726,11 @@ int read_users_score(int do_add, char username_entry_text[])
     fclose(mapwrite);
     return ret;
 }
-void load_the_map()
-{
-    int mapseltonum=0;
-    // for(int i =0;i<size_of_text_mapselect;i++)
-    //     mapseltonum = mapseltonum *10 + mapselect[i] - '0'; 
-    sscanf(mapselect, "%d", &mapseltonum);
-    char path[100];
-    sprintf(path, "assets/save/maps/map%d.txt\n", mapseltonum);
-    FILE *loadedmap = fopen(path, "r");
-    fscanf(loadedmap,"%s\n", username_text);
-    fscanf(loadedmap, "%d %d %d %d %d %d %d",&number_of_cells_x,&number_of_cells_y, &rand_start_x, &rand_start_y, &number_of_enemies, &number_of_politic_sides_per_user, &size_of_politic_sides);
-    for(int j = 0;j<number_of_cells_y;j++)
-        for(int i=0;i<number_of_cells_x;i++)
-            fscanf(loadedmap,"%d %d %d %d %d %d",&cells[i][j].x, &cells[i][j].y, &cells[i][j].is_territoy, &cells[i][j].politic_side_number, &cells[i][j].does_it_have_military, &cells[i][j].is_occupied);
-    for(int i=0;i<=size_of_politic_sides;i++)
-    {
-        fscanf(loadedmap,"%d %d %d %d %d %d\n", &politic_sides[i].player_id, &politic_sides[i].size_of_cells, &politic_sides[i].number_of_troopers,&politic_sides[i].number_of_moving_troopers,&politic_sides[i].id_of_moving_troppers,&politic_sides[i].is_moving);
-        for(int j=0;j<politic_sides[i].size_of_cells;j++)
-            fscanf(loadedmap,"%d %d\n", &politic_sides[i].cells_x[j], &politic_sides[i].cells_y[j]);
-    }
-    update_politic_sides_of_users();
-    fclose(loadedmap);
-}
-
 void create_moving_troopers(int start_loc, int des_loc)
 {
     if(start_loc==des_loc)
         return;
     int last_sec = politic_sides[start_loc].number_of_troopers - politic_sides[start_loc].number_of_moving_troopers;
-    printf("%d %d %d\n",last_sec,politic_sides[start_loc].number_of_troopers,politic_sides[start_loc].number_of_moving_troopers);
     for(int i=0;i<last_sec;i++)
     {
         int size_of_moving_troopers = politic_sides[start_loc].id_of_moving_troppers;
@@ -746,6 +846,8 @@ void destroy_the_few_things_left()
     SDL_FreeSurface(lucasfilmlogo);
     SDL_FreeSurface(gamelogobef);
     SDL_FreeSurface(gamelogo);
+    SDL_FreeSurface(menubef);
+    SDL_FreeSurface(menubefwithlogo);
     for(int i=0;i<15;i++)
     {
         SDL_FreeSurface(faces[i]);
@@ -784,7 +886,7 @@ void update_politic_sides_of_users()
 int did_win()
 {
     for(int i=0;i<size_of_politic_sides;i++)
-        if(i!=main_players_id && upboardwidth[i]>0)
+        if(i!=main_players_id && i!=nomansland_playerid && upboardwidth[i]>0)
             return 0;
     return 1;
 }

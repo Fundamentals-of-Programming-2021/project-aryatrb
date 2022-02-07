@@ -87,7 +87,6 @@ int main_players_id=0;
 int did_we_even_calculate=0;
 int is_there_any_type_n_kyber[5] ={0};
 
-int global_kyber_user_two;
 struct troop troops_with_no_home[2000];
 int size_of_troops_with_no_home=0;
 int window_width;
@@ -136,7 +135,7 @@ int dist_moving_trooper_per_sec=10;
 int start_ticks;
 double seconds_until_trooper_is_out = 0.18;
 double kybers_time_till_end[5] = {3000000,3000000,3000000, 3000000, 10000000};
-int size_of_wall_y=40;
+int size_of_wall_y=60;
 char username_text[33] = "                                ";
 char mapselect[33] =     "                                ";
 int game_running=1;
@@ -183,6 +182,7 @@ SDL_Surface *kyber_cristalon_photos[5];
 SDL_Surface *wall;
 SDL_Surface *wallflipped;
 SDL_Surface *backtomenu;
+SDL_Surface *savebutton;
 SDL_Surface *doordonot;
 SDL_Surface *ifyoudefine;
 
@@ -202,6 +202,7 @@ SDL_Rect updownbutton_six_target;
 SDL_Rect wall_target;
 SDL_Rect wallflipped_target;
 SDL_Rect backtomenu_target;
+SDL_Rect savebutton_target;
 SDL_Rect sound_target;
 
 SDL_Rect new_game_target;
@@ -230,6 +231,8 @@ SDL_Surface *lucasfilmlogobef;
 SDL_Surface *lucasfilmlogo;
 SDL_Surface *gamelogobef;
 SDL_Surface *gamelogo;
+SDL_Surface *menubef;
+SDL_Surface *menubefwithlogo;
 
 
 
@@ -237,7 +240,7 @@ SDL_Surface *gamelogo;
 
 
 SDL_Event ev;
-int page=-1;
+int page=0;
 struct cell cells[100][100];
 struct politic_side politic_sides[100];
 struct kyber_cristal kybers[100];
@@ -318,10 +321,14 @@ void load_everything()
     wallflipped_target.y = 0;
     wallflipped_target.w = window_width;
     wallflipped_target.h = size_of_wall_y;
-    backtomenu_target.x = 60;
-    backtomenu_target.y = window_height - 35;
-    backtomenu_target.w = 60;
-    backtomenu_target.h = 30;
+    backtomenu_target.x = 60*window_width/1920;
+    backtomenu_target.y = window_height - size_of_wall_y*0.85;
+    backtomenu_target.w = size_of_wall_y*0.8*700/298;
+    backtomenu_target.h = size_of_wall_y*0.8;
+    savebutton_target.y = window_height - size_of_wall_y*0.85;
+    savebutton_target.w = size_of_wall_y*0.8*700/298;
+    savebutton_target.x = window_width - 60*window_width/1920 - savebutton_target.w;
+    savebutton_target.h = size_of_wall_y*0.8;
     sound_target.x = 5;
     sound_target.y = window_height-40;
     sound_target.w = 35;
@@ -481,11 +488,14 @@ void loadimages()
     shariflogo =  SDL_LoadBMP("assets/intro/shariflogo.bmp");
     gamelogobef = SDL_LoadBMP("assets/intro/gamelogobef.bmp");
     gamelogo = SDL_LoadBMP("assets/intro/gamelogo.bmp");
+    menubef = SDL_LoadBMP("assets/intro/menubef.bmp");
+    menubefwithlogo = SDL_LoadBMP("assets/intro/menubefwithlogo.bmp");
 
 
     wall = SDL_LoadBMP("assets/wall.bmp");
     wallflipped = SDL_LoadBMP("assets/wallflipped.bmp");
     backtomenu = SDL_LoadBMP("assets/backtomenu.bmp");
+    savebutton = SDL_LoadBMP("assets/savegame.bmp");
 
     faces[0] = SDL_LoadBMP("assets/faces/vader.bmp");
     faces[1] = SDL_LoadBMP("assets/faces/boba.bmp");

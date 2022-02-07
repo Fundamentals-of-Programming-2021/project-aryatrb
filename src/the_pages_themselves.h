@@ -204,7 +204,6 @@ void page2()
             temp[size_of_text_mapselect+1]=ev.key.keysym.sym;
             temp[size_of_text_mapselect+2]='\0';
             TTF_SizeText(details_page_outline, temp, &mapsel_target.w, &mapsel_target.h);
-            printf("%d %d\n",mapsel_target.w, size_of_text_mapselect);
             if(mapsel_target.w<600 * window_width/1920)
             {
                 mapselect[size_of_text_mapselect]= ev.key.keysym.sym;
@@ -345,6 +344,9 @@ void page10()
                 Mix_PlayMusic(menu_music,-1);
                 page=0;
             }
+            else if (click_x>savebutton_target.x && click_x<savebutton_target.x + savebutton_target.w  
+                && click_y>savebutton_target.y && click_y<savebutton_target.y + savebutton_target.h)
+                save_the_map();
             else if(click_x > closebutton_target.x && click_x < closebutton_target.x + closebutton_target.w 
                     && click_y > closebutton_target.y && click_y < closebutton_target.y + closebutton_target.h)
             {
@@ -422,10 +424,20 @@ void winpage()
 void page1to10()
 {
     time(&game_start_time);
+    printf("line 424\n");
+    fflush(stdin);
     create_cells();
+    printf("line 427\n");
+    fflush(stdin);
     assign_politic_sides();
+    printf("line 430\n");
+    fflush(stdin);
     save_the_map();
+    printf("line 433\n");
+    fflush(stdin);
     first_user_save();
+    printf("line 436\n");
+    fflush(stdin);
     Mix_PauseMusic();
     Mix_PlayMusic(game_music,-1);  
     page=10;
@@ -455,6 +467,7 @@ void pageto1()
     page=1;
     char mapselectcpy[33]= "                                ";
     strcpy(username_text,mapselectcpy);
+    size_of_text_username=0;
 }
 
 void pageto2()

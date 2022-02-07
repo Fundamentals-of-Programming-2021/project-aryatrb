@@ -16,7 +16,7 @@ void rendercpypage0()
     credits_target.y = window_height -50*window_width/1335 - size_credits_y/2;
     credits_target.w = size_credits_x;
     credits_target.h = size_credits_y;
-    SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, startbackground);
+    SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, menubefwithlogo);
     SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
     SDL_Texture *newgame_texture = SDL_CreateTextureFromSurface(renderer, new_game);
     SDL_RenderCopy(renderer, newgame_texture, NULL, &new_game_target);
@@ -402,6 +402,8 @@ void rendercpypage10()
     SDL_RenderCopy(renderer, wallflippedtexture, NULL, &wallflipped_target);
     SDL_Texture *backtomenutexture = SDL_CreateTextureFromSurface(renderer, backtomenu);
     SDL_RenderCopy(renderer, backtomenutexture, NULL, &backtomenu_target);
+    SDL_Texture *savebuttontexture = SDL_CreateTextureFromSurface(renderer, savebutton);
+    SDL_RenderCopy(renderer, savebuttontexture, NULL, &savebutton_target);
     SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
     SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
     SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
@@ -454,13 +456,9 @@ void rendercpypage10()
                     spell_type_four(politic_sides[i].player_id);
                     politic_sides[i].number_of_troopers+=difftime(time_now,start_time) * players[politic_sides[i].player_id].create_trooper_rate;
                     if(politic_sides[i].player_id==nomansland_playerid && politic_sides[i].number_of_troopers>max_troop_no_mans_land)
-                    {
                         politic_sides[i].number_of_troopers = max_troop_no_mans_land;
-                    }
                     if(politic_sides[i].player_id!=nomansland_playerid && politic_sides[i].number_of_troopers>max_troop_in_someones_land)
-                    {
                         politic_sides[i].number_of_troopers = max_troop_in_someones_land;
-                    }
                 }
                 char test[4];
                 if(politic_sides[i].number_of_troopers<0)
@@ -514,7 +512,6 @@ void rendercpypage10()
     {
         if(politic_sides[j].id_of_moving_troppers==0)
             continue;
-        // SDL_Texture *movingtrooper_texture = SDL_CreateTextureFromSurface(renderer, troopers[politic_sides[j].troopers[0].player_id]);
         for(int i = 0 ; i<politic_sides[j].id_of_moving_troppers ; i++)
         {
             if(politic_sides[j].troopers[i].is_out==0 || politic_sides[j].troopers[i].did_end==1)
@@ -522,7 +519,6 @@ void rendercpypage10()
             SDL_Rect movingtrooper_target = {politic_sides[j].troopers[i].current_x, politic_sides[j].troopers[i].current_y, size_of_troopers_x_y, size_of_troopers_x_y};
             SDL_RenderCopy(renderer, movingtrooper_texture[politic_sides[j].troopers[0].player_id], NULL, &movingtrooper_target);
         }
-        // SDL_DestroyTexture(movingtrooper_texture);
     }
     for(int j=0;j<size_of_troops_with_no_home;j++)
     {
@@ -536,6 +532,7 @@ void rendercpypage10()
     SDL_DestroyTexture(walltexture);
     SDL_DestroyTexture(wallflippedtexture);
     SDL_DestroyTexture(backtomenutexture);
+    SDL_DestroyTexture(savebuttontexture);
     SDL_DestroyTexture(soundtexture);
     SDL_DestroyTexture(closebutton_texture);
 }
@@ -657,8 +654,8 @@ void pageminusone()
     struct timeval time_tea;
     gettimeofday(&time_tea,NULL);
     long long int diff=(time_tea.tv_sec-the_begin.tv_sec)*1000000 + time_tea.tv_usec - the_begin.tv_usec;
-    SDL_Delay(50);
-    if(diff>41000000)
+    SDL_Delay(25);
+    if(diff>43000000)
     {
         Mix_PausedMusic();
         Mix_PlayMusic(menu_music,-1);
@@ -684,90 +681,77 @@ void pageminusone()
         SDL_RenderPresent(renderer);
         SDL_DestroyTexture(startscreentexture);
     }
-    else if(diff<8000000)
+    else if(diff<9000000)
     {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogo);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
         SDL_DestroyTexture(startscreentexture);
     }
-    else if(diff<11000000)
+    else if(diff<12000000)
     {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=255 -(diff - 8000000)*255/3000000;
+        int temp=255 -(diff - 9000000)*255/3000000;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
         SDL_DestroyTexture(startscreentexture);
     }
-    else if(diff<14000000)
+    else if(diff<15000000)
     {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, shariflogobef);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=(diff - 11000000)*255/3000000;
+        int temp=(diff - 12000000)*255/3000000;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
         SDL_DestroyTexture(startscreentexture);
     }
 
-    else if(diff<17000000)
+    else if(diff<18000000)
     {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, shariflogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, shariflogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=(diff - 14000000)*255/3000000;
+        int temp=(diff - 15000000)*255/3000000;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
         SDL_DestroyTexture(startscreentexture);
     }
-    else if(diff<20000000)
+    else if(diff<22000000)
     {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, shariflogo);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
         SDL_DestroyTexture(startscreentexture);
     }
-    else if(diff<23000000)
+
+    else if(diff<25000000)
     {
-        SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogobef);
+        SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, shariflogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=255 -(diff - 20000000)*255/3000000;
+        int temp=255 -(diff - 22000000)*255/3000000;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
         SDL_DestroyTexture(startscreentexture);
     }
-
-    else if(diff<26000000)
+    else if(diff<28000000)
     {
-        SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogobef);
+        SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-        startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogobef);
+        startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=255 -(diff - 23000000)*255/3000000;
-        SDL_SetTextureAlphaMod(startscreentexture,temp);
-        SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-        SDL_RenderPresent(renderer);
-        SDL_DestroyTexture(startscreentexture);
-    }
-
-    else if(diff<29000000)
-    {
-        SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogobef);
-        SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-        startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogobef);
-        SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=(diff - 26000000)*255/3000000;
+        int temp=(diff - 25000000)*255/3000000;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
@@ -775,45 +759,83 @@ void pageminusone()
     }
     else if(diff<32000000)
     {
-        SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogobef);
-        SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-        startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogo);
-        SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=(diff - 29000000)*255/3000000;
-        SDL_SetTextureAlphaMod(startscreentexture,temp);
-        SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-        SDL_RenderPresent(renderer);
-        SDL_DestroyTexture(startscreentexture);
-    }
-    else if(diff<35000000)
-    {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogo);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
         SDL_DestroyTexture(startscreentexture);
     }
-    else if(diff<38000000)
+    else if(diff<36000000)
     {
-        SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogobef);
+        SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=255 -(diff - 35000000)*255/3000000;
+        int temp=255 -(diff - 32000000)*255/4000000;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
         SDL_DestroyTexture(startscreentexture);
     }
-    else if(diff<41000000)
+    else if(diff<39000000)
     {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-        startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogobef);
+        startscreentexture = SDL_CreateTextureFromSurface(renderer, menubef);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=255 -(diff - 38000000)*255/3000000;
+        int temp=(diff - 36000000)*255/3000000;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
         SDL_DestroyTexture(startscreentexture);
+    }
+    else if(diff<43000000)
+    {
+        int temp=(diff - 39000000)*255/4000000;
+        SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, menubef);
+        SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
+        startscreentexture = SDL_CreateTextureFromSurface(renderer, menubefwithlogo);
+        SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
+        SDL_SetTextureAlphaMod(startscreentexture,temp);
+        SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
+
+        SDL_Texture *newgame_texture = SDL_CreateTextureFromSurface(renderer, new_game);
+        SDL_SetTextureBlendMode(newgame_texture,SDL_BLENDMODE_BLEND);
+        SDL_SetTextureAlphaMod(newgame_texture,temp);
+        SDL_RenderCopy(renderer, newgame_texture, NULL, &new_game_target);
+
+        SDL_Texture *loadgame_texture = SDL_CreateTextureFromSurface(renderer, load_game);
+        SDL_SetTextureBlendMode(loadgame_texture,SDL_BLENDMODE_BLEND);
+        SDL_SetTextureAlphaMod(loadgame_texture,temp);
+        SDL_RenderCopy(renderer, loadgame_texture, NULL, &load_game_target);
+
+
+        SDL_Texture *leaderboard_texture = SDL_CreateTextureFromSurface(renderer, leaderboard);
+        SDL_SetTextureBlendMode(leaderboard_texture,SDL_BLENDMODE_BLEND);
+        SDL_SetTextureAlphaMod(leaderboard_texture,temp);
+        SDL_RenderCopy(renderer, leaderboard_texture, NULL, &leaderboard_target);
+        
+        SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
+        SDL_SetTextureBlendMode(soundtexture,SDL_BLENDMODE_BLEND);
+        SDL_SetTextureAlphaMod(soundtexture,temp);
+        SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
+
+        SDL_Texture *creditstexture = SDL_CreateTextureFromSurface(renderer, credits_button);
+        SDL_SetTextureBlendMode(creditstexture,SDL_BLENDMODE_BLEND);
+        SDL_SetTextureAlphaMod(creditstexture,temp);
+        SDL_RenderCopy(renderer, creditstexture, NULL, &credits_target);
+
+        SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
+        SDL_SetTextureBlendMode(closebutton_texture,SDL_BLENDMODE_BLEND);
+        SDL_SetTextureAlphaMod(closebutton_texture,temp);
+        SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target);
+
+        SDL_RenderPresent(renderer);
+        SDL_DestroyTexture(startscreentexture);
+        SDL_DestroyTexture(newgame_texture);
+        SDL_DestroyTexture(loadgame_texture);
+        SDL_DestroyTexture(leaderboard_texture);
+        SDL_DestroyTexture(soundtexture);
+        SDL_DestroyTexture(creditstexture);
+        SDL_DestroyTexture(closebutton_texture);
     }
 }
