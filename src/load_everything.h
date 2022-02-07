@@ -23,6 +23,7 @@ int dist_two_point(int i_one, int j_one, int i_two, int j_two);
 void page2to10();
 void pageto1();
 void pageto2();
+void pageminusone();
 
 struct troop{
     int current_x;
@@ -84,7 +85,7 @@ int nomansland_playerid=10;
 int main_players_id=0;
 
 int did_we_even_calculate=0;
-int is_there_any_type_n_kyber[4] ={0};
+int is_there_any_type_n_kyber[5] ={0};
 
 int global_kyber_user_two;
 struct troop troops_with_no_home[2000];
@@ -113,6 +114,8 @@ int credits_text_x, credits_text_y;
 int doordonot_x,doordonot_y;
 int ifyoudefine_x,ifyoudefine_y;
 int credits_text_loc_y;
+int leaderboard_page_y=-60;
+
 int size_of_closebutton_x_y;
 int loc_number_of_enemies_x, loc_number_of_enemies_y;
 int number_of_enemies_w, number_of_enemies_h;
@@ -120,6 +123,7 @@ int per_user_w, per_user_h;
 int mapsel_w, mapsel_h;
 int mapseltype_w,mapseltype_h;
 int usernametype_w,usernametype_h;
+int number_of_nomansland_x, number_of_nomansland_y;
 const double FPS = 30;
 int size_of_each_cell_x=162,size_of_each_cell_y=140 ,number_of_cells_x=0, number_of_cells_y=0;
 int first_click=-10;
@@ -133,8 +137,8 @@ int start_ticks;
 double seconds_until_trooper_is_out = 0.18;
 double kybers_time_till_end[5] = {3000000,3000000,3000000, 3000000, 10000000};
 int size_of_wall_y=40;
-char username_text[33] = "............................";
-char mapselect[33] = "............................";
+char username_text[33] = "                                ";
+char mapselect[33] =     "                                ";
 int game_running=1;
 int max_troop_no_mans_land=20;
 int max_troop_in_someones_land=50;
@@ -146,8 +150,11 @@ int did_win_int=0;
 
 int number_of_enemies=4;
 int number_of_politic_sides_per_user=1;
+int number_of_nomansland=8;
 int upboardwidth[15] = {0};
 int total_of_soldiers_in_map;
+
+struct timeval the_begin;
 
 SDL_Surface *startbackground;
 SDL_Surface *starsbackground;
@@ -186,6 +193,10 @@ SDL_Rect closebutton_target;
 
 SDL_Rect updownbutton_target;
 SDL_Rect updownbutton_sec_target;
+SDL_Rect updownbutton_thi_target;
+SDL_Rect updownbutton_fou_target;
+SDL_Rect updownbutton_fiv_target;
+SDL_Rect updownbutton_six_target;
 
 SDL_Rect wall_target;
 SDL_Rect wallflipped_target;
@@ -201,11 +212,31 @@ SDL_Rect backbutton_target;
 SDL_Rect enemies_target;
 SDL_Rect per_user_target;
 SDL_Rect username_target;
+SDL_Rect maxtrooperinplayers_house;
+SDL_Rect maxtrooperinnomansland_target;
+SDL_Rect start_troop_insomo_la_target;
 SDL_Rect win_page_target;
+SDL_Rect mapsel_target;
+
+SDL_Rect number_of_nomansland_target;
+SDL_Rect textbox_target;
+SDL_Surface *textbox;
+
+
+SDL_Surface *shariflogobef;
+SDL_Surface *shariflogo;
+SDL_Surface *lucasfilmlogobef;
+SDL_Surface *lucasfilmlogo;
+SDL_Surface *gamelogobef;
+SDL_Surface *gamelogo;
+
+
+
+
 
 
 SDL_Event ev;
-int page=0;
+int page=-1;
 struct cell cells[100][100];
 struct politic_side politic_sides[100];
 struct kyber_cristal kybers[100];
@@ -231,6 +262,7 @@ SDL_Renderer* renderer;
 SDL_Window* window;
 void load_everything()
 {
+    gettimeofday(&the_begin,NULL);
     SDL_Init(SDL_INIT_EVERYTHING);
     window = SDL_CreateWindow("State.io: A Star Wars Story", 20, 20, window_width, window_height, SDL_WINDOW_OPENGL);
     SDL_SetWindowFullscreen(window,SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -264,24 +296,19 @@ void load_everything()
     details_page_outline = TTF_OpenFont("assets/Starjedi.ttf",40*window_width/1920);
     TTF_SetFontOutline(details_page_outline,2);
     TTF_SetFontOutline(number_of_soldiers_outline,2);
-    TTF_SizeText(details_page,"number of enemies: 04",&number_of_enemies_w,&number_of_enemies_h);
-    TTF_SizeText(details_page,"number of systems per player: 01",&per_user_w,&per_user_h);
+    TTF_SizeText(details_page,"number of enemies: 4",&number_of_enemies_w,&number_of_enemies_h);
+    TTF_SizeText(details_page,"number of systems per player: 1",&per_user_w,&per_user_h);
     TTF_SizeText(details_page,"there are 00 maps. select one of them:",&mapsel_w,&mapsel_h);
     TTF_SizeText(details_page,"............................",&mapseltype_w,&mapseltype_h);
     TTF_SizeText(details_page,"............................",&usernametype_w,&usernametype_h);
-
+    TTF_SizeText(details_page,"number of no man's land: 8",&number_of_nomansland_x,&number_of_nomansland_y);
+    TTF_SizeText(details_page,"max troopers in a players planet: 50",&maxtrooperinplayers_house.w,&maxtrooperinplayers_house.h);
+    TTF_SizeText(details_page,"max troopers in no man's land: 50",&maxtrooperinnomansland_target.w,&maxtrooperinnomansland_target.h);
+    TTF_SizeText(details_page,"number of troopers the land has in the beginning: 50",&start_troop_insomo_la_target.w,&start_troop_insomo_la_target.h);
     closebutton_target.x = window_width - 10 - size_of_closebutton_x_y;
     closebutton_target.y = 25 - size_of_closebutton_x_y;
     closebutton_target.w = size_of_closebutton_x_y;
     closebutton_target.h = size_of_closebutton_x_y;
-    updownbutton_target.x = loc_number_of_enemies_x + number_of_enemies_w + 10*window_width/1920;
-    updownbutton_target.y = loc_number_of_enemies_y;
-    updownbutton_target.w = 40*window_width/1920;
-    updownbutton_target.h = 60*window_width/1920;
-    updownbutton_sec_target.x = loc_number_of_enemies_x + per_user_w + 10*window_width/1920;
-    updownbutton_sec_target.y = loc_number_of_enemies_y + per_user_h + 10*window_width/1920;
-    updownbutton_sec_target.w = 40*window_width/1920;
-    updownbutton_sec_target.h = 60*window_width/1920;
     wall_target.x = 0;
     wall_target.y = window_height - size_of_wall_y;
     wall_target.w = window_width;
@@ -325,15 +352,52 @@ void load_everything()
     backbutton_target.w = backbutton_x_y;
     backbutton_target.h = backbutton_x_y;
     enemies_target.x = loc_number_of_enemies_x;
-    enemies_target.y = loc_number_of_enemies_y;
+    enemies_target.y = loc_number_of_enemies_y + number_of_enemies_h + 10;
     enemies_target.w = number_of_enemies_w;
     enemies_target.h = number_of_enemies_h;
     per_user_target.x = loc_number_of_enemies_x;
-    per_user_target.y = loc_number_of_enemies_y + number_of_enemies_h + 10;
+    per_user_target.y = loc_number_of_enemies_y + 2*(number_of_enemies_h + 10);
     per_user_target.w = per_user_w;
     per_user_target.h = per_user_h;
+    number_of_nomansland_target.x = loc_number_of_enemies_x;
+    number_of_nomansland_target.y = loc_number_of_enemies_y + 3* (number_of_enemies_h + 10);
+    number_of_nomansland_target.w = number_of_nomansland_x;
+    number_of_nomansland_target.h = number_of_nomansland_y;
+
+    maxtrooperinplayers_house.x = loc_number_of_enemies_x;
+    maxtrooperinplayers_house.y = loc_number_of_enemies_y + 4*(number_of_enemies_h + 10);
+    maxtrooperinnomansland_target.x = loc_number_of_enemies_x;
+    maxtrooperinnomansland_target.y = loc_number_of_enemies_y + 5*(number_of_enemies_h + 10);
+    start_troop_insomo_la_target.x = loc_number_of_enemies_x;
+    start_troop_insomo_la_target.y = loc_number_of_enemies_y + 6*(number_of_enemies_h + 10);
+
+    updownbutton_target.x = loc_number_of_enemies_x + number_of_enemies_w + 50*window_width/1920;
+    updownbutton_target.y = enemies_target.y + enemies_target.h*0.1;
+    updownbutton_target.w = 40*window_width/1920;
+    updownbutton_target.h = 60*window_width/1920;
+    updownbutton_sec_target.x = loc_number_of_enemies_x + per_user_w + 50*window_width/1920;
+    updownbutton_sec_target.y = per_user_target.y + per_user_target.h*0.1;
+    updownbutton_sec_target.w = 40*window_width/1920;
+    updownbutton_sec_target.h = 60*window_width/1920;
+    updownbutton_thi_target.x = loc_number_of_enemies_x + number_of_nomansland_target.w + 50*window_width/1920;
+    updownbutton_thi_target.y = number_of_nomansland_target.y + number_of_nomansland_target.h*0.1;
+    updownbutton_thi_target.w = 40*window_width/1920;
+    updownbutton_thi_target.h = 60*window_width/1920;
+    updownbutton_fou_target.x = loc_number_of_enemies_x + maxtrooperinplayers_house.w + 50*window_width/1920;
+    updownbutton_fou_target.y = maxtrooperinplayers_house.y + maxtrooperinplayers_house.h*0.1;
+    updownbutton_fou_target.w = 40*window_width/1920;
+    updownbutton_fou_target.h = 60*window_width/1920;
+    updownbutton_fiv_target.x = maxtrooperinnomansland_target.x + maxtrooperinnomansland_target.w + 50*window_width/1920;
+    updownbutton_fiv_target.y = maxtrooperinnomansland_target.y + maxtrooperinnomansland_target.h*0.1;
+    updownbutton_fiv_target.w = 40*window_width/1920;
+    updownbutton_fiv_target.h = 60*window_width/1920;
+    updownbutton_six_target.x = start_troop_insomo_la_target.x + start_troop_insomo_la_target.w + 50*window_width/1920;
+    updownbutton_six_target.y = start_troop_insomo_la_target.y + start_troop_insomo_la_target.h*0.1;
+    updownbutton_six_target.w = 40*window_width/1920;
+    updownbutton_six_target.h = 60*window_width/1920;
+
     username_target.x = loc_number_of_enemies_x;
-    username_target.y = loc_number_of_enemies_y + 2* (number_of_enemies_h + 10);
+    username_target.y = loc_number_of_enemies_y;
     username_target.w = usernametype_w;
     username_target.h = usernametype_h;
 
@@ -405,6 +469,16 @@ void loadimages()
     doordonot = SDL_LoadBMP("assets/doordonot.bmp");
     ifyoudefine = SDL_LoadBMP("assets/ifyoudefine.bmp");
     closebutton = SDL_LoadBMP("assets/closebutton.bmp");
+    
+    textbox = SDL_LoadBMP("assets/textbox.bmp");
+
+
+    lucasfilmlogobef = SDL_LoadBMP("assets/intro/lucasfilmback.bmp");
+    lucasfilmlogo = SDL_LoadBMP("assets/intro/lucasfilm.bmp");
+    shariflogobef =  SDL_LoadBMP("assets/intro/shariflogobef.bmp");
+    shariflogo =  SDL_LoadBMP("assets/intro/shariflogo.bmp");
+    gamelogobef = SDL_LoadBMP("assets/intro/gamelogobef.bmp");
+    gamelogo = SDL_LoadBMP("assets/intro/gamelogo.bmp");
 
 
     wall = SDL_LoadBMP("assets/wall.bmp");

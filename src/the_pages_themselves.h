@@ -74,15 +74,27 @@ void page1()
     }
     if(ev.type==SDL_KEYDOWN && writing_mode_username==1)
     {
-        if((ev.key.keysym.sym==SDLK_BACKSPACE || ev.key.keysym.sym==SDLK_DELETE) && size_of_text_username>0)
+        if((ev.key.keysym.sym==SDLK_BACKSPACE || ev.key.keysym.sym==SDLK_DELETE))
         {
-            size_of_text_username--;
-            username_text[size_of_text_username]='.';
+            if(size_of_text_username>0)
+            {
+                size_of_text_username--;
+                username_text[size_of_text_username]=' ';
+            }
         }
-        else
+        else if (ev.key.keysym.sym!=SDLK_SPACE)
         {
-            username_text[size_of_text_username]= ev.key.keysym.sym;
-            size_of_text_username++;
+            char temp[40];
+            for(int i=0;i<size_of_text_username+1;i++)
+                temp[i]=username_text[i];
+            temp[size_of_text_username+1]=ev.key.keysym.sym;
+            temp[size_of_text_username+2]='\0';
+            TTF_SizeText(details_page_outline, temp, &usernametype_w, &usernametype_w);
+            if(usernametype_w<600 * window_width/1920)
+            {
+                username_text[size_of_text_username]= ev.key.keysym.sym;
+                size_of_text_username++;
+            }
         }
         TTF_SizeText(details_page,username_text,&usernametype_w,&usernametype_h);
     }
@@ -117,8 +129,37 @@ void page1()
         else if(click_x>updownbutton_sec_target.x && click_x<updownbutton_sec_target.x + updownbutton_sec_target.w
                 && click_y>updownbutton_sec_target.y + updownbutton_sec_target.h/2 && click_y<updownbutton_sec_target.y + updownbutton_sec_target.h && number_of_politic_sides_per_user>1)
                 number_of_politic_sides_per_user--;
-        else if(click_x>username_target.x && click_x<username_target.x + username_target.w
-                && click_y>username_target.y + username_target.h/2 && click_y<username_target.y + username_target.h)
+
+        else if(click_x>updownbutton_thi_target.x && click_x<updownbutton_thi_target.x + updownbutton_thi_target.w
+                && click_y>updownbutton_thi_target.y && click_y<updownbutton_thi_target.y + updownbutton_thi_target.h/2)  
+                number_of_nomansland++;
+        else if(click_x>updownbutton_thi_target.x && click_x<updownbutton_thi_target.x + updownbutton_thi_target.w
+                && click_y>updownbutton_thi_target.y + updownbutton_thi_target.h/2 && click_y<updownbutton_thi_target.y + updownbutton_thi_target.h && number_of_nomansland>0)
+                number_of_nomansland--;
+
+        else if(click_x>updownbutton_fou_target.x && click_x<updownbutton_fou_target.x + updownbutton_fou_target.w
+                && click_y>updownbutton_fou_target.y && click_y<updownbutton_fou_target.y + updownbutton_fou_target.h/2)  
+                max_troop_in_someones_land++;
+        else if(click_x>updownbutton_fou_target.x && click_x<updownbutton_fou_target.x + updownbutton_fou_target.w
+                && click_y>updownbutton_fou_target.y + updownbutton_fou_target.h/2 && click_y<updownbutton_fou_target.y + updownbutton_fou_target.h && max_troop_in_someones_land>0)
+                max_troop_in_someones_land--;
+   
+        else if(click_x>updownbutton_fiv_target.x && click_x<updownbutton_fiv_target.x + updownbutton_fiv_target.w
+                && click_y>updownbutton_fiv_target.y && click_y<updownbutton_fiv_target.y + updownbutton_fiv_target.h/2)  
+                max_troop_no_mans_land++;
+        else if(click_x>updownbutton_fiv_target.x && click_x<updownbutton_fiv_target.x + updownbutton_fiv_target.w
+                && click_y>updownbutton_fiv_target.y + updownbutton_fiv_target.h/2 && click_y<updownbutton_fiv_target.y + updownbutton_fiv_target.h && max_troop_no_mans_land>0)
+                max_troop_no_mans_land--;
+
+        else if(click_x>updownbutton_six_target.x && click_x<updownbutton_six_target.x + updownbutton_six_target.w
+                && click_y>updownbutton_six_target.y && click_y<updownbutton_six_target.y + updownbutton_six_target.h/2)  
+                start_troop_in_someones_land++;
+        else if(click_x>updownbutton_six_target.x && click_x<updownbutton_six_target.x + updownbutton_six_target.w
+                && click_y>updownbutton_six_target.y + updownbutton_six_target.h/2 && click_y<updownbutton_six_target.y + updownbutton_six_target.h && start_troop_in_someones_land>0)
+                start_troop_in_someones_land--;
+
+        else if(click_x>textbox_target.x && click_x<textbox_target.x + textbox_target.w
+                && click_y>textbox_target.y && click_y<textbox_target.y + textbox_target.h)
                 writing_mode_username=1;
     }
     if(click_x>backbutton_target.x && click_x<backbutton_target.x+backbutton_target.w && 
@@ -152,13 +193,23 @@ void page2()
             if(size_of_text_mapselect>0)
             {
                 size_of_text_mapselect--;
-                mapselect[size_of_text_mapselect]='.';
+                mapselect[size_of_text_mapselect]=' ';
             }
         }
         else if (ev.key.keysym.sym>='0' && ev.key.keysym.sym<='9')
         {
-            mapselect[size_of_text_mapselect]= ev.key.keysym.sym;
-            size_of_text_mapselect++;
+            char temp[40];
+            for(int i=0;i<size_of_text_mapselect+1;i++)
+                temp[i]=mapselect[i];
+            temp[size_of_text_mapselect+1]=ev.key.keysym.sym;
+            temp[size_of_text_mapselect+2]='\0';
+            TTF_SizeText(details_page_outline, temp, &mapsel_target.w, &mapsel_target.h);
+            printf("%d %d\n",mapsel_target.w, size_of_text_mapselect);
+            if(mapsel_target.w<600 * window_width/1920)
+            {
+                mapselect[size_of_text_mapselect]= ev.key.keysym.sym;
+                size_of_text_mapselect++;
+            }
         }
         TTF_SizeText(details_page,mapselect,&mapseltype_w,&mapseltype_h);
     }
@@ -177,8 +228,8 @@ void page2()
             game_running=0;
             return;
         }
-        else if(click_x>username_target.x && click_x<username_target.x + username_target.w
-                && click_y>username_target.y + username_target.h/2 && click_y<username_target.y + username_target.h)
+        else if(click_x>mapsel_target.x && click_x<mapsel_target.x + mapsel_target.w
+                && click_y>mapsel_target.y && click_y<mapsel_target.y + mapsel_target.h)
             writing_mode_map_select=1;
         else if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
         && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h)
@@ -208,10 +259,11 @@ void page3()
         game_running=0;
         return;
     }
-    if(ev.type==SDL_KEYDOWN && ev.key.keysym.sym==SDLK_UP && credits_text_loc_y<5)
-        credits_text_loc_y+=5;
-    else if(ev.type==SDL_KEYDOWN && ev.key.keysym.sym==SDLK_DOWN && credits_text_loc_y>5-(credits_text_y-window_height))
-        credits_text_loc_y-=5;
+    if(ev.type==SDL_KEYDOWN && ev.key.keysym.sym==SDLK_UP && leaderboard_page_y<-60)
+        leaderboard_page_y+=5;
+        
+    else if(ev.type==SDL_KEYDOWN && ev.key.keysym.sym==SDLK_DOWN && leaderboard_page_y>-100-(enemies_target.h*3/2*number_of_leaderboard_users-window_height))
+        leaderboard_page_y-=5;
     else if(ev.type==SDL_MOUSEBUTTONDOWN && ev.button.button==SDL_BUTTON_LEFT)
     {
         click_x=ev.button.x;
@@ -221,7 +273,6 @@ void page3()
         else if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
         {
             page=0;
-            
         }
         else if(click_x>closebutton_target.x && click_x<closebutton_target.x + closebutton_target.w 
                 && click_y>closebutton_target.y && click_y<closebutton_target.y + closebutton_target.h)
@@ -394,10 +445,16 @@ void page2to10()
 void pageto1()
 {
     enemies_target.x = loc_number_of_enemies_x;
-    enemies_target.y = loc_number_of_enemies_y;
+    enemies_target.y = loc_number_of_enemies_y + number_of_enemies_h + 10;
     enemies_target.w = number_of_enemies_w;
     enemies_target.h = number_of_enemies_h;
+    username_target.x = loc_number_of_enemies_x;
+    username_target.y = loc_number_of_enemies_y;
+    username_target.w = usernametype_w;
+    username_target.h = usernametype_h;
     page=1;
+    char mapselectcpy[33]= "                                ";
+    strcpy(username_text,mapselectcpy);
 }
 
 void pageto2()
@@ -405,7 +462,8 @@ void pageto2()
     enemies_target.x = loc_number_of_enemies_x;
     enemies_target.y = loc_number_of_enemies_y;
     page=2;
-    char mapselect[33] = "............................";
+    char mapselectcpy[33]= "                                ";
+    strcpy(mapselect,mapselectcpy);
     size_of_text_mapselect=0;
     findtotalofsaves();
 }
