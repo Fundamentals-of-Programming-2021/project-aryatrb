@@ -1,5 +1,9 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/state.dir/src/load_everythingc.c.o"
   "CMakeFiles/state.dir/src/main.c.o"
+  "CMakeFiles/state.dir/src/operations_of_the_game.c.o"
+  "CMakeFiles/state.dir/src/rendercpy.c.o"
+  "CMakeFiles/state.dir/src/the_pages_themselves.c.o"
   "state"
   "state.pdb"
 )

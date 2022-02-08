@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 project(state C)
 set(CMAKE_C_STANDARD 99)
-
 file(GLOB_RECURSE SOURCE "src/*.c" "src/*.h")
-add_executable(state "${SOURCE}")
+# add_executable(state rendercpy.c the_pages_themselves.c operations_of_the_game.c load_everything_c.c)
+add_executable("${PROJECT_NAME}" "${SOURCE}" src/rendercpy.c src/load_everythingc.c src/the_pages_themselves.c src/operations_of_the_game.c)
 
 include_directories("/usr/include/SDL2")
 target_link_libraries(state m SDL2 SDL2_gfx SDL2_ttf SDL2_mixer)
