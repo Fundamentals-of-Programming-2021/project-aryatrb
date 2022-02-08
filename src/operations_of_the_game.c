@@ -222,7 +222,7 @@ void spell_type_five()
 {
     struct timeval tv;
     gettimeofday(&tv,NULL);
-    for(int i = 0 ; i< number_of_enemies+1;i++)
+    for(int i = 0 ; i< 15;i++)
     {
         if(players[i].does_have_kyber!=-1 &&
             kybers[players[i].does_have_kyber].type==4 &&
@@ -251,6 +251,8 @@ void moving_troopers_update_location()
                 politic_sides[j].number_of_troopers--;
                 politic_sides[j].number_of_moving_troopers--;
                 politic_sides[j].troopers[i].is_out=1;
+                if(politic_sides[j].number_of_moving_troopers<=0)
+                    politic_sides[j].is_moving=0;
             }
             if(politic_sides[j].troopers[i].did_end==1 || politic_sides[j].troopers[i].is_out==0)
                 continue;
@@ -279,6 +281,8 @@ void moving_troopers_update_location()
                 politic_sides[j].troopers[i].current_x += players[politic_sides[j].player_id].till_end_a*sgn_m;
             m = politic_sides[j].troopers[i].current_x - politic_sides[j].troopers[i].dest_x;
             n = politic_sides[j].troopers[i].current_y - politic_sides[j].troopers[i].dest_y;
+            if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id!=politic_sides[j].player_id)
+                politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].is_getting_attacked=1;
             if(sqrt(m*m+n*n) < size_of_each_cell_x*1/5)
             {
                 politic_sides[j].troopers[i].did_end=1;
@@ -318,7 +322,10 @@ void moving_troopers_update_location()
                     politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].is_moving=0;
                 }
                 if(politic_sides[j].number_of_moving_troopers<=0)
+                {
+                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].is_getting_attacked=0;
                     politic_sides[j].is_moving=0;
+                }
             }
         }
 }
@@ -348,7 +355,6 @@ void moving_troopers_without_a_home_update_location()
         n = abs(n);
         if(abs(m)>abs(n) && m!=0 && n!=0)
         {
-            
             troops_with_no_home[i].current_x += ceil(players[troops_with_no_home[i].player_id].till_end_a*(double)m/(double)(sqrt(m*m+n*n))*sgn_m);
             troops_with_no_home[i].current_y += ceil(players[troops_with_no_home[i].player_id].till_end_a)*(double)n/(double)(sqrt(m*m+n*n))*sgn_n;
         }
@@ -363,11 +369,14 @@ void moving_troopers_without_a_home_update_location()
             troops_with_no_home[i].current_x += players[troops_with_no_home[i].player_id].till_end_a*sgn_m;
         m = troops_with_no_home[i].current_x - troops_with_no_home[i].dest_x;
         n = troops_with_no_home[i].current_y - troops_with_no_home[i].dest_y;
+        if( politic_sides[troops_with_no_home[i].enemy_politic_side_number].player_id!=troops_with_no_home[i].player_id)
+            politic_sides[troops_with_no_home[i].enemy_politic_side_number].is_getting_attacked=1;
         if(sqrt(m*m+n*n) < size_of_each_cell_x*1/5)
         {
             troops_with_no_home[i].did_end=1;
             if(politic_sides[troops_with_no_home[i].enemy_politic_side_number].player_id!=troops_with_no_home[i].player_id)
             {
+                politic_sides[troops_with_no_home[i].enemy_politic_side_number].is_getting_attacked=0;
                 if(troops_with_no_home[troops_with_no_home[i].enemy_politic_side_number].player_id!=nomansland_playerid &&
                     players[troops_with_no_home[troops_with_no_home[i].enemy_politic_side_number].player_id].does_have_kyber!=-1 &&
                        kybers[players[troops_with_no_home[i].enemy_politic_side_number].does_have_kyber].type==4 &&
@@ -449,6 +458,7 @@ int assign_politic_sides()
         players[i].till_end_a = dist_moving_trooper_per_sec;
         players[i].does_have_kyber=-1;
         players[i].create_trooper_rate=1;
+        players[i].is_on=0;
     }
     size_of_kybers=0;
     for(int i=0;i<number_of_enemies*number_of_politic_sides_per_user + number_of_nomansland + number_of_systems_of_the_user;i++)
@@ -498,6 +508,7 @@ int assign_politic_sides()
                 politic_sides[size_of_politic_sides].id_of_moving_troppers=0;
                 politic_sides[size_of_politic_sides].number_of_moving_troopers=0;
                 politic_sides[size_of_politic_sides].is_moving=0;
+                politic_sides[size_of_politic_sides].is_getting_attacked=0;
                 politic_sides[size_of_politic_sides].cells_x[0] = temp_x, politic_sides[size_of_politic_sides].cells_y[0] = temp_y;
                 cells[temp_x][temp_y].politic_side_number=size_of_politic_sides;
                 cells[temp_x][temp_y].does_it_have_military=1;
@@ -978,6 +989,8 @@ void create_kyber()
         int rand_two_side_second = rand()%size_of_politic_sides;
         while(rand_two_side_first==rand_two_side_second || politic_sides[rand_two_side_second].player_id==-1)
             rand_two_side_second = rand()%size_of_politic_sides;
+        kybers[size_of_kybers].politic_side_id_first=rand_two_side_first;
+        kybers[size_of_kybers].politic_side_id_second=rand_two_side_second;
         int first_center_x = cells[politic_sides[rand_two_side_first].cells_x[0]][politic_sides[rand_two_side_first].cells_y[0]].x+ size_of_each_cell_x/2 - size_of_kyber_photo_x/2;
         int first_center_y = cells[politic_sides[rand_two_side_first].cells_x[0]][politic_sides[rand_two_side_first].cells_y[0]].y + size_of_each_cell_y/2 - size_of_kyber_photo_y/2;
         int second_center_x = cells[politic_sides[rand_two_side_second].cells_x[0]][politic_sides[rand_two_side_second].cells_y[0]].x + size_of_each_cell_x/2 - size_of_kyber_photo_x/2;
@@ -985,8 +998,7 @@ void create_kyber()
         int dist_rand = rand()%70 + 15;
         kybers[size_of_kybers].x = (first_center_x* dist_rand + second_center_x*(100-dist_rand))/100;
         kybers[size_of_kybers].y = (first_center_y* dist_rand + second_center_y*(100-dist_rand))/100;
-        // kybers[size_of_kybers].type = rand()%5;
-        kybers[size_of_kybers].type = 4;
+        kybers[size_of_kybers].type = rand()%5;
         kybers[size_of_kybers].is_on=0;
         kybers[size_of_kybers].is_dead=0;
         size_of_kybers++;
@@ -1003,6 +1015,24 @@ int calculate_score()
 
 void enemy_ai()
 {
+    int didsendforkyber[15] ={0};
+    for(int j=0;j<size_of_politic_sides;j++)
+    {
+        if(didsendforkyber[politic_sides[j].player_id]==1 || politic_sides[j].player_id==main_players_id || politic_sides[j].player_id==nomansland_playerid)
+            continue;
+        for(int i=0;i<size_of_kybers;i++)
+        {
+            if(kybers[i].is_on!=1 && kybers[i].is_dead!=1 && (j==kybers[i].politic_side_id_first || j==kybers[i].politic_side_id_second))
+            {
+                didsendforkyber[politic_sides[j].player_id]=1;
+                if(j==kybers[i].politic_side_id_first)
+                    create_moving_troopers(j,kybers[i].politic_side_id_second);
+                else
+                    create_moving_troopers(j,kybers[i].politic_side_id_first);
+            }
+                
+        }
+    }
     int tot_of_user[10] = {0};
     for(int j=0;j<15;j++)
         if(j!=nomansland_playerid && j!=main_players_id && politic_sides_of_user[j]>1 && players[j].is_on==1)
@@ -1011,6 +1041,10 @@ void enemy_ai()
                 {
                     d++;
                     tot_of_user[j]+= politic_sides[i].number_of_troopers - politic_sides[i].number_of_moving_troopers;
+                    if(politic_sides[i].is_getting_attacked==1)
+                        for(int r=0;r<i;r++)
+                            if(politic_sides[r].player_id==j)
+                                create_moving_troopers(r,i);
                     int did_attack=0;
                     for(int k=0;k<size_of_politic_sides;k++)
                         if(j!=politic_sides[k].player_id &&
@@ -1037,47 +1071,41 @@ void enemy_ai()
                                             if(politic_sides[w].player_id==j)
                                                 create_moving_troopers(w,k);
                 }
-    // if()
     for(int j=0;j<size_of_politic_sides;j++)
     {
-        int optionss[20] = {0};
-        int choosen_ans=-1;
-        int does_have_anything_other_than_nomansland=0;
-        int dist = 10000;
-        for(int i=0;i<size_of_politic_sides;i++)
-            if((politic_sides[j].player_id!=nomansland_playerid && 
-                politic_sides[j].is_moving==0 &&
-                politic_sides[j].player_id!=politic_sides[i].player_id &&
-                politic_sides[j].player_id!=0)
-                &&
-                    (/*(politic_sides[i].is_moving==1 &&  
-                    politic_sides[j].number_of_troopers>10)
-                    ||*/
-                    (politic_sides[j].number_of_troopers - politic_sides[j].number_of_moving_troopers>politic_sides[i].number_of_troopers+3)))
-                    {
-                        if(politic_sides[i].player_id!=nomansland_playerid)
-                            does_have_anything_other_than_nomansland=1;
-                        choosen_ans=i;
-                        optionss[i]=1;
-                        // create_moving_troopers(j,i);
-                        // return;
-                    }
-        if(choosen_ans==-1)
-            continue;
-        for(int i=0;i<size_of_politic_sides;i++)
+        if((politic_sides[j].player_id!=nomansland_playerid && 
+            politic_sides[j].is_moving==0 &&
+            politic_sides[j].player_id!=main_players_id))
         {
-            if(does_have_anything_other_than_nomansland==1 && optionss[i]==1 && politic_sides[i].player_id !=nomansland_playerid && dist_between_two_poliside(i,j)<dist)
-            {
-                dist=dist_between_two_poliside(i,j);
-                choosen_ans=i;
-            }
-            else if(does_have_anything_other_than_nomansland==0 && optionss[i]==1 && dist_between_two_poliside(i,j)<dist)
-            {
-                dist=dist_between_two_poliside(i,j);
-                choosen_ans=i;
-            }
+            int optionss[40] = {0};
+            int choosen_ans=-1;
+            int does_have_anything_other_than_nomansland=0;
+            int dist = 10000;
+            for(int i=0;i<size_of_politic_sides;i++)
+                if((politic_sides[j].player_id!=politic_sides[i].player_id)
+                    &&
+                        ((politic_sides[i].is_moving==1 &&  
+                        politic_sides[j].number_of_troopers-politic_sides[j].number_of_moving_troopers>10)
+                        ||
+                        (politic_sides[j].number_of_troopers - politic_sides[j].number_of_moving_troopers>politic_sides[i].number_of_troopers+3)))
+                        {
+                            if(politic_sides[i].player_id!=nomansland_playerid)
+                                does_have_anything_other_than_nomansland=1;
+                            choosen_ans=i;
+                            optionss[i]=1;
+                        }
+            if(choosen_ans==-1)
+                continue;
+            for(int i=0;i<size_of_politic_sides;i++)
+                if(optionss[i]==1 && dist_between_two_poliside(i,j)<dist &&
+                    ((does_have_anything_other_than_nomansland==1 && politic_sides[i].player_id !=nomansland_playerid)|| (does_have_anything_other_than_nomansland==0)))
+                {
+                    dist=dist_between_two_poliside(i,j);
+                    choosen_ans=i;
+                }
+            create_moving_troopers(j,choosen_ans);
         }
-        create_moving_troopers(j,choosen_ans);
+
     }
 }
 double dist_between_two_poliside(int i, int j)

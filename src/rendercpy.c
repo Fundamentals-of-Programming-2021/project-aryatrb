@@ -318,7 +318,7 @@ void rendercpypage10()
     }
     for(int j =0 ;j<size_of_politic_sides;j++)
     {
-        if(politic_sides[j].id_of_moving_troppers==0)
+        if(politic_sides[j].id_of_moving_troppers==0 || politic_sides[j].player_id==nomansland_playerid)
             continue;
         for(int i = 0 ; i<politic_sides[j].id_of_moving_troppers ; i++)
         {

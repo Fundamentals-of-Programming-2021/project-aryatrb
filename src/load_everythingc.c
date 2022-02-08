@@ -56,7 +56,7 @@ void load_everything()
     for(int i=0;i<15;i++)
         upboardwidth[i] = 0;
     number_of_systems_of_the_user=1;
-    page=0;
+    page=-1;
     size_of_kybers=0;
     size_of_politic_sides=0;
     is_sound_on=1,size_of_cells=0;

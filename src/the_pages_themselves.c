@@ -439,7 +439,12 @@ void winpage()
         if(click_x>5 && click_x<40 && click_y>window_height-40 && click_y<window_height-5)
             soundchange();
         else if(click_x>backbutton_target.x && click_x<backbutton_target.x+backbutton_target.w && click_y<backbutton_target.y+backbutton_target.h && click_y>backbutton_target.y)
+        {
+            Mix_PausedMusic();
+            Mix_PlayMusic(menu_music,-1);
             page=0;
+            return;
+        }
         else if(click_x>closebutton_target.x && click_x<closebutton_target.x + closebutton_target.w 
                 && click_y>closebutton_target.y && click_y<closebutton_target.y + closebutton_target.h)
         {

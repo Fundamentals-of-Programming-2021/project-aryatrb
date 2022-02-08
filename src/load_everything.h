@@ -34,6 +34,7 @@ struct politic_side{
     int id_of_moving_troppers;
     int number_of_moving_troopers;
     int is_moving;
+    int is_getting_attacked;
     struct troop troopers[1000];
 };
 struct player_himself{
@@ -52,6 +53,8 @@ struct kyber_cristal{
     struct timeval time;
     double seconds_till_off;
     int player_id;
+    int politic_side_id_first;
+    int politic_side_id_second;
 };
 struct leaderboard_or_something{
     char name[100];
