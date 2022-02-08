@@ -19,28 +19,35 @@ void rendercpypage0()
     credits_target.y = window_height -50*window_width/1335 - size_credits_y/2;
     credits_target.w = size_credits_x;
     credits_target.h = size_credits_y;
-    SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, menubefwithlogo);
+    SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, startbackground);
     SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-    SDL_Texture *newgame_texture = SDL_CreateTextureFromSurface(renderer, new_game);
     SDL_RenderCopy(renderer, newgame_texture, NULL, &new_game_target);
-    SDL_Texture *loadgame_texture = SDL_CreateTextureFromSurface(renderer, load_game);
     SDL_RenderCopy(renderer, loadgame_texture, NULL, &load_game_target);
-    SDL_Texture *leaderboard_texture = SDL_CreateTextureFromSurface(renderer, leaderboard);
     SDL_RenderCopy(renderer, leaderboard_texture, NULL, &leaderboard_target);
-    SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
     SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
-    SDL_Texture *creditstexture = SDL_CreateTextureFromSurface(renderer, credits_button);
     SDL_RenderCopy(renderer, creditstexture, NULL, &credits_target);
-    SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
     SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target);
     SDL_RenderPresent(renderer);
     SDL_DestroyTexture(startscreentexture);
-    SDL_DestroyTexture(newgame_texture);
-    SDL_DestroyTexture(loadgame_texture);
-    SDL_DestroyTexture(leaderboard_texture);
-    SDL_DestroyTexture(soundtexture);
-    SDL_DestroyTexture(creditstexture);
-    SDL_DestroyTexture(closebutton_texture);
+}
+
+void rendercpypage1text(char text[],SDL_Surface *textsurface,SDL_Texture *text_texture ,SDL_Rect *target)
+{
+    TTF_SizeText(details_page_outline, text, &target->w, &target->h);
+    textsurface = TTF_RenderText_Solid(details_page_outline,text, black);
+    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
+    SDL_RenderCopy(renderer,text_texture,NULL,target);
+    SDL_DestroyTexture(text_texture);
+    SDL_FreeSurface(textsurface);
+    target->y+=2, target->x+=2;
+
+    TTF_SizeText(details_page, text, &target->w, &target->h);
+    textsurface = TTF_RenderText_Solid(details_page,text, white);
+    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
+    SDL_RenderCopy(renderer,text_texture,NULL,target);
+    SDL_DestroyTexture(text_texture);
+    SDL_FreeSurface(textsurface);
+    target->y-=2, target->x-=2;
 }
 void rendercpypage1()
 {
@@ -56,15 +63,10 @@ void rendercpypage1()
     
     SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, new_game_background);
     SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-    SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
     SDL_RenderCopy(renderer, backbuttontexture, NULL, &backbutton_target);
-    SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
     SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
-    SDL_Texture *startgametexture = SDL_CreateTextureFromSurface(renderer, startgame);
     SDL_RenderCopy(renderer, startgametexture, NULL, &start_game_target);
-    SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
     SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target);
-    SDL_Texture *updownbutton_texture = SDL_CreateTextureFromSurface(renderer, updownbutton);
     SDL_RenderCopy(renderer, updownbutton_texture, NULL, &updownbutton_target);
     SDL_RenderCopy(renderer, updownbutton_texture, NULL, &updownbutton_sec_target);
     SDL_RenderCopy(renderer, updownbutton_texture, NULL, &updownbutton_thi_target);
@@ -72,182 +74,33 @@ void rendercpypage1()
     SDL_RenderCopy(renderer, updownbutton_texture, NULL, &updownbutton_fiv_target);
     SDL_RenderCopy(renderer, updownbutton_texture, NULL, &updownbutton_six_target);
     SDL_RenderCopy(renderer, updownbutton_texture, NULL, &updownbutton_sev_target);
-    SDL_DestroyTexture(updownbutton_texture);
-
-    char test[22];
+    SDL_Surface *textsurface;
+    SDL_Texture *text_texture;
+    char test[100];
     sprintf(test,"number of enemies: %d",number_of_enemies);
-    TTF_SizeText(details_page_outline, test, &enemies_target.w, &enemies_target.h);
-    SDL_Surface *textsurface = TTF_RenderText_Solid(details_page_outline,test, black);
-    SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    enemies_target.y+=2, enemies_target.x+=2;
-
-    TTF_SizeText(details_page, test, &enemies_target.w, &enemies_target.h);
-    textsurface = TTF_RenderText_Solid(details_page,test, white);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-    SDL_FreeSurface(textsurface);
-    enemies_target.y-=2, enemies_target.x-=2;
-
-    char test2[70];
-    sprintf(test2, "number of systems per player: %d",number_of_politic_sides_per_user);
-    TTF_SizeText(details_page_outline, test2, &per_user_target.w, &per_user_target.h);
-    textsurface = TTF_RenderText_Solid(details_page_outline,test2, black);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&per_user_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    per_user_target.y+=2, per_user_target.x+=2;
-
-    TTF_SizeText(details_page, test2, &per_user_target.w, &per_user_target.h);
-    textsurface = TTF_RenderText_Solid(details_page,test2, white);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&per_user_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    per_user_target.y-=2, per_user_target.x-=2;
-
-    sprintf(test2, "number of no man's land: %d",number_of_nomansland);
-    TTF_SizeText(details_page_outline, test2, &number_of_nomansland_target.w, &number_of_nomansland_target.h);
-    textsurface = TTF_RenderText_Solid(details_page_outline,test2, black);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&number_of_nomansland_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    number_of_nomansland_target.y+=2, number_of_nomansland_target.x+=2;
-
-    TTF_SizeText(details_page, test2, &number_of_nomansland_target.w, &number_of_nomansland_target.h);
-    textsurface = TTF_RenderText_Solid(details_page,test2, white);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&number_of_nomansland_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    number_of_nomansland_target.y-=2, number_of_nomansland_target.x-=2;
-
-
-    char text_temp[13] = "username: ";
-    TTF_SizeText(details_page_outline, text_temp, &username_target.w, &username_target.h);
-    textsurface = TTF_RenderText_Solid(details_page_outline,text_temp, black);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&username_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    username_target.y+=2, username_target.x+=2;
-
-    TTF_SizeText(details_page, text_temp, &username_target.w, &username_target.h);
-    textsurface = TTF_RenderText_Solid(details_page,text_temp, white);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer, text_texture, NULL,&username_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    username_target.y-=2, username_target.x-=2;
+    rendercpypage1text(test,textsurface,text_texture,&enemies_target);
+    sprintf(test, "number of systems per player: %d",number_of_politic_sides_per_user);
+    rendercpypage1text(test,textsurface,text_texture,&per_user_target);
+    sprintf(test, "number of no man's land: %d",number_of_nomansland);
+    rendercpypage1text(test,textsurface,text_texture,&number_of_nomansland_target);
+    sprintf(test, "username: ");
+    rendercpypage1text(test,textsurface,text_texture,&username_target);
     int temp_w= username_target.w;
-    
     username_target.x +=temp_w;
-    textbox_target = username_target;
-    textbox_target.w = 600 * window_width/1920;
-    textbox_target.h *=1.2;
-    textbox_target.x*=0.97;
-    SDL_Texture *textbox_texture = SDL_CreateTextureFromSurface(renderer, textbox);
+    textbox_target = username_target, textbox_target.w = 600 * window_width/1920, textbox_target.h *=1.2, textbox_target.x*=0.97;
     SDL_RenderCopy(renderer, textbox_texture, NULL, &textbox_target);
-    SDL_DestroyTexture(textbox_texture);
-
-    TTF_SizeText(details_page_outline, username_text, &username_target.w, &username_target.h);
-    textsurface = TTF_RenderText_Solid(details_page_outline,username_text, black);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&username_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    username_target.y+=2, username_target.x+=2;
-
-    TTF_SizeText(details_page, username_text, &username_target.w, &username_target.h);
-    textsurface = TTF_RenderText_Solid(details_page,username_text, white);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&username_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    username_target.y-=2, username_target.x-=2;
+    rendercpypage1text(username_text,textsurface,text_texture,&username_target);
     username_target.x-=temp_w;
-
-    sprintf(test2, "max troopers in a players planet: %d",max_troop_in_someones_land);
-    TTF_SizeText(details_page_outline, test2, &maxtrooperinplayers_house.w, &maxtrooperinplayers_house.h);
-    textsurface = TTF_RenderText_Solid(details_page_outline,test2, black);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&maxtrooperinplayers_house);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    maxtrooperinplayers_house.y+=2, maxtrooperinplayers_house.x+=2;
-
-    TTF_SizeText(details_page, test2, &maxtrooperinplayers_house.w, &maxtrooperinplayers_house.h);
-    textsurface = TTF_RenderText_Solid(details_page,test2, white);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer, text_texture, NULL,&maxtrooperinplayers_house);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    maxtrooperinplayers_house.y-=2, maxtrooperinplayers_house.x-=2;
-
-    sprintf(test2, "max troopers in no man's land: %d",max_troop_no_mans_land);
-    TTF_SizeText(details_page_outline, test2, &maxtrooperinnomansland_target.w, &maxtrooperinnomansland_target.h);
-    textsurface = TTF_RenderText_Solid(details_page_outline,test2, black);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&maxtrooperinnomansland_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    maxtrooperinnomansland_target.y+=2, maxtrooperinnomansland_target.x+=2;
-
-    TTF_SizeText(details_page, test2, &maxtrooperinnomansland_target.w, &maxtrooperinnomansland_target.h);
-    textsurface = TTF_RenderText_Solid(details_page,test2, white);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer, text_texture, NULL,&maxtrooperinnomansland_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    maxtrooperinnomansland_target.y-=2, maxtrooperinnomansland_target.x-=2;
-
-    sprintf(test2, "number of troopers the land has in the beginning: %d",start_troop_in_someones_land);
-    TTF_SizeText(details_page_outline, test2, &start_troop_insomo_la_target.w, &start_troop_insomo_la_target.h);
-    textsurface = TTF_RenderText_Solid(details_page_outline,test2, black);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&start_troop_insomo_la_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    start_troop_insomo_la_target.y+=2, start_troop_insomo_la_target.x+=2;
-
-    TTF_SizeText(details_page, test2, &start_troop_insomo_la_target.w, &start_troop_insomo_la_target.h);
-    textsurface = TTF_RenderText_Solid(details_page,test2, white);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer, text_texture, NULL,&start_troop_insomo_la_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    start_troop_insomo_la_target.y-=2, start_troop_insomo_la_target.x-=2;
-
-
-    sprintf(test2, "number of systems of the main player: %d",number_of_systems_of_the_user);
-    TTF_SizeText(details_page_outline, test2, &number_of_systems_of_user_target.w, &number_of_systems_of_user_target.h);
-    textsurface = TTF_RenderText_Solid(details_page_outline,test2, black);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&number_of_systems_of_user_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    number_of_systems_of_user_target.y+=2, number_of_systems_of_user_target.x+=2;
-
-    TTF_SizeText(details_page, test2, &number_of_systems_of_user_target.w, &number_of_systems_of_user_target.h);
-    textsurface = TTF_RenderText_Solid(details_page,test2, white);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer, text_texture, NULL,&number_of_systems_of_user_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    number_of_systems_of_user_target.y-=2, number_of_systems_of_user_target.x-=2;
-    
-
+    sprintf(test, "max troopers in a players planet: %d",max_troop_in_someones_land);
+    rendercpypage1text(test,textsurface,text_texture,&maxtrooperinplayers_house);
+    sprintf(test, "max troopers in no man's land: %d",max_troop_no_mans_land);
+    rendercpypage1text(test,textsurface,text_texture,&maxtrooperinnomansland_target);
+    sprintf(test, "number of troopers the land has in the beginning: %d",start_troop_in_someones_land);
+    rendercpypage1text(test,textsurface,text_texture,&start_troop_insomo_la_target);
+    sprintf(test, "number of systems of the main player: %d",number_of_systems_of_the_user);
+    rendercpypage1text(test,textsurface,text_texture,&number_of_systems_of_user_target);
     SDL_RenderPresent(renderer);
     SDL_DestroyTexture(startscreentexture);
-    SDL_DestroyTexture(soundtexture);
-    SDL_DestroyTexture(backbuttontexture);
-    SDL_DestroyTexture(startgametexture);
-    SDL_DestroyTexture(closebutton_texture);
-    SDL_DestroyTexture(updownbutton_texture);
 }
 void rendercpypage2()
 {
@@ -268,63 +121,44 @@ void rendercpypage2()
 
     SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, padmegrave1);
     SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-    SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
     SDL_RenderCopy(renderer, backbuttontexture, NULL, &backbutton_target);
-    SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
     SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
-    SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
     SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target); 
     SDL_Texture *startgametexture = SDL_CreateTextureFromSurface(renderer, startgame);
     SDL_RenderCopy(renderer, startgametexture, NULL, &start_game_target);
+    SDL_Surface *textsurface;
+    SDL_Texture *text_texture;
     char test[60];
     sprintf(test, "there are %d maps. select one of them:", mapnumsel);
-
-    TTF_SizeText(details_page_outline, test, &enemies_target.w, &enemies_target.h);
-    SDL_Surface *textsurface = TTF_RenderText_Solid(details_page_outline,test, black);
-    SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-
-    enemies_target.y+=2, enemies_target.x+=2;
-    TTF_SizeText(details_page, test, &enemies_target.w, &enemies_target.h);
-    textsurface = TTF_RenderText_Solid(details_page,test, white);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    enemies_target.y-=2, enemies_target.x-=2;
-
+    rendercpypage1text(test,textsurface,text_texture,&enemies_target);
     int temp_w= username_target.w;    
     textbox_target = username_target;
     textbox_target.w = 600 * window_width/1920;
     textbox_target.h *=1.2;
-    // textbox_target.x*=0.97;
-    SDL_Texture *textbox_texture = SDL_CreateTextureFromSurface(renderer, textbox);
     SDL_RenderCopy(renderer, textbox_texture, NULL, &textbox_target);
-    SDL_DestroyTexture(textbox_texture);
     mapsel_target=username_target;
     mapsel_target.x*=1.08;
-    TTF_SizeText(details_page_outline, mapselect, &mapsel_target.w, &mapsel_target.h);
-    textsurface = TTF_RenderText_Solid(details_page_outline,mapselect, black);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&mapsel_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    mapsel_target.y+=2, mapsel_target.x+=2;
-    TTF_SizeText(details_page, mapselect, &mapsel_target.w, &mapsel_target.h);
-    textsurface = TTF_RenderText_Solid(details_page,mapselect, white);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&mapsel_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    mapsel_target.y-=2, mapsel_target.x-=2;
-    
+    rendercpypage1text(mapselect,textsurface,text_texture,&mapsel_target);
     SDL_RenderPresent(renderer);
     SDL_DestroyTexture(startgametexture);
     SDL_DestroyTexture(startscreentexture);
-    SDL_DestroyTexture(soundtexture);
-    SDL_DestroyTexture(backbuttontexture);
+}
+void rendercpypage3text(char text[],SDL_Surface *textsurface,SDL_Texture *text_texture ,SDL_Rect *target)
+{
+    textsurface = TTF_RenderText_Solid(details_page_outline,text, black);
+    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
+    SDL_RenderCopy(renderer,text_texture,NULL,target);
+    SDL_DestroyTexture(text_texture);
+    SDL_FreeSurface(textsurface);
+    target->y+=2, target->x+=2;
+
+    TTF_SizeText(details_page, text, &target->w, &target->h);
+    textsurface = TTF_RenderText_Solid(details_page,text, white);
+    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
+    SDL_RenderCopy(renderer,text_texture,NULL,target);
+    SDL_DestroyTexture(text_texture);
+    SDL_FreeSurface(textsurface);
+    target->y-=2, target->x-=2;
 }
 void rendercpypage3()
 {
@@ -335,11 +169,8 @@ void rendercpypage3()
 
     SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, leaderboardbackground);
     SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-    SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
     SDL_RenderCopy(renderer, backbuttontexture, NULL, &backbutton_target);
-    SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
     SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
-    SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
     SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target); 
     char test[150];
     SDL_Surface *textsurface;
@@ -347,22 +178,10 @@ void rendercpypage3()
     for(int i=0;i<number_of_leaderboard_users;i++)
     {
         sprintf(test, "%d. %s",i+1,leaderboard_users[i].name);
-        TTF_SizeText(details_page_outline, test, &enemies_target.w, &enemies_target.h);        
+        TTF_SizeText(details_page_outline, test, &enemies_target.w, &enemies_target.h);  
         enemies_target.x = window_width*1/10;
-        enemies_target.y = enemies_target.h*3/2*(i+1) + leaderboard_page_y;
-        textsurface = TTF_RenderText_Solid(details_page_outline,test, black);
-        text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-        SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-        SDL_DestroyTexture(text_texture);
-        SDL_FreeSurface(textsurface);
-        enemies_target.y+=2, enemies_target.x+=2;
-
-        TTF_SizeText(details_page, test, &enemies_target.w, &enemies_target.h);
-        textsurface = TTF_RenderText_Solid(details_page,test, white);
-        text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-        SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-        SDL_FreeSurface(textsurface);
-        enemies_target.y-=2, enemies_target.x-=2;
+        enemies_target.y = enemies_target.h*3/2*(i+1) + leaderboard_page_y;      
+        rendercpypage3text(test,textsurface,text_texture,&enemies_target);
     }
     for(int i=0;i<number_of_leaderboard_users;i++)
     {
@@ -370,26 +189,10 @@ void rendercpypage3()
         TTF_SizeText(details_page_outline, test, &enemies_target.w, &enemies_target.h);        
         enemies_target.x = window_width*9/10 - enemies_target.w/2;
         enemies_target.y = enemies_target.h*3/2*(i+1) + leaderboard_page_y;
-        textsurface = TTF_RenderText_Solid(details_page_outline,test, black);
-        text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-        SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-        SDL_DestroyTexture(text_texture);
-        SDL_FreeSurface(textsurface);
-        enemies_target.y+=2, enemies_target.x+=2;
-
-        TTF_SizeText(details_page, test, &enemies_target.w, &enemies_target.h);
-        textsurface = TTF_RenderText_Solid(details_page,test, white);
-        text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-        SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-        SDL_FreeSurface(textsurface);
-        enemies_target.y-=2, enemies_target.x-=2;
+        rendercpypage3text(test,textsurface,text_texture,&enemies_target);
     }
-
-
     SDL_RenderPresent(renderer);
     SDL_DestroyTexture(startscreentexture);
-    SDL_DestroyTexture(soundtexture);
-    SDL_DestroyTexture(backbuttontexture);
 }
 void rendercpypage4()
 {
@@ -398,72 +201,40 @@ void rendercpypage4()
     backbutton_target.w = backbutton_x_y;
     backbutton_target.h = backbutton_x_y;
     SDL_Rect credits_text_target = {window_width/2 - credits_text_x/2 , credits_text_loc_y, credits_text_x, credits_text_y};
-
     SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, padmegrave2);
     SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-    SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
     SDL_RenderCopy(renderer, backbuttontexture, NULL, &backbutton_target);
-    SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
     SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
-    SDL_Texture *creditstext_texture = SDL_CreateTextureFromSurface(renderer, credits_text);
     SDL_RenderCopy(renderer, creditstext_texture, NULL, &credits_text_target);
-
     SDL_RenderPresent(renderer);
     SDL_DestroyTexture(startscreentexture);
-    SDL_DestroyTexture(soundtexture);
-    SDL_DestroyTexture(backbuttontexture);
-    SDL_DestroyTexture(creditstext_texture);
 }
 void rendercpypage10()
 {
     savebutton_target.x = window_width - 60*window_width/1920 - savebutton_target.w;
     SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, starsbackground);
     SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-    SDL_Texture *walltexture = SDL_CreateTextureFromSurface(renderer, wall);
     SDL_RenderCopy(renderer, walltexture, NULL, &wall_target);
-    SDL_Texture *wallflippedtexture = SDL_CreateTextureFromSurface(renderer, wallflipped);
     SDL_RenderCopy(renderer, wallflippedtexture, NULL, &wallflipped_target);
-    SDL_Texture *backtomenutexture = SDL_CreateTextureFromSurface(renderer, backtomenu);
     SDL_RenderCopy(renderer, backtomenutexture, NULL, &backtomenu_target);
-    SDL_Texture *savebuttontexture = SDL_CreateTextureFromSurface(renderer, savebutton);
     SDL_RenderCopy(renderer, savebuttontexture, NULL, &savebutton_target);
-    SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
     SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
-    SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
     SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target);
-    SDL_Texture *startgametexture;
-    SDL_Texture *leaders_faces_texture;
     SDL_Rect upboard_target = {window_width*0.2, size_of_wall_y*0.1,window_width*0.6,size_of_wall_y*0.8};
     SDL_Rect temp_target = upboard_target;
     temp_target.x = window_width*0.10;
     temp_target.w= upboard_target.x-temp_target.x;
-    SDL_Texture *handletexture = SDL_CreateTextureFromSurface(renderer, lightsaberhandle);
     SDL_RenderCopy(renderer, handletexture, NULL, &temp_target);
-    SDL_DestroyTexture(handletexture);
     int k=0;
-    if(did_we_even_calculate)
+    for(int i=0;i<15;i++)
     {
-        for(int i=0;i<number_of_enemies+1;i++)
-        {
-            SDL_Texture *tempture = SDL_CreateTextureFromSurface(renderer, upboardcolor[i]);
-            upboard_target.x = window_width*0.2 + window_width*0.6*(double)((double)k/(double)total_of_soldiers_in_map);
-            k+=upboardwidth[i];
-            upboard_target.w= (window_width*0.8) - upboard_target.x;
-            SDL_RenderCopy(renderer, tempture, NULL, &upboard_target);
-            SDL_DestroyTexture(tempture);
-        }
-        SDL_Texture *tempture = SDL_CreateTextureFromSurface(renderer, upboardcolor[nomansland_playerid]);
         upboard_target.x = window_width*0.2 + window_width*0.6*(double)((double)k/(double)total_of_soldiers_in_map);
-        k+=upboardwidth[nomansland_playerid];
+        k+=upboardwidth[i];
         upboard_target.w= (window_width*0.8) - upboard_target.x;
-        SDL_RenderCopy(renderer, tempture, NULL, &upboard_target);
-        SDL_DestroyTexture(tempture);
+        SDL_RenderCopy(renderer, upboardcolortexture[i], NULL, &upboard_target);
     }
-   
     for(int i=0;i<size_of_politic_sides;i++)
     {
-        leaders_faces_texture = SDL_CreateTextureFromSurface(renderer, faces[politic_sides[i].player_id]);
-        startgametexture = SDL_CreateTextureFromSurface(renderer, planets_photos[politic_sides[i].player_id]);
         for(int j=politic_sides[i].size_of_cells-1;j>=0;j--)
         {
             int x = politic_sides[i].cells_x[j], y = politic_sides[i].cells_y[j];
@@ -475,11 +246,11 @@ void rendercpypage10()
                 cell_target.x-=0.1*size_of_each_cell_x;
                 cell_target.y-=0.1*size_of_each_cell_y;
             }
-            SDL_RenderCopy(renderer, startgametexture, NULL, &cell_target);
+            SDL_RenderCopy(renderer, planetphotostexture[politic_sides[i].player_id], NULL, &cell_target);
             if(j==0)
             {
                 SDL_Rect leader_target = {cells[x][y].x+ size_of_each_cell_x/2 - size_of_leaders_x_y/2, cells[x][y].y + size_of_each_cell_y*1/10, size_of_leaders_x_y, size_of_leaders_x_y};
-                SDL_RenderCopy(renderer, leaders_faces_texture, NULL, &leader_target);
+                SDL_RenderCopy(renderer, facestexture[politic_sides[i].player_id], NULL, &leader_target);
                 SDL_Rect temp_trooper_target = leader_target;
                 SDL_Color white = {255,255,255,255};
                 int w,h;
@@ -523,8 +294,6 @@ void rendercpypage10()
                 leader_target.y-=2, leader_target.x-=2;
             }
         }   
-        SDL_DestroyTexture(leaders_faces_texture);
-        SDL_DestroyTexture(startgametexture);
         savebutton_target.w = size_of_wall_y*0.8*700/298;
         savebutton_target.h = size_of_wall_y*0.8;
     }
@@ -542,10 +311,9 @@ void rendercpypage10()
             kyber_target.x -=size_of_kyber_photo_x/2;
             kyber_target.y -=size_of_kyber_photo_y/2;
             SDL_RenderCopy(renderer, kyberontexture[kybers[i].type], NULL, &kyber_target);
-            // SDL_Rect temprect = kyber_target;
-            // temprect.w = 40*window_width/1920;
-            // temp
-            
+            kyber_target.w = 24*1920/window_width;
+            kyber_target.h = 5.5*kyber_target.w;
+            SDL_RenderCopy(renderer,kybersabertexture[kybers[i].player_id],NULL,&kyber_target);
         }
     }
     for(int j =0 ;j<size_of_politic_sides;j++)
@@ -569,12 +337,6 @@ void rendercpypage10()
     }
     SDL_RenderPresent(renderer);
     SDL_DestroyTexture(startscreentexture);
-    SDL_DestroyTexture(walltexture);
-    SDL_DestroyTexture(wallflippedtexture);
-    SDL_DestroyTexture(backtomenutexture);
-    SDL_DestroyTexture(savebuttontexture);
-    SDL_DestroyTexture(soundtexture);
-    SDL_DestroyTexture(closebutton_texture);
 }
 void rendercpywinpage()
 {
@@ -587,114 +349,57 @@ void rendercpywinpage()
     if(did_win_int==-1)
         startscreentexture = SDL_CreateTextureFromSurface(renderer, losebackground);
     SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-    SDL_Texture *backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
     SDL_RenderCopy(renderer, backbuttontexture, NULL, &backbutton_target);
-    SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
     SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target);
-    SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
     SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
     if(did_win_int==1)
     {
         SDL_Rect ifyoudefine_target = {window_width/2 - ifyoudefine_x/2 , 20, ifyoudefine_x, ifyoudefine_y};
-        SDL_Texture *quote_texture = SDL_CreateTextureFromSurface(renderer, ifyoudefine);
         SDL_RenderCopy(renderer, quote_texture, NULL, &ifyoudefine_target);
-        SDL_DestroyTexture(quote_texture);
     }
     else
     {
         SDL_Rect doordonot_target = {window_width/2 - doordonot_x/2 , 20, doordonot_x, doordonot_y};
-        SDL_Texture *doordonot_texture = SDL_CreateTextureFromSurface(renderer, doordonot);
         SDL_RenderCopy(renderer, doordonot_texture, NULL, &doordonot_target);
-        SDL_DestroyTexture(doordonot_texture);
     }
     char test[150];
     SDL_Surface *textsurface;
     SDL_Texture *text_texture;
-    if(did_win_int==0)
+    if(did_win_int==-1)
     {
         sprintf(test, "you lost!");
         TTF_SizeText(details_page_outline, test, &enemies_target.w, &enemies_target.h);        
         enemies_target.x = window_width/2 - enemies_target.w/2;
         enemies_target.y = window_height/2 - enemies_target.h/2 - enemies_target.h*3/2;
-        textsurface = TTF_RenderText_Solid(details_page_outline,test, black);
-        text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-        SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-        SDL_DestroyTexture(text_texture);
-        SDL_FreeSurface(textsurface);
-        enemies_target.y+=2, enemies_target.x+=2;
-
-        TTF_SizeText(details_page, test, &enemies_target.w, &enemies_target.h);
-        textsurface = TTF_RenderText_Solid(details_page,test, white);
-        text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-        SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-        SDL_FreeSurface(textsurface);
-        enemies_target.y-=2, enemies_target.x-=2;
+        rendercpypage3text(test,textsurface,text_texture,&enemies_target);
     }
-    sprintf(test, "game duration: %d",(int)difftime(calc_time,game_start_time)/60);
+    sprintf(test, "game duration: %d minutes",(int)difftime(calc_time,game_start_time)/60);
     TTF_SizeText(details_page_outline, test, &enemies_target.w, &enemies_target.h);
     enemies_target.x = window_width/2 - enemies_target.w/2;
     enemies_target.y = window_height/2 - enemies_target.h/2;
-    textsurface = TTF_RenderText_Solid(details_page_outline,test, black);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-     enemies_target.y+=2, enemies_target.x+=2;
-
-    TTF_SizeText(details_page, test, &enemies_target.w, &enemies_target.h);
-    textsurface = TTF_RenderText_Solid(details_page,test, white);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-    SDL_FreeSurface(textsurface);
-    enemies_target.y-=2, enemies_target.x-=2;
+    rendercpypage3text(test,textsurface,text_texture,&enemies_target);
 
     sprintf(test, "your score from this game: %d",added_score);
     TTF_SizeText(details_page_outline, test, &enemies_target.w, &enemies_target.h);
     enemies_target.x = window_width/2 - enemies_target.w/2;
     enemies_target.y = window_height/2 - enemies_target.h/2 + enemies_target.h*3/2;
-    textsurface = TTF_RenderText_Solid(details_page_outline,test, black);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    enemies_target.y+=2, enemies_target.x+=2;
-
-    TTF_SizeText(details_page, test, &enemies_target.w, &enemies_target.h);
-    textsurface = TTF_RenderText_Solid(details_page,test, white);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-    SDL_FreeSurface(textsurface);
-    enemies_target.y-=2, enemies_target.x-=2;
+    rendercpypage3text(test,textsurface,text_texture,&enemies_target);
 
     sprintf(test, "your total score: %d",user_score);
     TTF_SizeText(details_page_outline, test, &enemies_target.w, &enemies_target.h);
     enemies_target.x = window_width/2 - enemies_target.w/2;
     enemies_target.y = window_height/2 - enemies_target.h/2 + enemies_target.h*3;
-    textsurface = TTF_RenderText_Solid(details_page_outline,test, black);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(textsurface);
-    enemies_target.y+=2, enemies_target.x+=2;
-
-    TTF_SizeText(details_page, test, &enemies_target.w, &enemies_target.h);
-    textsurface = TTF_RenderText_Solid(details_page,test, white);
-    text_texture = SDL_CreateTextureFromSurface(renderer,textsurface);
-    SDL_RenderCopy(renderer,text_texture,NULL,&enemies_target);
-    SDL_FreeSurface(textsurface);
-    enemies_target.y-=2, enemies_target.x-=2;
+    rendercpypage3text(test,textsurface,text_texture,&enemies_target);
 
     SDL_RenderPresent(renderer);
     SDL_DestroyTexture(startscreentexture);
-    SDL_DestroyTexture(soundtexture);
-    SDL_DestroyTexture(backbuttontexture);
 }
 void pageminusone()
 {
     struct timeval time_tea;
     gettimeofday(&time_tea,NULL);
     long long int diff=(time_tea.tv_sec-the_begin.tv_sec)*1000000 + time_tea.tv_usec - the_begin.tv_usec;
-    SDL_Delay(25);
+    SDL_Delay(40);
     if(diff>43000000)
     {
         Mix_PausedMusic();
@@ -713,6 +418,7 @@ void pageminusone()
     {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
+        SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
         int temp=(diff-2000000)*255/3000000;
@@ -732,6 +438,7 @@ void pageminusone()
     {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
+        SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
         int temp=255 -(diff - 9000000)*255/3000000;
@@ -744,6 +451,7 @@ void pageminusone()
     {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
+        SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, shariflogobef);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
         int temp=(diff - 12000000)*255/3000000;
@@ -757,6 +465,7 @@ void pageminusone()
     {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, shariflogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
+        SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, shariflogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
         int temp=(diff - 15000000)*255/3000000;
@@ -777,6 +486,7 @@ void pageminusone()
     {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
+        SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, shariflogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
         int temp=255 -(diff - 22000000)*255/3000000;
@@ -789,6 +499,7 @@ void pageminusone()
     {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
+        SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
         int temp=(diff - 25000000)*255/3000000;
@@ -808,6 +519,7 @@ void pageminusone()
     {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
+        SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
         int temp=255 -(diff - 32000000)*255/4000000;
@@ -820,9 +532,11 @@ void pageminusone()
     {
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogobef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
+        SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, menubef);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=(diff - 36000000)*255/3000000;
+        diff/=10000;
+        int temp=(diff - 3600)*255/300;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
@@ -830,52 +544,16 @@ void pageminusone()
     }
     else if(diff<43000000)
     {
-        int temp=(diff - 39000000)*255/4000000;
+        diff/=10000;
+        int temp=(diff - 3900)*255/400;
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, menubef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
+        SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, menubefwithlogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
-
-        SDL_Texture *newgame_texture = SDL_CreateTextureFromSurface(renderer, new_game);
-        SDL_SetTextureBlendMode(newgame_texture,SDL_BLENDMODE_BLEND);
-        SDL_SetTextureAlphaMod(newgame_texture,temp);
-        SDL_RenderCopy(renderer, newgame_texture, NULL, &new_game_target);
-
-        SDL_Texture *loadgame_texture = SDL_CreateTextureFromSurface(renderer, load_game);
-        SDL_SetTextureBlendMode(loadgame_texture,SDL_BLENDMODE_BLEND);
-        SDL_SetTextureAlphaMod(loadgame_texture,temp);
-        SDL_RenderCopy(renderer, loadgame_texture, NULL, &load_game_target);
-
-
-        SDL_Texture *leaderboard_texture = SDL_CreateTextureFromSurface(renderer, leaderboard);
-        SDL_SetTextureBlendMode(leaderboard_texture,SDL_BLENDMODE_BLEND);
-        SDL_SetTextureAlphaMod(leaderboard_texture,temp);
-        SDL_RenderCopy(renderer, leaderboard_texture, NULL, &leaderboard_target);
-        
-        SDL_Texture *soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
-        SDL_SetTextureBlendMode(soundtexture,SDL_BLENDMODE_BLEND);
-        SDL_SetTextureAlphaMod(soundtexture,temp);
-        SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
-
-        SDL_Texture *creditstexture = SDL_CreateTextureFromSurface(renderer, credits_button);
-        SDL_SetTextureBlendMode(creditstexture,SDL_BLENDMODE_BLEND);
-        SDL_SetTextureAlphaMod(creditstexture,temp);
-        SDL_RenderCopy(renderer, creditstexture, NULL, &credits_target);
-
-        SDL_Texture *closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
-        SDL_SetTextureBlendMode(closebutton_texture,SDL_BLENDMODE_BLEND);
-        SDL_SetTextureAlphaMod(closebutton_texture,temp);
-        SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target);
-
-        SDL_RenderPresent(renderer);
         SDL_DestroyTexture(startscreentexture);
-        SDL_DestroyTexture(newgame_texture);
-        SDL_DestroyTexture(loadgame_texture);
-        SDL_DestroyTexture(leaderboard_texture);
-        SDL_DestroyTexture(soundtexture);
-        SDL_DestroyTexture(creditstexture);
-        SDL_DestroyTexture(closebutton_texture);
+        SDL_RenderPresent(renderer);
     }
 }

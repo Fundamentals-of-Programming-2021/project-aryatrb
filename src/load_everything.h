@@ -38,6 +38,7 @@ struct politic_side{
 };
 struct player_himself{
     int player_id;
+    int is_on;
     int till_end_a;
     int does_have_kyber;
     int create_trooper_rate;
@@ -92,7 +93,7 @@ void moving_troopers_update_location();
 void moving_troopers_without_a_home_update_location();
 void make_troopers_without_a_home(int q);
 void create_cells();
-void assign_politic_sides();
+int assign_politic_sides();
 void save_the_map();
 void load_the_map();
 void first_user_save();
@@ -111,7 +112,8 @@ void leaderboard_set();
 void upboard_setup();
 void load_everything();
 void loadimages();
-
+void rendercpypage1text(char text[],SDL_Surface *textsurface,SDL_Texture *text_texture ,SDL_Rect *target);
+void rendercpypage3text(char text[],SDL_Surface *textsurface,SDL_Texture *text_texture ,SDL_Rect *target);
 
 
 struct player_himself players[11];
@@ -164,6 +166,8 @@ int size_of_each_cell_x,size_of_each_cell_y ,number_of_cells_x, number_of_cells_
 int first_click;
 int second_click;
 int is_first_clicked;
+int global_second_kyber;
+int global_third_kyber;
 // struct troop moving_troopers[2000];
 // int size_of_moving_troopers=0;
 int dist_from_mid;
@@ -214,6 +218,7 @@ SDL_Surface *faces[15];
 SDL_Surface *troopers[15];
 SDL_Surface *planets_photos[15];
 SDL_Surface *upboardcolor[15];
+SDL_Surface *kybersaber[15];
 SDL_Surface *lightsaberhandle;
 SDL_Surface *kyber_cristal_photos[5];
 SDL_Surface *kyber_cristalon_photos[5];
@@ -300,7 +305,28 @@ time_t calc_time;
 SDL_Texture *movingtrooper_texture[10];
 SDL_Texture *kybertexture[5];
 SDL_Texture *kyberontexture[5];
-
+SDL_Texture *kybersabertexture[15];
+SDL_Texture *facestexture[15];
+SDL_Texture *planetphotostexture[15];
+SDL_Texture *savebuttontexture;
+SDL_Texture *backtomenutexture;
+SDL_Texture *soundtexture;
+SDL_Texture *closebutton_texture;
+SDL_Texture *walltexture;
+SDL_Texture *wallflippedtexture;
+SDL_Texture *handletexture;
+SDL_Texture *newgame_texture;
+SDL_Texture *loadgame_texture;
+SDL_Texture *leaderboard_texture;
+SDL_Texture *creditstexture;
+SDL_Texture *backbuttontexture;
+SDL_Texture *startgametexture;
+SDL_Texture *updownbutton_texture;
+SDL_Texture *creditstext_texture;
+SDL_Texture *textbox_texture;
+SDL_Texture *quote_texture;
+SDL_Texture *doordonot_texture;
+SDL_Texture *upboardcolortexture[15];
 
 
 SDL_Renderer* renderer;

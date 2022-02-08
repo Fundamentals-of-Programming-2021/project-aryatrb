@@ -33,11 +33,11 @@ void load_everything()
     dist_from_mid=10;
     dist_moving_trooper_per_sec=10;
     seconds_until_trooper_is_out = 0.18;
-    kybers_time_till_end[0] = 3000000;
-    kybers_time_till_end[1] = 3000000;
-    kybers_time_till_end[2] = 3000000;
-    kybers_time_till_end[3] = 3000000;
-    kybers_time_till_end[4] = 3000000;
+    kybers_time_till_end[0] = 5000000;
+    kybers_time_till_end[1] = 5000000;
+    kybers_time_till_end[2] = 5000000;
+    kybers_time_till_end[3] = 5000000;
+    kybers_time_till_end[4] = 5000000;
     size_of_wall_y=60;
     char tempchar[55]="                                ";
     username_text[33];
@@ -52,7 +52,7 @@ void load_everything()
 
     number_of_enemies=4;
     number_of_politic_sides_per_user=1;
-    number_of_nomansland=6;
+    number_of_nomansland=8;
     for(int i=0;i<15;i++)
         upboardwidth[i] = 0;
     number_of_systems_of_the_user=1;
@@ -83,11 +83,11 @@ void load_everything()
     generatemap_x = 327*window_width/1335 , generatemap_y =37*window_width/1335;
     size_of_leaders_x_y=45*(size_of_each_cell_x/81);
     size_of_troopers_x_y=20*(size_of_each_cell_x/81);
-    size_of_kyber_photo_x = 40, size_of_kyber_photo_y=72;
-    credits_text_x=1100*window_width/1335,credits_text_y=1307*window_width/1335;
+    size_of_kyber_photo_x = 40*(size_of_each_cell_x/162), size_of_kyber_photo_y=72*(size_of_each_cell_x/162);
+    credits_text_x=1100*window_width/1352,credits_text_y=1307*window_width/1335;
     doordonot_x = 726*window_width/1335, doordonot_y = 37*window_width/1335;
     ifyoudefine_x = 801*window_width/1335, ifyoudefine_y = 115*window_width/1335;
-    credits_text_loc_y=5;
+    credits_text_loc_y=10;
     size_of_closebutton_x_y = 20;
     loc_number_of_enemies_x = window_width*0.1, loc_number_of_enemies_y = window_height*0.1;
 
@@ -220,7 +220,7 @@ void load_everything()
     menu_music = Mix_LoadMUS("assets/menu.mp3");
     game_music = Mix_LoadMUS("assets/Anakins_Symphony.mp3");
     intro_music =Mix_LoadMUS("assets/intro/intromusic.mp3");
-    Mix_PlayMusic(intro_music,0);
+    Mix_PlayMusic(intro_music,-1);
     loadimages();
 }
 
@@ -266,7 +266,7 @@ void loadimages()
         winbackground = SDL_LoadBMP("assets/vaderrogueone16-9.bmp");
         losebackground = SDL_LoadBMP("assets/vaderburning16-9.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource16-9.bmp");
-        startbackground = SDL_LoadBMP("assets/background16-9.bmp");
+        startbackground = SDL_LoadBMP("assets/intro/menubefwihlogo.bmp");
     }
     starsbackground = SDL_LoadBMP("assets/stars.bmp");
     load_game = SDL_LoadBMP("assets/load_game.bmp");
@@ -309,6 +309,10 @@ void loadimages()
     faces[4] = SDL_LoadBMP("assets/faces/maul.bmp");
     faces[nomansland_playerid] = SDL_LoadBMP("assets/faces/r2d2.bmp");
 
+    for(int i=0;i<5;i++)
+        facestexture[i]=SDL_CreateTextureFromSurface(renderer, faces[i]);
+    facestexture[nomansland_playerid] =SDL_CreateTextureFromSurface(renderer, faces[nomansland_playerid]);
+
     troopers[0] = SDL_LoadBMP("assets/troopers/stormtrooper.bmp");
     troopers[1] = SDL_LoadBMP("assets/troopers/deathtrooper.bmp");
     troopers[2] = SDL_LoadBMP("assets/troopers/ahsokatrooper.bmp");
@@ -342,6 +346,10 @@ void loadimages()
     planets_photos[4] = SDL_LoadBMP("assets/planet_mustafar.bmp");
     planets_photos[nomansland_playerid] = SDL_LoadBMP("assets/metal.bmp");
 
+    for(int i=0;i<5;i++)
+        planetphotostexture[i]=SDL_CreateTextureFromSurface(renderer,planets_photos[i]);
+    planetphotostexture[nomansland_playerid]=SDL_CreateTextureFromSurface(renderer,planets_photos[nomansland_playerid]);
+
     lightsaberhandle=SDL_LoadBMP("assets/sabers/handle.bmp");
     upboardcolor[0]=SDL_LoadBMP("assets/sabers/lightsaberred.bmp");
     upboardcolor[1]=SDL_LoadBMP("assets/sabers/spear.bmp");
@@ -349,4 +357,35 @@ void loadimages()
     upboardcolor[3]=SDL_LoadBMP("assets/sabers/lightsabergreen.bmp");
     upboardcolor[4]=SDL_LoadBMP("assets/sabers/darksaber.bmp");
     upboardcolor[nomansland_playerid]=SDL_LoadBMP("assets/sabers/lightsaberwhite.bmp");
+    for(int i=0;i<5;i++)
+        upboardcolortexture[i] = SDL_CreateTextureFromSurface(renderer, upboardcolor[i]);
+    upboardcolortexture[nomansland_playerid] = SDL_CreateTextureFromSurface(renderer, upboardcolor[nomansland_playerid]);
+
+    kybersaber[0] =SDL_LoadBMP("assets/kybersaber/lightsaberred.bmp");
+    kybersaber[1] =SDL_LoadBMP("assets/kybersaber/spear.bmp");
+    kybersaber[2] =SDL_LoadBMP("assets/kybersaber/lightsaberblue.bmp");
+    kybersaber[3] =SDL_LoadBMP("assets/kybersaber/lightsabergreen.bmp");
+    kybersaber[4] =SDL_LoadBMP("assets/kybersaber/darksaber.bmp");
+    for(int i=0;i<5;i++)
+        kybersabertexture[i] =SDL_CreateTextureFromSurface(renderer, kybersaber[i]);
+    savebuttontexture = SDL_CreateTextureFromSurface(renderer, savebutton);
+    backtomenutexture = SDL_CreateTextureFromSurface(renderer, backtomenu);
+    soundtexture = SDL_CreateTextureFromSurface(renderer, soundonphoto);
+    closebutton_texture = SDL_CreateTextureFromSurface(renderer, closebutton);
+    walltexture = SDL_CreateTextureFromSurface(renderer, wall);
+    wallflippedtexture = SDL_CreateTextureFromSurface(renderer, wallflipped);
+    handletexture = SDL_CreateTextureFromSurface(renderer, lightsaberhandle);
+    newgame_texture = SDL_CreateTextureFromSurface(renderer, new_game);
+    loadgame_texture = SDL_CreateTextureFromSurface(renderer, load_game);
+    leaderboard_texture = SDL_CreateTextureFromSurface(renderer, leaderboard);
+    creditstexture = SDL_CreateTextureFromSurface(renderer, credits_button);
+    backbuttontexture = SDL_CreateTextureFromSurface(renderer, backbutton);
+    startgametexture = SDL_CreateTextureFromSurface(renderer, startgame);
+    updownbutton_texture = SDL_CreateTextureFromSurface(renderer, updownbutton);
+    creditstext_texture = SDL_CreateTextureFromSurface(renderer, credits_text);
+    textbox_texture = SDL_CreateTextureFromSurface(renderer, textbox);
+    quote_texture = SDL_CreateTextureFromSurface(renderer, ifyoudefine);
+    doordonot_texture = SDL_CreateTextureFromSurface(renderer, doordonot);
+    global_second_kyber=0;
+    global_third_kyber=0;
 }

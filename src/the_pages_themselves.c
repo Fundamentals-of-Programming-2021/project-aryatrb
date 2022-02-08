@@ -321,10 +321,10 @@ void page4()
         game_running=0;
         return;
     }
-    if(ev.type==SDL_KEYDOWN && ev.key.keysym.sym==SDLK_UP && credits_text_loc_y<5)
-        credits_text_loc_y+=5;
-    else if(ev.type==SDL_KEYDOWN && ev.key.keysym.sym==SDLK_DOWN && credits_text_loc_y>5-(credits_text_y-window_height))
-        credits_text_loc_y-=5;
+    if(ev.type==SDL_KEYDOWN && ev.key.keysym.sym==SDLK_UP && credits_text_loc_y<10)
+        credits_text_loc_y+=10;
+    else if(ev.type==SDL_KEYDOWN && ev.key.keysym.sym==SDLK_DOWN && credits_text_loc_y>15-(credits_text_y-window_height))
+        credits_text_loc_y-=10;
     else if(ev.type==SDL_MOUSEBUTTONDOWN && ev.button.button==SDL_BUTTON_LEFT)
     {
         click_x=ev.button.x;
@@ -455,20 +455,15 @@ void winpage()
 void page1to10()
 {
     time(&game_start_time);
-    printf("line 424\n");
-    fflush(stdin);
-    create_cells();
-    printf("line 427\n");
-    fflush(stdin);
-    assign_politic_sides();
-    printf("line 430\n");
-    fflush(stdin);
+    while(1)
+    {
+        create_cells();
+        if(assign_politic_sides()==1)
+            break;
+    }
+
     save_the_map();
-    printf("line 433\n");
-    fflush(stdin);
     first_user_save();
-    printf("line 436\n");
-    fflush(stdin);
     Mix_PauseMusic();
     Mix_PlayMusic(game_music,-1);  
     page=10;

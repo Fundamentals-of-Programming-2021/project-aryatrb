@@ -11,5 +11,5 @@ assets/leaderboard/1users_files/obi-two-kenobi.txt
 assets/leaderboard/1users_files/akha-wan.txt
 assets/leaderboard/1users_files/han-accompanied.txt
 assets/leaderboard/1users_files/walter-black.txt
-assets/leaderboard/1users_files/.txt
 assets/leaderboard/1users_files/saul-badman.txt
+assets/leaderboard/1users_files/.txt
