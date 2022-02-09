@@ -320,7 +320,7 @@ void rendercpypage10()
             if(politic_sides[j].troopers[i].is_out==0 || politic_sides[j].troopers[i].did_end==1)
                 continue;
             SDL_Rect movingtrooper_target = {politic_sides[j].troopers[i].current_x, politic_sides[j].troopers[i].current_y, size_of_troopers_x_y, size_of_troopers_x_y};
-            SDL_RenderCopy(renderer, movingtrooper_texture[politic_sides[j].troopers[0].player_id], NULL, &movingtrooper_target);
+            SDL_RenderCopy(renderer, movingtrooper_texture[politic_sides[j].troopers[i].player_id], NULL, &movingtrooper_target);
         }
     }
     for(int j=0;j<size_of_troops_with_no_home;j++)

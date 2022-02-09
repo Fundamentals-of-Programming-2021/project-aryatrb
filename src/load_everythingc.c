@@ -295,9 +295,10 @@ void loadimages()
     faces[3] = SDL_LoadBMP("assets/faces/luke.bmp");
     faces[4] = SDL_LoadBMP("assets/faces/maul.bmp");
     faces[5] = SDL_LoadBMP("assets/faces/macewindu.bmp");
+    faces[6] = SDL_LoadBMP("assets/faces/templeguard.bmp");
     faces[nomansland_playerid] = SDL_LoadBMP("assets/faces/r2d2.bmp");
 
-    for(int i=0;i<6;i++)
+    for(int i=0;i<7;i++)
         facestexture[i]=SDL_CreateTextureFromSurface(renderer, faces[i]);
     facestexture[nomansland_playerid] =SDL_CreateTextureFromSurface(renderer, faces[nomansland_playerid]);
 
@@ -307,8 +308,9 @@ void loadimages()
     troopers[3] = SDL_LoadBMP("assets/troopers/clonetrooper.bmp");
     troopers[4] = SDL_LoadBMP("assets/troopers/mandalorian.bmp");
     troopers[5] = SDL_LoadBMP("assets/troopers/coruscantguard.bmp");
+    troopers[6] = SDL_LoadBMP("assets/troopers/guardtrooper.bmp");
 
-    for(int i=0;i<6;i++)
+    for(int i=0;i<7;i++)
         movingtrooper_texture[i]=SDL_CreateTextureFromSurface(renderer, troopers[i]);
 
     kyber_cristal_photos[0] = SDL_LoadBMP("assets/kybers/kyber_blue.bmp");
@@ -334,9 +336,10 @@ void loadimages()
     planets_photos[3] = SDL_LoadBMP("assets/planets/planet_naboo.bmp");
     planets_photos[4] = SDL_LoadBMP("assets/planets/planet_mustafar.bmp");
     planets_photos[5] = SDL_LoadBMP("assets/planets/planet_coruscant.bmp");
+    planets_photos[6] = SDL_LoadBMP("assets/planets/planet_kamino.bmp");
     planets_photos[nomansland_playerid] = SDL_LoadBMP("assets/planets/metal.bmp");
 
-    for(int i=0;i<6;i++)
+    for(int i=0;i<7;i++)
         planetphotostexture[i]=SDL_CreateTextureFromSurface(renderer,planets_photos[i]);
     planetphotostexture[nomansland_playerid]=SDL_CreateTextureFromSurface(renderer,planets_photos[nomansland_playerid]);
 
@@ -347,8 +350,9 @@ void loadimages()
     upboardcolor[3]= SDL_LoadBMP("assets/sabers/lightsabergreen.bmp");
     upboardcolor[4]= SDL_LoadBMP("assets/sabers/darksaber.bmp");
     upboardcolor[5]= SDL_LoadBMP("assets/sabers/lightsaberpurple.bmp");
+    upboardcolor[6]= SDL_LoadBMP("assets/sabers/lightsaberyellow.bmp");
     upboardcolor[nomansland_playerid]=SDL_LoadBMP("assets/sabers/lightsaberwhite.bmp");
-    for(int i=0;i<6;i++)
+    for(int i=0;i<7;i++)
         upboardcolortexture[i] = SDL_CreateTextureFromSurface(renderer, upboardcolor[i]);
     upboardcolortexture[nomansland_playerid] = SDL_CreateTextureFromSurface(renderer, upboardcolor[nomansland_playerid]);
 
@@ -358,6 +362,7 @@ void loadimages()
     kybersaber[3] = SDL_LoadBMP("assets/kybersaber/lightsabergreen.bmp");
     kybersaber[4] = SDL_LoadBMP("assets/kybersaber/darksaber.bmp");
     kybersaber[5] = SDL_LoadBMP("assets/kybersaber/lightsaberpurple.bmp");
+    kybersaber[6] = SDL_LoadBMP("assets/kybersaber/lightsaberyellow.bmp");
     for(int i=0;i<5;i++)
         kybersabertexture[i] =SDL_CreateTextureFromSurface(renderer, kybersaber[i]);
     savebuttontexture = SDL_CreateTextureFromSurface(renderer, savebutton);

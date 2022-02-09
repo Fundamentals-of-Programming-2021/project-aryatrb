@@ -390,7 +390,6 @@ void page10()
     }
     create_kyber();
     moving_troopers_update_location();
-    moving_troopers_without_a_home_update_location();
     update_politic_sides_of_users();
     enemy_ai();
     upboard_setup();
