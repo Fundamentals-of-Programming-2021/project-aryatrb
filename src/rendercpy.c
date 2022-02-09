@@ -74,6 +74,7 @@ void rendercpypage1()
     SDL_RenderCopy(renderer, updownbutton_texture, NULL, &updownbutton_fiv_target);
     SDL_RenderCopy(renderer, updownbutton_texture, NULL, &updownbutton_six_target);
     SDL_RenderCopy(renderer, updownbutton_texture, NULL, &updownbutton_sev_target);
+    SDL_RenderCopy(renderer, updownbutton_texture, NULL, &updownbutton_eig_target);
     SDL_Surface *textsurface;
     SDL_Texture *text_texture;
     char test[100];
@@ -99,6 +100,7 @@ void rendercpypage1()
     rendercpypage1text(test,textsurface,text_texture,&start_troop_insomo_la_target);
     sprintf(test, "number of systems of the main player: %d",number_of_systems_of_the_user);
     rendercpypage1text(test,textsurface,text_texture,&number_of_systems_of_user_target);
+    SDL_RenderCopy(renderer,facestexture[main_players_id],NULL,&select_character_target);
     SDL_RenderPresent(renderer);
     SDL_DestroyTexture(startscreentexture);
 }
@@ -236,7 +238,7 @@ void rendercpypage10()
         {
             int x = politic_sides[i].cells_x[j], y = politic_sides[i].cells_y[j];
             SDL_Rect cell_target = {cells[x][y].x , cells[x][y].y, size_of_each_cell_x, size_of_each_cell_y};
-            if(i==main_players_id && is_first_clicked==1 && j==0)
+            if(politic_sides[i].player_id==main_players_id && is_first_clicked==1 && first_click==i && j==0)
             {
                 cell_target.w=(int)(cell_target.w*1.2);
                 cell_target.h=(int)(cell_target.h*1.2);

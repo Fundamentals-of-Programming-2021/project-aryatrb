@@ -117,7 +117,7 @@ void page1()
                 click_y<backbutton_target.y+backbutton_target.h && click_y>backbutton_target.y)
             page=0;
         else if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
-        && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h)
+        && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h && size_of_text_username>0)
             page1to10();
         else if(click_x>closebutton_target.x && click_x<closebutton_target.x + closebutton_target.w 
                 && click_y>closebutton_target.y && click_y<closebutton_target.y + closebutton_target.h)
@@ -126,7 +126,7 @@ void page1()
             return;
         }
         else if(click_x>updownbutton_target.x && click_x<updownbutton_target.x + updownbutton_target.w
-                && click_y>updownbutton_target.y && click_y<updownbutton_target.y + updownbutton_target.h/2)
+                && click_y>updownbutton_target.y && click_y<updownbutton_target.y + updownbutton_target.h/2 && number_of_enemies<6)
                 number_of_enemies++;
         else if(click_x>updownbutton_target.x && click_x<updownbutton_target.x + updownbutton_target.w
                 && click_y>updownbutton_target.y + updownbutton_target.h/2 && click_y<updownbutton_target.y + updownbutton_target.h && number_of_enemies>1)
@@ -172,6 +172,23 @@ void page1()
         else if(click_x>updownbutton_sev_target.x && click_x<updownbutton_sev_target.x + updownbutton_sev_target.w
                 && click_y>updownbutton_sev_target.y + updownbutton_sev_target.h/2 && click_y<updownbutton_sev_target.y + updownbutton_sev_target.h && number_of_systems_of_the_user>0)
                 number_of_systems_of_the_user--;
+
+        else if(click_x>updownbutton_eig_target.x && click_x<updownbutton_eig_target.x + updownbutton_eig_target.w
+                && click_y>updownbutton_eig_target.y && click_y<updownbutton_eig_target.y + updownbutton_eig_target.h/2 && swap_char<6)
+        {
+            if(swap_char!=0)
+                change_char(main_players_id,swap_char);
+            swap_char++;
+            change_char(main_players_id,swap_char);
+        }
+        else if(click_x>updownbutton_eig_target.x && click_x<updownbutton_eig_target.x + updownbutton_eig_target.w
+                && click_y>updownbutton_eig_target.y + updownbutton_eig_target.h/2 && click_y<updownbutton_eig_target.y + updownbutton_eig_target.h && swap_char>0)
+        {
+            if(swap_char!=0)
+                change_char(main_players_id,swap_char);
+            swap_char--;
+            change_char(main_players_id,swap_char);
+        }
 
         else if(click_x>textbox_target.x && click_x<textbox_target.x + textbox_target.w
                 && click_y>textbox_target.y && click_y<textbox_target.y + textbox_target.h)
@@ -246,7 +263,7 @@ void page2()
                 && click_y>mapsel_target.y && click_y<mapsel_target.y + mapsel_target.h)
             writing_mode_map_select=1;
         else if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
-        && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h)
+        && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h && size_of_text_mapselect>0)
             page2to10();   
     }
     if(click_x>25 && click_x<75 && click_y<75 && click_y>25)

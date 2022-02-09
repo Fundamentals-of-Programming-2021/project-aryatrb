@@ -20,7 +20,7 @@ void load_everything()
     black.a = 0,black.b =0,black.g =0,black.r=0;
     leaderboard_page_y=-60;
     FPS = 30;
-    size_of_each_cell_x=162,size_of_each_cell_y=140 ,number_of_cells_x=0, number_of_cells_y=0;
+    number_of_cells_x=0, number_of_cells_y=0;
     first_click=-10;
     is_first_clicked=0;
     dist_moving_trooper_per_sec=10;
@@ -39,7 +39,7 @@ void load_everything()
     max_troop_in_someones_land=50;
     start_troop_in_someones_land=10;
     did_win_int=0;
-
+    swap_char=0;
     number_of_enemies=4;
     number_of_politic_sides_per_user=1;
     number_of_nomansland=8;
@@ -69,7 +69,7 @@ void load_everything()
     size_credits_x = 163*window_width/1335,size_credits_y=37*window_width/1335;
     backbutton_x_y=50;
     start_game_x = 327*window_width/1335 , start_game_y =37*window_width/1335;
-    size_of_leaders_x_y=45*(size_of_each_cell_x/81);
+    size_of_leaders_x_y=45*((float)size_of_each_cell_x/81);
     size_of_troopers_x_y=20*(size_of_each_cell_x/81);
     size_of_kyber_photo_x = 40*(size_of_each_cell_x/162), size_of_kyber_photo_y=72*(size_of_each_cell_x/162);
     credits_text_x=1100*window_width/1352,credits_text_y=1307*window_width/1335;
@@ -96,6 +96,7 @@ void load_everything()
     TTF_SizeText(details_page,"max troopers in no man's land: 50",&maxtrooperinnomansland_target.w,&maxtrooperinnomansland_target.h);
     TTF_SizeText(details_page,"number of troopers the land has in the beginning: 50",&start_troop_insomo_la_target.w,&start_troop_insomo_la_target.h);
     TTF_SizeText(details_page,"number of systems of the main player: 8",&number_of_systems_of_user_target.w,&number_of_systems_of_user_target.h);
+    select_character_target.w = size_of_leaders_x_y, select_character_target.h = size_of_leaders_x_y;
     closebutton_target.x = window_width - 10 - size_of_closebutton_x_y;
     closebutton_target.y = 25 - size_of_closebutton_x_y;
     closebutton_target.w = size_of_closebutton_x_y;
@@ -167,6 +168,8 @@ void load_everything()
     start_troop_insomo_la_target.y = loc_number_of_enemies_y + 6*(number_of_enemies_h + 10);
     number_of_systems_of_user_target.x = loc_number_of_enemies_x;
     number_of_systems_of_user_target.y = loc_number_of_enemies_y + 7*(number_of_enemies_h + 10);
+    select_character_target.x =  loc_number_of_enemies_x;
+    select_character_target.y = loc_number_of_enemies_y + 8*(number_of_enemies_h + 10);
 
     updownbutton_target.x = loc_number_of_enemies_x + number_of_enemies_w + 50*window_width/1920;
     updownbutton_target.y = enemies_target.y + (int)(enemies_target.h*0.1);
@@ -196,6 +199,10 @@ void load_everything()
     updownbutton_sev_target.y = number_of_systems_of_user_target.y + (int)(number_of_systems_of_user_target.h*0.1);
     updownbutton_sev_target.w = 40*window_width/1920;
     updownbutton_sev_target.h = 60*window_width/1920;
+    updownbutton_eig_target.x = select_character_target.x + select_character_target.w + 50*window_width/1920;
+    updownbutton_eig_target.y = select_character_target.y + (int)(select_character_target.h*0.1);
+    updownbutton_eig_target.w = 40*window_width/1920;
+    updownbutton_eig_target.h = 60*window_width/1920;
 
     username_target.x = loc_number_of_enemies_x;
     username_target.y = loc_number_of_enemies_y;
@@ -338,7 +345,6 @@ void loadimages()
     planets_photos[5] = SDL_LoadBMP("assets/planets/planet_coruscant.bmp");
     planets_photos[6] = SDL_LoadBMP("assets/planets/planet_kamino.bmp");
     planets_photos[nomansland_playerid] = SDL_LoadBMP("assets/planets/metal.bmp");
-
     for(int i=0;i<7;i++)
         planetphotostexture[i]=SDL_CreateTextureFromSurface(renderer,planets_photos[i]);
     planetphotostexture[nomansland_playerid]=SDL_CreateTextureFromSurface(renderer,planets_photos[nomansland_playerid]);

@@ -92,8 +92,6 @@ void spell_type_three_endcheck();
 void spell_type_four(int player_id);
 void spell_type_five();
 void moving_troopers_update_location();
-void moving_troopers_without_a_home_update_location();
-void make_troopers_without_a_home(int q);
 void create_cells();
 int assign_politic_sides();
 void save_the_map();
@@ -116,7 +114,8 @@ void load_everything();
 void loadimages();
 void rendercpypage1text(char text[],SDL_Surface *textsurface,SDL_Texture *text_texture ,SDL_Rect *target);
 void rendercpypage3text(char text[],SDL_Surface *textsurface,SDL_Texture *text_texture ,SDL_Rect *target);
-
+void change_char(int i, int j);
+void swaptexture(SDL_Texture *i_t,SDL_Texture *j_t);
 
 struct player_himself players[11];
 struct leaderboard_or_something leaderboard_users[50];
@@ -181,6 +180,7 @@ int rand_start_y;
 int rand_start_x;
 int added_score;
 int did_win_int;
+int swap_char;
 
 int number_of_enemies;
 int number_of_politic_sides_per_user;
@@ -245,6 +245,7 @@ SDL_Rect updownbutton_fou_target;
 SDL_Rect updownbutton_fiv_target;
 SDL_Rect updownbutton_six_target;
 SDL_Rect updownbutton_sev_target;
+SDL_Rect updownbutton_eig_target;
 
 SDL_Rect wall_target;
 SDL_Rect wallflipped_target;
@@ -265,6 +266,7 @@ SDL_Rect maxtrooperinplayers_house;
 SDL_Rect maxtrooperinnomansland_target;
 SDL_Rect start_troop_insomo_la_target;
 SDL_Rect number_of_systems_of_user_target;
+SDL_Rect select_character_target;
 SDL_Rect mapsel_target;
 
 SDL_Rect number_of_nomansland_target;
