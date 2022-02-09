@@ -1,14 +1,7 @@
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <math.h>
 #include <time.h>
 #include <SDL2/SDL.h>
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
-#include <SDL2/SDL2_gfxPrimitives.h>
-#include <sys/time.h>
-#include "math.h"
 #include "string.h"
 #include "load_everything.h"
 
@@ -56,19 +49,19 @@ void page0()
             }
         }
         if(click_x>new_game_target.x && click_x<new_game_target.x + new_game_target.w && click_y>new_game_target.y && click_y<new_game_target.y + new_game_target.h)
-            size_new_game_x=327*window_width/1335*1.1,size_new_game_y=37*window_width/1335*1.1;
+            size_new_game_x=(int)(327*(float)window_width/1335*1.1),size_new_game_y=(int)(37*(float)window_width/1335*1.1);
         else
             size_new_game_x=327*window_width/1335, size_new_game_y=37*window_width/1335;
         if(click_x>load_game_target.x  && click_x<load_game_target.x + load_game_target.w  && click_y>load_game_target.y && click_y<load_game_target.y + load_game_target.h)
-            size_load_game_x=327*window_width/1335*1.1, size_load_game_y=37*window_width/1335*1.1;
+            size_load_game_x=(int)(327*(float)window_width/1335*1.1), size_load_game_y=(int)(37*(float)window_width/1335*1.1);
         else
             size_load_game_x=327*window_width/1335, size_load_game_y=37*window_width/1335;
         if(click_x>leaderboard_target.x && click_x<leaderboard_target.x + leaderboard_target.w && click_y>leaderboard_target.y && click_y<leaderboard_target.y + leaderboard_target.h)
-            leaderboard_game_x=327*window_width/1335*1.1, leaderboard_game_y=37*window_width/1335*1.1;
+            leaderboard_game_x=(int)(327*(float)window_width/1335*1.1), leaderboard_game_y=(int)(37*(float)window_width/1335*1.1);
         else
             leaderboard_game_x=327*window_width/1335, leaderboard_game_y=37*window_width/1335;
         if(click_x>credits_target.x && click_x<credits_target.x+credits_target.w && click_y>credits_target.y && click_y<credits_target.y+credits_target.h)
-            size_credits_x=163*window_width/1335*1.1, size_credits_y=37*window_width/1335*1.1;
+            size_credits_x=(int)(163*(float)window_width/1335*1.1), size_credits_y=(int)(37*(float)window_width/1335*1.1);
         else
             size_credits_x=163*window_width/1335, size_credits_y=37*window_width/1335;
     }
@@ -102,12 +95,12 @@ void page1()
             char temp[40];
             for(int i=0;i<size_of_text_username+1;i++)
                 temp[i]=username_text[i];
-            temp[size_of_text_username+1]=ev.key.keysym.sym;
+            temp[size_of_text_username+1]=(char)ev.key.keysym.sym;
             temp[size_of_text_username+2]='\0';
             TTF_SizeText(details_page_outline, temp, &usernametype_w, &usernametype_w);
             if(usernametype_w<600 * window_width/1920)
             {
-                username_text[size_of_text_username]= ev.key.keysym.sym;
+                username_text[size_of_text_username]= (char)ev.key.keysym.sym;
                 size_of_text_username++;
             }
         }
@@ -186,12 +179,12 @@ void page1()
     }
     if(click_x>backbutton_target.x && click_x<backbutton_target.x+backbutton_target.w && 
        click_y<backbutton_target.y+backbutton_target.h && click_y>backbutton_target.y)
-        backbutton_x_y=50 * 1.2;
+        backbutton_x_y=(int)(50 * 1.2);
     else
         backbutton_x_y=50;
     if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
     && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h)
-        start_game_x=327*window_width/1335 * 1.1, start_game_y= 37*window_width/1335 * 1.1;
+        start_game_x=(int)(327*(float)window_width/1335 * 1.1), start_game_y= (int)(37*(float)window_width/1335 * 1.1);
     else
         start_game_x=327*window_width/1335, start_game_y= 37*window_width/1335;
 }
@@ -223,12 +216,12 @@ void page2()
             char temp[40];
             for(int i=0;i<size_of_text_mapselect+1;i++)
                 temp[i]=mapselect[i];
-            temp[size_of_text_mapselect+1]=ev.key.keysym.sym;
+            temp[size_of_text_mapselect+1]=(char)ev.key.keysym.sym;
             temp[size_of_text_mapselect+2]='\0';
             TTF_SizeText(details_page_outline, temp, &mapsel_target.w, &mapsel_target.h);
             if(mapsel_target.w<600 * window_width/1920)
             {
-                mapselect[size_of_text_mapselect]= ev.key.keysym.sym;
+                mapselect[size_of_text_mapselect]= (char)ev.key.keysym.sym;
                 size_of_text_mapselect++;
             }
         }
@@ -257,12 +250,12 @@ void page2()
             page2to10();   
     }
     if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
-        backbutton_x_y=50 * 1.2;
+        backbutton_x_y=(int)(50 * 1.2);
     else
         backbutton_x_y=50;
     if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
     && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h)
-        start_game_x=327*window_width/1335 * 1.1, start_game_y= 37*window_width/1335 * 1.1;
+        start_game_x=(int)(327*(float)window_width/1335 * 1.1), start_game_y= (int)(37*(float)window_width/1335 * 1.1);
     else
         start_game_x=327*window_width/1335, start_game_y= 37*window_width/1335;
 }
@@ -303,7 +296,7 @@ void page3()
         }
     }
     if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
-        backbutton_x_y=50 * 1.2;
+        backbutton_x_y=(int)(50 * 1.2);
     else
         backbutton_x_y=50;
 }
@@ -335,7 +328,7 @@ void page4()
             page=0;
     }
     if(click_x>25 && click_x<75 && click_y<75 && click_y>25)
-        backbutton_x_y=50 * 1.2;
+        backbutton_x_y=(int)(50 * 1.2);
     else
         backbutton_x_y=50;
 }
@@ -375,8 +368,8 @@ void page10()
                 && click_y>savebutton_target.y && click_y<savebutton_target.y + savebutton_target.h)
             {
                 save_the_map();
-                savebutton_target.w*=1.2;
-                savebutton_target.h*=1.2;
+                savebutton_target.w=(int)(savebutton_target.w*1.2);
+                savebutton_target.h=(int)(savebutton_target.h*1.2);
             }
             else if(click_x > closebutton_target.x && click_x < closebutton_target.x + closebutton_target.w 
                     && click_y > closebutton_target.y && click_y < closebutton_target.y + closebutton_target.h)
@@ -453,7 +446,7 @@ void winpage()
         }
     }
     if(click_x>backbutton_target.x && click_x<backbutton_target.x+backbutton_target.w && click_y<backbutton_target.y+backbutton_target.h && click_y>backbutton_target.y)
-        backbutton_x_y=50*1.2;
+        backbutton_x_y=(int)(50*1.2);
     else
         backbutton_x_y=50;
 }

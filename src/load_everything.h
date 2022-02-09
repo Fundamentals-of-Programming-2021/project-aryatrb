@@ -59,7 +59,6 @@ struct kyber_cristal{
 struct leaderboard_or_something{
     char name[100];
     int score;
-    int rank;
 };
 int sgn(int a);
 void pageminusone();
@@ -81,7 +80,7 @@ void rendercpywinpage();
 void page2to10();
 void pageto1();
 void pageto2();
-void check_to_create_politic_side(struct politic_side politic_sides[], struct cell cells[][100], int temp_x, int temp_y,int size_of_politic_sides, int a, int b);
+void check_to_create_politic_side(int temp_x, int temp_y, int a, int b);
 void soundchange();
 void findtotalofsaves();
 int findclickedcell(int click_x, int click_y, int *ret, int id_is_zero);
@@ -125,9 +124,6 @@ int number_of_leaderboard_users;
 int nomansland_playerid;
 int main_players_id;
 
-int did_we_even_calculate;
-int is_there_any_type_n_kyber[5];
-
 struct troop troops_with_no_home[2000];
 int size_of_troops_with_no_home;
 int window_width;
@@ -146,7 +142,6 @@ int leaderboard_game_x, leaderboard_game_y;
 int size_credits_x, size_credits_y;
 int backbutton_x_y;
 int start_game_x, start_game_y;
-int generatemap_x, generatemap_y;
 int size_of_leaders_x_y;
 int size_of_troopers_x_y;
 int size_of_kyber_photo_x, size_of_kyber_photo_y;
@@ -171,11 +166,8 @@ int second_click;
 int is_first_clicked;
 int global_second_kyber;
 int global_third_kyber;
-// struct troop moving_troopers[2000];
-// int size_of_moving_troopers=0;
-int dist_from_mid;
 int dist_moving_trooper_per_sec;
-int start_ticks;
+unsigned int start_ticks;
 double seconds_until_trooper_is_out;
 double kybers_time_till_end[5];
 int size_of_wall_y;
@@ -231,6 +223,14 @@ SDL_Surface *backtomenu;
 SDL_Surface *savebutton;
 SDL_Surface *doordonot;
 SDL_Surface *ifyoudefine;
+SDL_Surface *shariflogobef;
+SDL_Surface *shariflogo;
+SDL_Surface *lucasfilmlogobef;
+SDL_Surface *lucasfilmlogo;
+SDL_Surface *gamelogobef;
+SDL_Surface *gamelogo;
+SDL_Surface *menubef;
+SDL_Surface *menubefwithlogo;
 
 Mix_Music *menu_music;
 Mix_Music *game_music;
@@ -265,7 +265,6 @@ SDL_Rect maxtrooperinplayers_house;
 SDL_Rect maxtrooperinnomansland_target;
 SDL_Rect start_troop_insomo_la_target;
 SDL_Rect number_of_systems_of_user_target;
-SDL_Rect win_page_target;
 SDL_Rect mapsel_target;
 
 SDL_Rect number_of_nomansland_target;
@@ -273,14 +272,7 @@ SDL_Rect textbox_target;
 SDL_Surface *textbox;
 
 
-SDL_Surface *shariflogobef;
-SDL_Surface *shariflogo;
-SDL_Surface *lucasfilmlogobef;
-SDL_Surface *lucasfilmlogo;
-SDL_Surface *gamelogobef;
-SDL_Surface *gamelogo;
-SDL_Surface *menubef;
-SDL_Surface *menubefwithlogo;
+
 
 
 
@@ -294,10 +286,9 @@ struct politic_side politic_sides[100];
 struct kyber_cristal kybers[100];
 int size_of_kybers;
 int size_of_politic_sides;
-int is_sound_on,size_of_cells;
+int is_sound_on;
 int writing_mode_username,size_of_text_username;
 int writing_mode_map_select,size_of_text_mapselect;
-int selected_map_num;
 int mapnumsel;
 time_t time_now;
 time_t game_start_time;
@@ -311,6 +302,7 @@ SDL_Texture *kyberontexture[5];
 SDL_Texture *kybersabertexture[15];
 SDL_Texture *facestexture[15];
 SDL_Texture *planetphotostexture[15];
+SDL_Texture *upboardcolortexture[15];
 SDL_Texture *savebuttontexture;
 SDL_Texture *backtomenutexture;
 SDL_Texture *soundtexture;
@@ -329,9 +321,8 @@ SDL_Texture *creditstext_texture;
 SDL_Texture *textbox_texture;
 SDL_Texture *quote_texture;
 SDL_Texture *doordonot_texture;
-SDL_Texture *upboardcolortexture[15];
 
 
 SDL_Renderer* renderer;
 SDL_Window* window;
-#endif // LOADEVERYTHINGH
+#endif // LOADEVERYTHINGH_H

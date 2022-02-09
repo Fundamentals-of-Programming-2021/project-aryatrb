@@ -87,7 +87,7 @@ void rendercpypage1()
     rendercpypage1text(test,textsurface,text_texture,&username_target);
     int temp_w= username_target.w;
     username_target.x +=temp_w;
-    textbox_target = username_target, textbox_target.w = 600 * window_width/1920, textbox_target.h *=1.2, textbox_target.x*=0.97;
+    textbox_target = username_target, textbox_target.w = 600 * window_width/1920, textbox_target.h =(int)(textbox_target.h*1.2), textbox_target.x=(int)(textbox_target.x*0.97);
     SDL_RenderCopy(renderer, textbox_texture, NULL, &textbox_target);
     rendercpypage1text(username_text,textsurface,text_texture,&username_target);
     username_target.x-=temp_w;
@@ -124,23 +124,20 @@ void rendercpypage2()
     SDL_RenderCopy(renderer, backbuttontexture, NULL, &backbutton_target);
     SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
     SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target); 
-    SDL_Texture *startgametexture = SDL_CreateTextureFromSurface(renderer, startgame);
     SDL_RenderCopy(renderer, startgametexture, NULL, &start_game_target);
     SDL_Surface *textsurface;
     SDL_Texture *text_texture;
     char test[60];
     sprintf(test, "there are %d maps. select one of them:", mapnumsel);
     rendercpypage1text(test,textsurface,text_texture,&enemies_target);
-    int temp_w= username_target.w;    
     textbox_target = username_target;
     textbox_target.w = 600 * window_width/1920;
-    textbox_target.h *=1.2;
+    textbox_target.h =(int)(textbox_target.h*1.2);
     SDL_RenderCopy(renderer, textbox_texture, NULL, &textbox_target);
     mapsel_target=username_target;
-    mapsel_target.x*=1.08;
+    mapsel_target.x=(int)(mapsel_target.x*1.08);
     rendercpypage1text(mapselect,textsurface,text_texture,&mapsel_target);
     SDL_RenderPresent(renderer);
-    SDL_DestroyTexture(startgametexture);
     SDL_DestroyTexture(startscreentexture);
 }
 void rendercpypage3text(char text[],SDL_Surface *textsurface,SDL_Texture *text_texture ,SDL_Rect *target)
@@ -220,17 +217,17 @@ void rendercpypage10()
     SDL_RenderCopy(renderer, savebuttontexture, NULL, &savebutton_target);
     SDL_RenderCopy(renderer, soundtexture, NULL, &sound_target);
     SDL_RenderCopy(renderer, closebutton_texture, NULL, &closebutton_target);
-    SDL_Rect upboard_target = {window_width*0.2, size_of_wall_y*0.1,window_width*0.6,size_of_wall_y*0.8};
+    SDL_Rect upboard_target = {(int)(window_width*0.2), (int)(size_of_wall_y*0.1),(int)(window_width*0.6),(int)(size_of_wall_y*0.8)};
     SDL_Rect temp_target = upboard_target;
-    temp_target.x = window_width*0.10;
+    temp_target.x = (int)(window_width*0.10);
     temp_target.w= upboard_target.x-temp_target.x;
     SDL_RenderCopy(renderer, handletexture, NULL, &temp_target);
     int k=0;
     for(int i=0;i<15;i++)
     {
-        upboard_target.x = window_width*0.2 + window_width*0.6*(double)((double)k/(double)total_of_soldiers_in_map);
+        upboard_target.x = (int)(window_width*0.2) + (int)(window_width*0.6*(double)((double)k/(double)total_of_soldiers_in_map));
         k+=upboardwidth[i];
-        upboard_target.w= (window_width*0.8) - upboard_target.x;
+        upboard_target.w= (int)(window_width*0.8) - upboard_target.x;
         SDL_RenderCopy(renderer, upboardcolortexture[i], NULL, &upboard_target);
     }
     for(int i=0;i<size_of_politic_sides;i++)
@@ -241,25 +238,23 @@ void rendercpypage10()
             SDL_Rect cell_target = {cells[x][y].x , cells[x][y].y, size_of_each_cell_x, size_of_each_cell_y};
             if(i==main_players_id && is_first_clicked==1 && j==0)
             {
-                cell_target.w*=1.2;
-                cell_target.h*=1.2;
-                cell_target.x-=0.1*size_of_each_cell_x;
-                cell_target.y-=0.1*size_of_each_cell_y;
+                cell_target.w=(int)(cell_target.w*1.2);
+                cell_target.h=(int)(cell_target.h*1.2);
+                cell_target.x-=(int)(0.1*size_of_each_cell_x);
+                cell_target.y-=(int)(0.1*size_of_each_cell_y);
             }
             SDL_RenderCopy(renderer, planetphotostexture[politic_sides[i].player_id], NULL, &cell_target);
             if(j==0)
             {
                 SDL_Rect leader_target = {cells[x][y].x+ size_of_each_cell_x/2 - size_of_leaders_x_y/2, cells[x][y].y + size_of_each_cell_y*1/10, size_of_leaders_x_y, size_of_leaders_x_y};
                 SDL_RenderCopy(renderer, facestexture[politic_sides[i].player_id], NULL, &leader_target);
-                SDL_Rect temp_trooper_target = leader_target;
-                SDL_Color white = {255,255,255,255};
                 int w,h;
                 TTF_SizeText(number_of_soldiers,"100",&w,&h);
                 if(difftime(time_now,start_time)>=1 && politic_sides[i].player_id!=nomansland_playerid &&
                 ((politic_sides[i].player_id==nomansland_playerid && politic_sides[i].number_of_troopers<max_troop_no_mans_land) || (politic_sides[i].player_id!=nomansland_playerid && politic_sides[i].number_of_troopers<max_troop_in_someones_land)))
                 {
                     spell_type_four(politic_sides[i].player_id);
-                    politic_sides[i].number_of_troopers+=difftime(time_now,start_time) * players[politic_sides[i].player_id].create_trooper_rate;
+                    politic_sides[i].number_of_troopers+=(int)difftime(time_now,start_time) * players[politic_sides[i].player_id].create_trooper_rate;
                     if(politic_sides[i].player_id==nomansland_playerid && politic_sides[i].number_of_troopers>max_troop_no_mans_land)
                         politic_sides[i].number_of_troopers = max_troop_no_mans_land;
                     if(politic_sides[i].player_id!=nomansland_playerid && politic_sides[i].number_of_troopers>max_troop_in_someones_land)
@@ -294,8 +289,8 @@ void rendercpypage10()
                 leader_target.y-=2, leader_target.x-=2;
             }
         }   
-        savebutton_target.w = size_of_wall_y*0.8*700/298;
-        savebutton_target.h = size_of_wall_y*0.8;
+        savebutton_target.w = (int)(size_of_wall_y*0.8*700/298);
+        savebutton_target.h = (int)(size_of_wall_y*0.8);
     }
     for(int i=0; i<size_of_kybers;i++)
     {
@@ -312,7 +307,7 @@ void rendercpypage10()
             kyber_target.y -=size_of_kyber_photo_y/2;
             SDL_RenderCopy(renderer, kyberontexture[kybers[i].type], NULL, &kyber_target);
             kyber_target.w = 24*1920/window_width;
-            kyber_target.h = 5.5*kyber_target.w;
+            kyber_target.h = (int)(5.5*kyber_target.w);
             SDL_RenderCopy(renderer,kybersabertexture[kybers[i].player_id],NULL,&kyber_target);
         }
     }
@@ -421,7 +416,7 @@ void pageminusone()
         SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=(diff-2000000)*255/3000000;
+        long long int temp=(diff-2000000)*255/3000000;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
@@ -441,7 +436,7 @@ void pageminusone()
         SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, lucasfilmlogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=255 -(diff - 9000000)*255/3000000;
+        long long int temp=255 -(diff - 9000000)*255/3000000;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
@@ -454,7 +449,7 @@ void pageminusone()
         SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, shariflogobef);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=(diff - 12000000)*255/3000000;
+        long long int temp=(diff - 12000000)*255/3000000;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
@@ -468,7 +463,7 @@ void pageminusone()
         SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, shariflogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=(diff - 15000000)*255/3000000;
+        long long int temp=(diff - 15000000)*255/3000000;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
@@ -489,7 +484,7 @@ void pageminusone()
         SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, shariflogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=255 -(diff - 22000000)*255/3000000;
+        long long int temp=255 -(diff - 22000000)*255/3000000;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
@@ -502,7 +497,7 @@ void pageminusone()
         SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=(diff - 25000000)*255/3000000;
+        long long int temp=(diff - 25000000)*255/3000000;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
@@ -522,7 +517,7 @@ void pageminusone()
         SDL_DestroyTexture(startscreentexture);
         startscreentexture = SDL_CreateTextureFromSurface(renderer, gamelogo);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
-        int temp=255 -(diff - 32000000)*255/4000000;
+        long long int temp=255 -(diff - 32000000)*255/4000000;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
@@ -536,7 +531,7 @@ void pageminusone()
         startscreentexture = SDL_CreateTextureFromSurface(renderer, menubef);
         SDL_SetTextureBlendMode(startscreentexture,SDL_BLENDMODE_BLEND);
         diff/=10000;
-        int temp=(diff - 3600)*255/300;
+        long long int temp=(diff - 3600)*255/300;
         SDL_SetTextureAlphaMod(startscreentexture,temp);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_RenderPresent(renderer);
@@ -545,7 +540,7 @@ void pageminusone()
     else if(diff<43000000)
     {
         diff/=10000;
-        int temp=(diff - 3900)*255/400;
+        long long int temp=(diff - 3900)*255/400;
         SDL_Texture *startscreentexture = SDL_CreateTextureFromSurface(renderer, menubef);
         SDL_RenderCopy(renderer, startscreentexture, NULL, NULL);
         SDL_DestroyTexture(startscreentexture);

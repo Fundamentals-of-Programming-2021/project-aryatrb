@@ -1,17 +1,15 @@
 
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
 #include <SDL2/SDL.h>
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
-#include <SDL2/SDL2_gfxPrimitives.h>
 #include <sys/time.h>
 #include "math.h"
 #include "string.h"
 #include "load_everything.h"
-void check_to_create_politic_side(struct politic_side politic_sides[], struct cell cells[][100], int temp_x, int temp_y,int size_of_politic_sides, int a, int b)
+void check_to_create_politic_side(int temp_x, int temp_y,int a, int b)
 {
     if(temp_x+a>number_of_cells_x-1 || temp_x+a<0 || temp_y+b>number_of_cells_y-1 || temp_y+a<0)
         return;
@@ -42,7 +40,6 @@ void soundchange()
 }
 void findtotalofsaves()
 {
-    char teemp[1000];
     FILE *mapsave = fopen("assets/save/files_details.txt", "r+");
     while(1)
         if(fscanf(mapsave,"assets/save/maps/map%d.txt\n",&mapnumsel)==EOF)
@@ -53,8 +50,6 @@ int findclickedcell(int click_x, int click_y, int *ret, int id_is_zero)
 {
     for(int j=0;j<size_of_politic_sides;j++)
     {
-        politic_sides[j].cells_x[0];
-        politic_sides[j].cells_y[0];
         if(click_x>cells[politic_sides[j].cells_x[0]][politic_sides[j].cells_y[0]].x && click_x<cells[politic_sides[j].cells_x[0]][politic_sides[j].cells_y[0]].x + size_of_each_cell_x
         && click_y>cells[politic_sides[j].cells_x[0]][politic_sides[j].cells_y[0]].y && click_y<cells[politic_sides[j].cells_x[0]][politic_sides[j].cells_y[0]].y + size_of_each_cell_y)
         {
@@ -126,7 +121,7 @@ int check_if_any_enemy_soldier_is_nearby_poli(struct troop *chosen_troop)
 }
 int dist_two_point(int i_one, int j_one, int i_two, int j_two)
 {
-    return sqrt((i_one-i_two)*(i_one-i_two)+(j_one-j_two)*(j_one-j_two));
+    return (int)sqrt((i_one-i_two)*(i_one-i_two)+(j_one-j_two)*(j_one-j_two));
 }
 void spell_type_one(struct troop *chosen_troop)
 {
@@ -138,7 +133,7 @@ void spell_type_one(struct troop *chosen_troop)
         return;
     }
     gettimeofday(&tv,NULL);
-    if((tv.tv_sec - kybers[players[chosen_troop->player_id].does_have_kyber].time.tv_sec)*1000000 +
+    if((long int)(tv.tv_sec - kybers[players[chosen_troop->player_id].does_have_kyber].time.tv_sec)*1000000 +
         tv.tv_usec - kybers[players[chosen_troop->player_id].does_have_kyber].time.tv_usec
         >
         kybers_time_till_end[0])
@@ -166,9 +161,9 @@ void spell_type_two_endcheck()
             kybers_time_till_end[1])
             {
                 kybers[i].is_dead=1;
-                for(int i=0;i<10;i++)
-                    if(i!=kybers[i].player_id)
-                        players[i].till_end_a /=3;
+                for(int j=0;j<10;j++)
+                    if(j!=kybers[i].player_id)
+                        players[j].till_end_a /=3;
                 players[kybers[i].player_id].does_have_kyber=-1;
                 global_second_kyber=0;
             }
@@ -189,9 +184,9 @@ void spell_type_three_endcheck()
             kybers_time_till_end[2])
             {
                 kybers[i].is_dead=1;
-                for(int i=0;i<10;i++)
-                    if(i!=kybers[i].player_id)
-                        players[i].till_end_a = dist_moving_trooper_per_sec;
+                for(int j=0;j<10;j++)
+                    if(j!=kybers[i].player_id)
+                        players[j].till_end_a = dist_moving_trooper_per_sec;
                 players[kybers[i].player_id].does_have_kyber=-1;
                 global_third_kyber=0;
             }
@@ -244,8 +239,8 @@ void moving_troopers_update_location()
         for(int i = 0 ; i<politic_sides[j].id_of_moving_troppers; i++)
         {
             gettimeofday(&tv,NULL);
-            if(politic_sides[j].troopers[i].is_out==0 && 
-                (tv.tv_sec -politic_sides[j].troopers[i].time.tv_sec)*1000000 
+            if(politic_sides[j].troopers[i].is_out==0 &&
+                    (tv.tv_sec -politic_sides[j].troopers[i].time.tv_sec)*1000000
                 + tv.tv_usec-politic_sides[j].troopers[i].time.tv_usec >politic_sides[j].troopers[i].seconds_till_out)
             {
                 politic_sides[j].number_of_troopers--;
@@ -283,7 +278,7 @@ void moving_troopers_update_location()
             n = politic_sides[j].troopers[i].current_y - politic_sides[j].troopers[i].dest_y;
             if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id!=politic_sides[j].player_id)
                 politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].is_getting_attacked=1;
-            if(sqrt(m*m+n*n) < size_of_each_cell_x*1/5)
+            if(sqrt(m*m+n*n) < (float)size_of_each_cell_x*(float)1/5)
             {
                 politic_sides[j].troopers[i].did_end=1;
                 if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id!=politic_sides[j].player_id)
@@ -313,9 +308,9 @@ void moving_troopers_update_location()
                     politic_sides_of_user[politic_sides[j].player_id]++;
                     politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id=politic_sides[j].player_id;
                     make_troopers_without_a_home(politic_sides[j].troopers[i].enemy_politic_side_number);
-                    for(int i=0;i<politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].id_of_moving_troppers;i++)
-                        if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].troopers[i].is_out==0)
-                            politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].troopers[i].seconds_till_out=0;
+                    for(int w=0;w<politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].id_of_moving_troppers;w++)
+                        if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].troopers[w].is_out==0)
+                            politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].troopers[w].seconds_till_out=0;
                     politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].id_of_moving_troppers=0;
                     politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers=0;
                     politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_moving_troopers=0;
@@ -371,7 +366,7 @@ void moving_troopers_without_a_home_update_location()
         n = troops_with_no_home[i].current_y - troops_with_no_home[i].dest_y;
         if( politic_sides[troops_with_no_home[i].enemy_politic_side_number].player_id!=troops_with_no_home[i].player_id)
             politic_sides[troops_with_no_home[i].enemy_politic_side_number].is_getting_attacked=1;
-        if(sqrt(m*m+n*n) < size_of_each_cell_x*1/5)
+        if(sqrt(m*m+n*n) < (float)size_of_each_cell_x*(float)1/5)
         {
             troops_with_no_home[i].did_end=1;
             if(politic_sides[troops_with_no_home[i].enemy_politic_side_number].player_id!=troops_with_no_home[i].player_id)
@@ -420,6 +415,7 @@ void make_troopers_without_a_home(int q)
 }
 void create_cells()
 {
+    srand(time(NULL));
     number_of_cells_x=0;
     number_of_cells_y=0;
     rand_start_y = rand()%size_of_each_cell_y + size_of_wall_y;
@@ -447,12 +443,13 @@ void create_cells()
 
 int assign_politic_sides()
 {
+    srand(time(NULL));
     size_of_politic_sides=0;
-    int planets[5] = {0};
+    int planets[15] = {0};
     planets[0]=1;
     for(int i =0 ;i<100;i++)
         politic_sides_of_user[i]=0;
-    int politic_sides_of_user_temp=0;
+    int politic_sides_of_user_temp;
     for(int i=0;i<10;i++)
     {
         players[i].till_end_a = dist_moving_trooper_per_sec;
@@ -472,7 +469,7 @@ int assign_politic_sides()
             int temp_x = rand()%number_of_cells_x;
             int temp_y = rand()%number_of_cells_y;
             attemp++;
-            if(attemp==15)
+            if(attemp==50)
                 return 0;
             if(cells[temp_x][temp_y].is_territoy==1 && cells[temp_x][temp_y].is_occupied!=1)
             {
@@ -512,19 +509,19 @@ int assign_politic_sides()
                 politic_sides[size_of_politic_sides].cells_x[0] = temp_x, politic_sides[size_of_politic_sides].cells_y[0] = temp_y;
                 cells[temp_x][temp_y].politic_side_number=size_of_politic_sides;
                 cells[temp_x][temp_y].does_it_have_military=1;
-                check_to_create_politic_side(politic_sides,cells,temp_x,temp_y,size_of_politic_sides,0,1);
-                check_to_create_politic_side(politic_sides,cells,temp_x,temp_y,size_of_politic_sides,0,-1);
-                check_to_create_politic_side(politic_sides,cells,temp_x,temp_y,size_of_politic_sides,0,2);
-                check_to_create_politic_side(politic_sides,cells,temp_x,temp_y,size_of_politic_sides,0,-2);
+                check_to_create_politic_side(temp_x,temp_y,0,1);
+                check_to_create_politic_side(temp_x,temp_y,0,-1);
+                check_to_create_politic_side(temp_x,temp_y,0,2);
+                check_to_create_politic_side(temp_x,temp_y,0,-2);
                 if(temp_y%2==1)
                 {
-                    check_to_create_politic_side(politic_sides,cells,temp_x,temp_y,size_of_politic_sides,-1,1);
-                    check_to_create_politic_side(politic_sides,cells,temp_x,temp_y,size_of_politic_sides,-1,-1);
+                    check_to_create_politic_side(temp_x,temp_y,-1,1);
+                    check_to_create_politic_side(temp_x,temp_y,-1,-1);
                 }
                 else
                 {
-                    check_to_create_politic_side(politic_sides,cells,temp_x,temp_y,size_of_politic_sides,1,1);
-                    check_to_create_politic_side(politic_sides,cells,temp_x,temp_y,size_of_politic_sides,1,-1);
+                    check_to_create_politic_side(temp_x,temp_y,1,1);
+                    check_to_create_politic_side(temp_x,temp_y,1,-1);
                 }
                 size_of_politic_sides++;
                 politic_sides_of_user_temp++;
@@ -707,7 +704,6 @@ void first_user_save()
     FILE *mapsave = fopen("assets/leaderboard/users_list.txt", "r+");
     while(1)
     {
-        int al;
         if(fgets(temper_text,100, mapsave)==NULL)
             break;
         sscanf(temper_text,"assets/leaderboard/1users_files/%s.txt", temp_text);
@@ -884,14 +880,15 @@ void destroy_the_few_things_left()
     SDL_FreeSurface(backbutton);
     SDL_FreeSurface(startgame);
     SDL_FreeSurface(updownbutton);
-    SDL_FreeSurface(lightsaberhandle);
     for(int i=0;i<15;i++)
     {
         SDL_FreeSurface(faces[i]);
         SDL_FreeSurface(troopers[i]);
         SDL_FreeSurface(planets_photos[i]);
         SDL_FreeSurface(upboardcolor[i]);
+        SDL_FreeSurface(kybersaber[i]);
     }
+    SDL_FreeSurface(lightsaberhandle);
     for(int i=0;i<5;i++)
     {
         SDL_DestroyTexture(kybertexture[i]);
@@ -899,25 +896,38 @@ void destroy_the_few_things_left()
         SDL_FreeSurface(kyber_cristal_photos[i]);
         SDL_FreeSurface(kyber_cristalon_photos[i]);
     }
+    SDL_FreeSurface(wall);
+    SDL_FreeSurface(wallflipped);
+    SDL_FreeSurface(backtomenu);
+    SDL_FreeSurface(savebutton);
+    SDL_FreeSurface(doordonot);
+    SDL_FreeSurface(ifyoudefine);
+    SDL_FreeSurface(shariflogobef);
+    SDL_FreeSurface(shariflogo);
+
+    SDL_FreeSurface(lucasfilmlogobef);
+    SDL_FreeSurface(lucasfilmlogo);
+    SDL_FreeSurface(gamelogobef);
+    SDL_FreeSurface(gamelogo);
+    SDL_FreeSurface(menubef);
+    SDL_FreeSurface(menubefwithlogo);
     for(int i=0;i<10;i++)
         SDL_DestroyTexture(movingtrooper_texture[i]);
-    for(int i=0;i<5;i++)
+    for(int i=0;i<15;i++)
     {
         SDL_DestroyTexture(kybersabertexture[i]);
         SDL_DestroyTexture(facestexture[i]);
-        SDL_FreeSurface(kybersaber[i]);
         SDL_DestroyTexture(planetphotostexture[i]);
         SDL_DestroyTexture(upboardcolortexture[i]);
+
     }
-    SDL_DestroyTexture(upboardcolortexture[nomansland_playerid]);
-    SDL_DestroyTexture(facestexture[nomansland_playerid]);
-    SDL_DestroyTexture(planetphotostexture[nomansland_playerid]);
     SDL_DestroyTexture(savebuttontexture);
     SDL_DestroyTexture(backtomenutexture);
     SDL_DestroyTexture(soundtexture);
     SDL_DestroyTexture(closebutton_texture);
     SDL_DestroyTexture(walltexture);
     SDL_DestroyTexture(wallflippedtexture);
+    SDL_DestroyTexture(handletexture);
     SDL_DestroyTexture(newgame_texture);
     SDL_DestroyTexture(loadgame_texture);
     SDL_DestroyTexture(leaderboard_texture);
@@ -929,21 +939,7 @@ void destroy_the_few_things_left()
     SDL_DestroyTexture(textbox_texture);
     SDL_DestroyTexture(quote_texture);
     SDL_DestroyTexture(doordonot_texture);
-    SDL_FreeSurface(wall);
-    SDL_FreeSurface(wallflipped);
-    SDL_FreeSurface(backtomenu);
-    SDL_FreeSurface(doordonot);
-    
-    SDL_FreeSurface(ifyoudefine);
-    SDL_FreeSurface(shariflogobef);
-    SDL_FreeSurface(shariflogo);
-    
-    SDL_FreeSurface(lucasfilmlogobef);
-    SDL_FreeSurface(lucasfilmlogo);
-    SDL_FreeSurface(gamelogobef);
-    SDL_FreeSurface(gamelogo);
-    SDL_FreeSurface(menubef);
-    SDL_FreeSurface(menubefwithlogo);
+
     Mix_FreeMusic(menu_music);
     Mix_FreeMusic(game_music);
     Mix_FreeMusic(intro_music);
@@ -953,6 +949,7 @@ void destroy_the_few_things_left()
     TTF_CloseFont(details_page_outline);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    Mix_CloseAudio();
     Mix_Quit();
     TTF_Quit();
     SDL_Quit();
@@ -980,6 +977,7 @@ int did_lose()
 }
 void create_kyber()
 {
+    srand(time(NULL));
     int rand_to_do_kyber = rand()%600;
     if(rand_to_do_kyber==0)
     {
@@ -1008,9 +1006,9 @@ int calculate_score()
 {
     time(&calc_time);
     if(did_win_int==1)
-        return (20-difftime(calc_time,game_start_time)/60)*number_of_enemies*did_win_int;
+        return (int)(20-difftime(calc_time,game_start_time)/60)*number_of_enemies*did_win_int;
     else    
-        return (20-difftime(calc_time,game_start_time)/60)*(6-number_of_enemies)*did_win_int;
+        return (int)(20-difftime(calc_time,game_start_time)/60)*(6-number_of_enemies)*did_win_int;
 }
 
 void enemy_ai()
@@ -1122,7 +1120,6 @@ void leaderboard_set()
     FILE *mapsave = fopen("assets/leaderboard/users_list.txt", "r");
     while(1)
     {
-        int al;
         if(fgets(temper_text,100, mapsave)==NULL)
             break;
         sscanf(temper_text,"assets/leaderboard/1users_files/%s.txt", temp_text);
@@ -1138,7 +1135,6 @@ void leaderboard_set()
         strcpy(leaderboard_users[number_of_leaderboard_users].name, ss);
         leaderboard_users[number_of_leaderboard_users].score = read_users_score(0,ss);
         number_of_leaderboard_users++;
-        leaderboard_users[number_of_leaderboard_users].rank=number_of_leaderboard_users;
     }
     fclose(mapsave);
     for(int i=0;i<number_of_leaderboard_users;i++)
@@ -1177,5 +1173,4 @@ void upboard_setup()
     for(int i=0;i<15;i++)
         total_of_soldiers_in_map+= upboardwidth[i];
     total_of_soldiers_in_map+= upboardwidth[nomansland_playerid];
-    did_we_even_calculate=1;
 }

@@ -1,13 +1,9 @@
-#include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
 #include <SDL2/SDL.h>
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
-#include <SDL2/SDL2_gfxPrimitives.h>
 #include <sys/time.h>
-#include "math.h"
 #include "string.h"
 #include "load_everything.h"
 
@@ -17,9 +13,6 @@ void load_everything()
     nomansland_playerid=10;
     main_players_id=0;
 
-    did_we_even_calculate=0;
-    for(int i=0;i<5;i++)
-        is_there_any_type_n_kyber[i] =0;
     size_of_troops_with_no_home=0;
     for(int i=0;i<100;i++)
         politic_sides_of_user[i]=0;
@@ -30,7 +23,6 @@ void load_everything()
     size_of_each_cell_x=162,size_of_each_cell_y=140 ,number_of_cells_x=0, number_of_cells_y=0;
     first_click=-10;
     is_first_clicked=0;
-    dist_from_mid=10;
     dist_moving_trooper_per_sec=10;
     seconds_until_trooper_is_out = 0.18;
     kybers_time_till_end[0] = 5000000;
@@ -40,9 +32,7 @@ void load_everything()
     kybers_time_till_end[4] = 5000000;
     size_of_wall_y=60;
     char tempchar[55]="                                ";
-    username_text[33];
     strcpy(username_text,tempchar);
-    mapselect[33];
     strcpy(mapselect,tempchar);
     game_running=1;
     max_troop_no_mans_land=20;
@@ -56,13 +46,12 @@ void load_everything()
     for(int i=0;i<15;i++)
         upboardwidth[i] = 0;
     number_of_systems_of_the_user=1;
-    page=-1;
+    page=0;
     size_of_kybers=0;
     size_of_politic_sides=0;
-    is_sound_on=1,size_of_cells=0;
+    is_sound_on=1;
     writing_mode_username=0,size_of_text_username=0;
     writing_mode_map_select=0,size_of_text_mapselect=0;
-    selected_map_num=0;
     mapnumsel=0;
     gettimeofday(&the_begin,NULL);
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -80,7 +69,6 @@ void load_everything()
     size_credits_x = 163*window_width/1335,size_credits_y=37*window_width/1335;
     backbutton_x_y=50;
     start_game_x = 327*window_width/1335 , start_game_y =37*window_width/1335;
-    generatemap_x = 327*window_width/1335 , generatemap_y =37*window_width/1335;
     size_of_leaders_x_y=45*(size_of_each_cell_x/81);
     size_of_troopers_x_y=20*(size_of_each_cell_x/81);
     size_of_kyber_photo_x = 40*(size_of_each_cell_x/162), size_of_kyber_photo_y=72*(size_of_each_cell_x/162);
@@ -89,7 +77,7 @@ void load_everything()
     ifyoudefine_x = 801*window_width/1335, ifyoudefine_y = 115*window_width/1335;
     credits_text_loc_y=10;
     size_of_closebutton_x_y = 20;
-    loc_number_of_enemies_x = window_width*0.1, loc_number_of_enemies_y = window_height*0.1;
+    loc_number_of_enemies_x = (int)(window_width*0.1), loc_number_of_enemies_y = (int)(window_height*0.1);
 
 
     number_of_soldiers = TTF_OpenFont("assets/EPISODE1.TTF",18*window_width/1920);
@@ -121,13 +109,13 @@ void load_everything()
     wallflipped_target.w = window_width;
     wallflipped_target.h = size_of_wall_y;
     backtomenu_target.x = 60*window_width/1920;
-    backtomenu_target.y = window_height - size_of_wall_y*0.85;
-    backtomenu_target.w = size_of_wall_y*0.8*700/298;
-    backtomenu_target.h = size_of_wall_y*0.8;
-    savebutton_target.y = window_height - size_of_wall_y*0.85;
-    savebutton_target.w = size_of_wall_y*0.8*700/298;
-    savebutton_target.x = window_width - 60*window_width/1920 - savebutton_target.w;
-    savebutton_target.h = size_of_wall_y*0.8;
+    backtomenu_target.y = window_height - (int)(size_of_wall_y*0.85);
+    backtomenu_target.w = (int)(size_of_wall_y*0.8*700/298);
+    backtomenu_target.h = (int)(size_of_wall_y*0.8);
+    savebutton_target.y = window_height - (int)(size_of_wall_y*0.85);
+    savebutton_target.w = (int)(size_of_wall_y*0.8*700/298);
+    savebutton_target.x = window_width - (int)(60*window_width/1920) - savebutton_target.w;
+    savebutton_target.h = (int)(size_of_wall_y*0.8);
     sound_target.x = 5;
     sound_target.y = window_height-40;
     sound_target.w = 35;
@@ -181,31 +169,31 @@ void load_everything()
     number_of_systems_of_user_target.y = loc_number_of_enemies_y + 7*(number_of_enemies_h + 10);
 
     updownbutton_target.x = loc_number_of_enemies_x + number_of_enemies_w + 50*window_width/1920;
-    updownbutton_target.y = enemies_target.y + enemies_target.h*0.1;
+    updownbutton_target.y = enemies_target.y + (int)(enemies_target.h*0.1);
     updownbutton_target.w = 40*window_width/1920;
     updownbutton_target.h = 60*window_width/1920;
     updownbutton_sec_target.x = loc_number_of_enemies_x + per_user_w + 50*window_width/1920;
-    updownbutton_sec_target.y = per_user_target.y + per_user_target.h*0.1;
+    updownbutton_sec_target.y = per_user_target.y + (int)(per_user_target.h*0.1);
     updownbutton_sec_target.w = 40*window_width/1920;
     updownbutton_sec_target.h = 60*window_width/1920;
     updownbutton_thi_target.x = loc_number_of_enemies_x + number_of_nomansland_target.w + 50*window_width/1920;
-    updownbutton_thi_target.y = number_of_nomansland_target.y + number_of_nomansland_target.h*0.1;
+    updownbutton_thi_target.y = number_of_nomansland_target.y + (int)(number_of_nomansland_target.h*0.1);
     updownbutton_thi_target.w = 40*window_width/1920;
     updownbutton_thi_target.h = 60*window_width/1920;
     updownbutton_fou_target.x = loc_number_of_enemies_x + maxtrooperinplayers_house.w + 50*window_width/1920;
-    updownbutton_fou_target.y = maxtrooperinplayers_house.y + maxtrooperinplayers_house.h*0.1;
+    updownbutton_fou_target.y = maxtrooperinplayers_house.y + (int)(maxtrooperinplayers_house.h*0.1);
     updownbutton_fou_target.w = 40*window_width/1920;
     updownbutton_fou_target.h = 60*window_width/1920;
     updownbutton_fiv_target.x = maxtrooperinnomansland_target.x + maxtrooperinnomansland_target.w + 50*window_width/1920;
-    updownbutton_fiv_target.y = maxtrooperinnomansland_target.y + maxtrooperinnomansland_target.h*0.1;
+    updownbutton_fiv_target.y = maxtrooperinnomansland_target.y + (int)(maxtrooperinnomansland_target.h*0.1);
     updownbutton_fiv_target.w = 40*window_width/1920;
     updownbutton_fiv_target.h = 60*window_width/1920;
     updownbutton_six_target.x = start_troop_insomo_la_target.x + start_troop_insomo_la_target.w + 50*window_width/1920;
-    updownbutton_six_target.y = start_troop_insomo_la_target.y + start_troop_insomo_la_target.h*0.1;
+    updownbutton_six_target.y = start_troop_insomo_la_target.y + (int)(start_troop_insomo_la_target.h*0.1);
     updownbutton_six_target.w = 40*window_width/1920;
     updownbutton_six_target.h = 60*window_width/1920;
     updownbutton_sev_target.x = number_of_systems_of_user_target.x + number_of_systems_of_user_target.w + 50*window_width/1920;
-    updownbutton_sev_target.y = number_of_systems_of_user_target.y + number_of_systems_of_user_target.h*0.1;
+    updownbutton_sev_target.y = number_of_systems_of_user_target.y + (int)(number_of_systems_of_user_target.h*0.1);
     updownbutton_sev_target.w = 40*window_width/1920;
     updownbutton_sev_target.h = 60*window_width/1920;
 
@@ -228,7 +216,7 @@ void loadimages()
 {
     double ratio = (double)window_width/(double)window_height;
     
-    if(ratio - 3/2< 0.0000001 && ratio - 3/2> -0.0000001)
+    if(ratio - (float)3/2< 0.0000001 && ratio - (float)3/2> -0.0000001)
     {
         leaderboardbackground = SDL_LoadBMP("assets/kenobivsmaul3-2.bmp");
         winbackground = SDL_LoadBMP("assets/vaderrogueone3-2.bmp");
@@ -236,7 +224,7 @@ void loadimages()
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource3-2.bmp");
         startbackground = SDL_LoadBMP("assets/background3-2.bmp");
     }
-    else if(ratio - 4/3 < 0.0001 && ratio - 4/3 > -0.0001)
+    else if(ratio - (float)4/3 < 0.0001 && ratio - (float)4/3 > -0.0001)
     {
         leaderboardbackground = SDL_LoadBMP("assets/kenobivsmaul4-3.bmp");
         winbackground = SDL_LoadBMP("assets/vaderrogueone4-3.bmp");
@@ -244,7 +232,7 @@ void loadimages()
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource4-3.bmp");
         startbackground = SDL_LoadBMP("assets/background4-3.bmp");
     }
-    else if(ratio - 5/4< 0.0001 && ratio - 5/4> -0.0001)
+    else if(ratio - (float)5/4< 0.0001 && ratio - (float)5/4> -0.0001)
     {
         leaderboardbackground = SDL_LoadBMP("assets/kenobivsmaul5-4.bmp");
         winbackground = SDL_LoadBMP("assets/vaderrogueone5-4.bmp");
@@ -252,7 +240,7 @@ void loadimages()
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource5-4.bmp");
         startbackground = SDL_LoadBMP("assets/background5-4.bmp");
     }
-    else if(ratio - 16/10< 0.0001 && ratio - 16/10> -0.0001)
+    else if(ratio - (float)16/10< 0.0001 && ratio - (float)16/10> -0.0001)
     {
         leaderboardbackground = SDL_LoadBMP("assets/kenobivsmaul16-10.bmp");
         winbackground = SDL_LoadBMP("assets/vaderrogueone16-10.bmp");
@@ -286,7 +274,6 @@ void loadimages()
     
     textbox = SDL_LoadBMP("assets/textbox.bmp");
 
-
     lucasfilmlogobef = SDL_LoadBMP("assets/intro/lucasfilmback.bmp");
     lucasfilmlogo = SDL_LoadBMP("assets/intro/lucasfilm.bmp");
     shariflogobef =  SDL_LoadBMP("assets/intro/shariflogobef.bmp");
@@ -307,9 +294,10 @@ void loadimages()
     faces[2] = SDL_LoadBMP("assets/faces/tano.bmp");
     faces[3] = SDL_LoadBMP("assets/faces/luke.bmp");
     faces[4] = SDL_LoadBMP("assets/faces/maul.bmp");
+    faces[5] = SDL_LoadBMP("assets/faces/macewindu.bmp");
     faces[nomansland_playerid] = SDL_LoadBMP("assets/faces/r2d2.bmp");
 
-    for(int i=0;i<5;i++)
+    for(int i=0;i<6;i++)
         facestexture[i]=SDL_CreateTextureFromSurface(renderer, faces[i]);
     facestexture[nomansland_playerid] =SDL_CreateTextureFromSurface(renderer, faces[nomansland_playerid]);
 
@@ -318,8 +306,9 @@ void loadimages()
     troopers[2] = SDL_LoadBMP("assets/troopers/ahsokatrooper.bmp");
     troopers[3] = SDL_LoadBMP("assets/troopers/clonetrooper.bmp");
     troopers[4] = SDL_LoadBMP("assets/troopers/mandalorian.bmp");
+    troopers[5] = SDL_LoadBMP("assets/troopers/coruscantguard.bmp");
 
-    for(int i=0;i<number_of_enemies+1;i++)
+    for(int i=0;i<6;i++)
         movingtrooper_texture[i]=SDL_CreateTextureFromSurface(renderer, troopers[i]);
 
     kyber_cristal_photos[0] = SDL_LoadBMP("assets/kybers/kyber_blue.bmp");
@@ -339,33 +328,36 @@ void loadimages()
     for(int i=0;i<5;i++)
         kyberontexture[i]=SDL_CreateTextureFromSurface(renderer, kyber_cristalon_photos[i]);
 
-    planets_photos[0] = SDL_LoadBMP("assets/planet_death_star.bmp");
-    planets_photos[1] = SDL_LoadBMP("assets/planet_lothal.bmp");
-    planets_photos[2] = SDL_LoadBMP("assets/planet_rodia.bmp");
-    planets_photos[3] = SDL_LoadBMP("assets/planet_naboo.bmp");
-    planets_photos[4] = SDL_LoadBMP("assets/planet_mustafar.bmp");
-    planets_photos[nomansland_playerid] = SDL_LoadBMP("assets/metal.bmp");
+    planets_photos[0] = SDL_LoadBMP("assets/planets/planet_death_star.bmp");
+    planets_photos[1] = SDL_LoadBMP("assets/planets/planet_lothal.bmp");
+    planets_photos[2] = SDL_LoadBMP("assets/planets/planet_rodia.bmp");
+    planets_photos[3] = SDL_LoadBMP("assets/planets/planet_naboo.bmp");
+    planets_photos[4] = SDL_LoadBMP("assets/planets/planet_mustafar.bmp");
+    planets_photos[5] = SDL_LoadBMP("assets/planets/planet_coruscant.bmp");
+    planets_photos[nomansland_playerid] = SDL_LoadBMP("assets/planets/metal.bmp");
 
-    for(int i=0;i<5;i++)
+    for(int i=0;i<6;i++)
         planetphotostexture[i]=SDL_CreateTextureFromSurface(renderer,planets_photos[i]);
     planetphotostexture[nomansland_playerid]=SDL_CreateTextureFromSurface(renderer,planets_photos[nomansland_playerid]);
 
     lightsaberhandle=SDL_LoadBMP("assets/sabers/handle.bmp");
-    upboardcolor[0]=SDL_LoadBMP("assets/sabers/lightsaberred.bmp");
-    upboardcolor[1]=SDL_LoadBMP("assets/sabers/spear.bmp");
-    upboardcolor[2]=SDL_LoadBMP("assets/sabers/lightsaberblue.bmp");
-    upboardcolor[3]=SDL_LoadBMP("assets/sabers/lightsabergreen.bmp");
-    upboardcolor[4]=SDL_LoadBMP("assets/sabers/darksaber.bmp");
+    upboardcolor[0]= SDL_LoadBMP("assets/sabers/lightsaberred.bmp");
+    upboardcolor[1]= SDL_LoadBMP("assets/sabers/spear.bmp");
+    upboardcolor[2]= SDL_LoadBMP("assets/sabers/lightsaberblue.bmp");
+    upboardcolor[3]= SDL_LoadBMP("assets/sabers/lightsabergreen.bmp");
+    upboardcolor[4]= SDL_LoadBMP("assets/sabers/darksaber.bmp");
+    upboardcolor[5]= SDL_LoadBMP("assets/sabers/lightsaberpurple.bmp");
     upboardcolor[nomansland_playerid]=SDL_LoadBMP("assets/sabers/lightsaberwhite.bmp");
-    for(int i=0;i<5;i++)
+    for(int i=0;i<6;i++)
         upboardcolortexture[i] = SDL_CreateTextureFromSurface(renderer, upboardcolor[i]);
     upboardcolortexture[nomansland_playerid] = SDL_CreateTextureFromSurface(renderer, upboardcolor[nomansland_playerid]);
 
-    kybersaber[0] =SDL_LoadBMP("assets/kybersaber/lightsaberred.bmp");
-    kybersaber[1] =SDL_LoadBMP("assets/kybersaber/spear.bmp");
-    kybersaber[2] =SDL_LoadBMP("assets/kybersaber/lightsaberblue.bmp");
-    kybersaber[3] =SDL_LoadBMP("assets/kybersaber/lightsabergreen.bmp");
-    kybersaber[4] =SDL_LoadBMP("assets/kybersaber/darksaber.bmp");
+    kybersaber[0] = SDL_LoadBMP("assets/kybersaber/lightsaberred.bmp");
+    kybersaber[1] = SDL_LoadBMP("assets/kybersaber/spear.bmp");
+    kybersaber[2] = SDL_LoadBMP("assets/kybersaber/lightsaberblue.bmp");
+    kybersaber[3] = SDL_LoadBMP("assets/kybersaber/lightsabergreen.bmp");
+    kybersaber[4] = SDL_LoadBMP("assets/kybersaber/darksaber.bmp");
+    kybersaber[5] = SDL_LoadBMP("assets/kybersaber/lightsaberpurple.bmp");
     for(int i=0;i<5;i++)
         kybersabertexture[i] =SDL_CreateTextureFromSurface(renderer, kybersaber[i]);
     savebuttontexture = SDL_CreateTextureFromSurface(renderer, savebutton);
