@@ -770,7 +770,6 @@ CMakeFiles/state.dir/src/rendercpy.c.o: src/rendercpy.c \
   /usr/include/SDL2/SDL_shape.h \
   /usr/include/SDL2/SDL_system.h \
   /usr/include/SDL2/SDL_timer.h \
-  /usr/include/SDL2/SDL2_gfxPrimitives.h \
   /usr/include/time.h \
   /usr/include/x86_64-linux-gnu/bits/time.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h \
@@ -969,8 +968,7 @@ CMakeFiles/state.dir/src/the_pages_themselves.c.o: src/the_pages_themselves.c \
   /usr/include/SDL2/SDL_ttf.h \
   /usr/include/SDL2/SDL.h \
   src/load_everything.h \
-  /usr/include/x86_64-linux-gnu/sys/time.h \
-  /usr/include/SDL2/SDL2_gfxPrimitives.h
+  /usr/include/x86_64-linux-gnu/sys/time.h
 
 
 src/the_pages_themselves.c:
@@ -994,8 +992,6 @@ src/rendercpy.c:
 /usr/include/SDL2/SDL_log.h:
 
 /usr/include/SDL2/SDL_hints.h:
-
-/usr/include/SDL2/SDL2_gfxPrimitives.h:
 
 /usr/include/SDL2/SDL_haptic.h:
 

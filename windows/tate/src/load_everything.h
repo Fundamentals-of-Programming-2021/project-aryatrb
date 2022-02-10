@@ -34,7 +34,7 @@ struct politic_side{
     int number_of_moving_troopers;
     int is_moving;
     int is_getting_attacked;
-    struct troop troopers[1000];
+    struct troop troopers[50000];
 };
 struct player_himself{
     int player_id;
