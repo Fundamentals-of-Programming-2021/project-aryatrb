@@ -1,0 +1,1 @@
+/usr/bin/cc -g -rdynamic CMakeFiles/state.dir/src/load_everythingc.c.o CMakeFiles/state.dir/src/main.c.o CMakeFiles/state.dir/src/operations_of_the_game.c.o CMakeFiles/state.dir/src/rendercpy.c.o CMakeFiles/state.dir/src/the_pages_themselves.c.o -o state  -lm -lSDL2 -lSDL2_gfx -lSDL2_ttf -lSDL2_mixer 

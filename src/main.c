@@ -1,6 +1,6 @@
 #include "load_everything.h"
 
-int main() 
+int main(int argc, char* args[])
 {
     load_everything();
     main_while_operation();

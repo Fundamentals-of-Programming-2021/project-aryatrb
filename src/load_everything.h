@@ -3,7 +3,6 @@
 #include <sys/time.h>
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
-#include <SDL2/SDL2_gfxPrimitives.h>
 struct troop{
     int current_x;
     int current_y;

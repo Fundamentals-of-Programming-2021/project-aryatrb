@@ -507,15 +507,19 @@ void save_the_map()
     }
     fprintf(mapwrite,"%d\n",size_of_kybers);
     for(int i=0;i<size_of_kybers;i++)
-        fprintf(mapwrite,"%d %d %d %d %d %ld %ld %lf %d\n",kybers[i].type,
-                                kybers[i].x,
-                                kybers[i].y,
-                                kybers[i].is_on,
-                                kybers[i].is_dead,
-                                kybers[i].time.tv_sec,
-                                kybers[i].time.tv_usec,
-                                kybers[i].seconds_till_off,
-                                kybers[i].player_id);
+    {
+        fprintf(mapwrite, "%d %d %d %d %d %ld %ld %lf %d\n", kybers[i].type,
+                kybers[i].x,
+                kybers[i].y,
+                kybers[i].is_on,
+                kybers[i].is_dead,
+                kybers[i].time.tv_sec,
+                kybers[i].time.tv_usec,
+                kybers[i].seconds_till_off,
+                kybers[i].player_id);
+        for(int j=0;j<10;j++)
+            fprintf(mapwrite, "%d\n", kybers[i].affected_players[j]);
+    }
     for(int i=0;i<number_of_enemies+1;i++)
         fprintf(mapwrite,"%d %d %d %d %d %d\n",  players[i].player_id,
                                                             players[i].is_on,
@@ -585,15 +589,20 @@ void load_the_map()
     }
     fscanf(loadedmap,"%d\n",&size_of_kybers);
     for(int i=0;i<size_of_kybers;i++)
+    {
         fscanf(loadedmap,"%d %d %d %d %d %ld %ld %lf %d\n",&kybers[i].type,
-                                                            &kybers[i].x,
-                                                            &kybers[i].y,
-                                                            &kybers[i].is_on,
-                                                            &kybers[i].is_dead,
-                                                            &kybers[i].time.tv_sec,
-                                                            &kybers[i].time.tv_usec,
-                                                            &kybers[i].seconds_till_off,
-                                                            &kybers[i].player_id);
+               &kybers[i].x,
+               &kybers[i].y,
+               &kybers[i].is_on,
+               &kybers[i].is_dead,
+               &kybers[i].time.tv_sec,
+               &kybers[i].time.tv_usec,
+               &kybers[i].seconds_till_off,
+               &kybers[i].player_id);
+        for(int j=0;j<10;j++)
+            fscanf(loadedmap,"%d",&kybers[i].affected_players[j]);
+    }
+
     for(int i=0;i<number_of_enemies+1;i++)
         fscanf(loadedmap,"%d %d %d %d %d %d",&players[i].player_id,
                                                         &players[i].is_on,
@@ -908,7 +917,7 @@ int did_lose()
 }
 void create_kyber()
 {
-    int rand_to_do_kyber = rand()%100;
+    int rand_to_do_kyber = rand()%500;
     if(rand_to_do_kyber==0)
     {
         int rand_two_side_first = rand()%size_of_politic_sides;
