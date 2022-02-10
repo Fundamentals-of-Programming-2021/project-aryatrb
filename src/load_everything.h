@@ -41,7 +41,8 @@ struct player_himself{
     int player_id;
     int is_on;
     int till_end_a;
-    int does_have_kyber;
+    int does_have_kyber_type;
+    int id_of_kyber;
     int create_trooper_rate;
 };
 struct kyber_cristal{
@@ -115,7 +116,7 @@ void loadimages();
 void rendercpypage1text(char text[],SDL_Surface *textsurface,SDL_Texture *text_texture ,SDL_Rect *target);
 void rendercpypage3text(char text[],SDL_Surface *textsurface,SDL_Texture *text_texture ,SDL_Rect *target);
 void change_char(int i, int j);
-void swaptexture(SDL_Texture *i_t,SDL_Texture *j_t);
+void till_out_changer_spellthree();
 
 struct player_himself players[11];
 struct leaderboard_or_something leaderboard_users[50];
@@ -191,6 +192,7 @@ int number_of_systems_of_the_user;
 
 struct timeval the_begin;
 
+
 SDL_Surface *startbackground;
 SDL_Surface *starsbackground;
 SDL_Surface *winbackground;
@@ -227,8 +229,10 @@ SDL_Surface *shariflogobef;
 SDL_Surface *shariflogo;
 SDL_Surface *lucasfilmlogobef;
 SDL_Surface *lucasfilmlogo;
+SDL_Rect lucasfilmtarget;
 SDL_Surface *gamelogobef;
 SDL_Surface *gamelogo;
+SDL_Rect gamelogotarget;
 SDL_Surface *menubef;
 SDL_Surface *menubefwithlogo;
 

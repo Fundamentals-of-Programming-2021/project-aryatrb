@@ -209,6 +209,16 @@ void load_everything()
     username_target.w = usernametype_w;
     username_target.h = usernametype_h;
 
+    lucasfilmtarget.h= (int)(174*(float)window_height/(float)1080);
+    lucasfilmtarget.w= (int)((float )565/174*(float)lucasfilmtarget.h);
+    lucasfilmtarget.x= window_width/2 - lucasfilmtarget.w/2;
+    lucasfilmtarget.y= window_height/2 - lucasfilmtarget.h/2;
+
+    gamelogotarget.h= (int)(250*(float)window_height/(float)1080);
+    gamelogotarget.w=(int)((float )600/250*(float)gamelogotarget.h);
+    gamelogotarget.x= window_width/2 - gamelogotarget.w/2;
+    gamelogotarget.y= window_height/2 - gamelogotarget.h/2;
+
     time(&start_time);
     time(&start_time_troop);
     Mix_OpenAudio(MIX_DEFAULT_FREQUENCY,MIX_DEFAULT_FORMAT,2,2048);
@@ -230,6 +240,10 @@ void loadimages()
         losebackground = SDL_LoadBMP("assets/vaderburning3-2.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource3-2.bmp");
         startbackground = SDL_LoadBMP("assets/background3-2.bmp");
+        shariflogobef =  SDL_LoadBMP("assets/intro/shariflogobef3-2.bmp");
+        gamelogobef = SDL_LoadBMP("assets/intro/gamelogobef3-2.bmp");
+        menubef = SDL_LoadBMP("assets/intro/menubef3-2.bmp");
+        shariflogo =  SDL_LoadBMP("assets/intro/shariflogo3-2.bmp");
     }
     else if(ratio - (float)4/3 < 0.0001 && ratio - (float)4/3 > -0.0001)
     {
@@ -238,6 +252,10 @@ void loadimages()
         losebackground = SDL_LoadBMP("assets/vaderburning4-3.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource4-3.bmp");
         startbackground = SDL_LoadBMP("assets/background4-3.bmp");
+        shariflogobef =  SDL_LoadBMP("assets/intro/shariflogobef4-3.bmp");
+        gamelogobef = SDL_LoadBMP("assets/intro/gamelogobef4-3.bmp");
+        menubef = SDL_LoadBMP("assets/intro/menubef4-3.bmp");
+        shariflogo =  SDL_LoadBMP("assets/intro/shariflogo4-3.bmp");
     }
     else if(ratio - (float)5/4< 0.0001 && ratio - (float)5/4> -0.0001)
     {
@@ -246,6 +264,10 @@ void loadimages()
         losebackground = SDL_LoadBMP("assets/vaderburning5-4.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource5-4.bmp");
         startbackground = SDL_LoadBMP("assets/background5-4.bmp");
+        shariflogobef =  SDL_LoadBMP("assets/intro/shariflogobef5-4.bmp");
+        gamelogobef = SDL_LoadBMP("assets/intro/gamelogobef5-4.bmp");
+        menubef = SDL_LoadBMP("assets/intro/menubef5-4.bmp");
+        shariflogo =  SDL_LoadBMP("assets/intro/shariflogo5-4.bmp");
     }
     else if(ratio - (float)16/10< 0.0001 && ratio - (float)16/10> -0.0001)
     {
@@ -254,6 +276,10 @@ void loadimages()
         losebackground = SDL_LoadBMP("assets/vaderburning16-10.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource16-10.bmp");
         startbackground = SDL_LoadBMP("assets/background16-10.bmp");
+        shariflogobef =  SDL_LoadBMP("assets/intro/shariflogobef16-10.bmp");
+        gamelogobef = SDL_LoadBMP("assets/intro/gamelogobef16-10.bmp");
+        menubef = SDL_LoadBMP("assets/intro/menubef16-10.bmp");
+        shariflogo =  SDL_LoadBMP("assets/intro/shariflogo16-10.bmp");
     }
     else
     {
@@ -261,7 +287,11 @@ void loadimages()
         winbackground = SDL_LoadBMP("assets/vaderrogueone16-9.bmp");
         losebackground = SDL_LoadBMP("assets/vaderburning16-9.bmp");
         new_game_background = SDL_LoadBMP("assets/backgroundtroopersource16-9.bmp");
-        startbackground = SDL_LoadBMP("assets/intro/menubefwihlogo.bmp");
+        startbackground = SDL_LoadBMP("assets/background16-9.bmp");
+        shariflogobef =  SDL_LoadBMP("assets/intro/shariflogobef16-9.bmp");
+        gamelogobef = SDL_LoadBMP("assets/intro/gamelogobef16-9.bmp");
+        menubef = SDL_LoadBMP("assets/intro/menubef16-9.bmp");
+        shariflogo =  SDL_LoadBMP("assets/intro/shariflogo16-9.bmp");
     }
     starsbackground = SDL_LoadBMP("assets/stars.bmp");
     load_game = SDL_LoadBMP("assets/load_game.bmp");
@@ -283,12 +313,7 @@ void loadimages()
 
     lucasfilmlogobef = SDL_LoadBMP("assets/intro/lucasfilmback.bmp");
     lucasfilmlogo = SDL_LoadBMP("assets/intro/lucasfilm.bmp");
-    shariflogobef =  SDL_LoadBMP("assets/intro/shariflogobef.bmp");
-    shariflogo =  SDL_LoadBMP("assets/intro/shariflogo.bmp");
-    gamelogobef = SDL_LoadBMP("assets/intro/gamelogobef.bmp");
     gamelogo = SDL_LoadBMP("assets/intro/gamelogo.bmp");
-    menubef = SDL_LoadBMP("assets/intro/menubef.bmp");
-    menubefwithlogo = SDL_LoadBMP("assets/intro/menubefwithlogo.bmp");
 
 
     wall = SDL_LoadBMP("assets/wall.bmp");

@@ -3,6 +3,7 @@
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
 #include "string.h"
+#include "stdio.h"
 #include "load_everything.h"
 
 
@@ -115,7 +116,12 @@ void page1()
             soundchange();
         else if(click_x>backbutton_target.x && click_x<backbutton_target.x+backbutton_target.w &&
                 click_y<backbutton_target.y+backbutton_target.h && click_y>backbutton_target.y)
-            page=0;
+        {
+            if(swap_char!=0)
+                change_char(main_players_id,swap_char);
+            swap_char=0;
+            page = 0;
+        }
         else if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
         && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h && size_of_text_username>0)
             page1to10();
@@ -377,6 +383,7 @@ void page10()
             else if (click_x>backtomenu_target.x && click_x<backtomenu_target.x + backtomenu_target.w  
                 && click_y>backtomenu_target.y && click_y<backtomenu_target.y + backtomenu_target.h)
             {
+
                 Mix_PauseMusic();
                 Mix_PlayMusic(menu_music,-1);
                 page=0;
@@ -451,6 +458,9 @@ void winpage()
         {
             Mix_PausedMusic();
             Mix_PlayMusic(menu_music,-1);
+            if(swap_char!=0)
+                change_char(main_players_id,swap_char);
+            swap_char=0;
             page=0;
             return;
         }
@@ -495,6 +505,16 @@ void page2to10()
 
 void pageto1()
 {
+    if(swap_char!=0)
+        change_char(main_players_id,swap_char);
+    swap_char=0;
+    number_of_enemies=4;
+    number_of_politic_sides_per_user=1;
+    number_of_nomansland=8;
+    max_troop_in_someones_land=50;
+    max_troop_no_mans_land=20;
+    start_troop_in_someones_land=10;
+    number_of_systems_of_the_user=1;
     enemies_target.x = loc_number_of_enemies_x;
     enemies_target.y = loc_number_of_enemies_y + number_of_enemies_h + 10;
     enemies_target.w = number_of_enemies_w;

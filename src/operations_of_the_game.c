@@ -62,20 +62,27 @@ int findclickedcell(int click_x, int click_y, int *ret, int id_is_zero)
 }
 int check_if_any_enemy_soldier_is_nearby_poli(struct troop *chosen_troop)
 {
-    for(int i=0;players[chosen_troop->player_id].does_have_kyber==-1 && i<size_of_kybers;i++)
+    for(int i=0;players[chosen_troop->player_id].id_of_kyber==-1 && i<size_of_kybers;i++)
         if(kybers[i].is_on==0 && kybers[i].is_dead==0 &&
            dist_two_point(chosen_troop->current_x+size_of_troopers_x_y/2, chosen_troop->current_y+size_of_troopers_x_y/2, kybers[i].x + size_of_kyber_photo_x/2,kybers[i].y+size_of_kyber_photo_y/2)
            <size_of_kyber_photo_y)
         {
-            players[chosen_troop->player_id].does_have_kyber=i;
+            players[chosen_troop->player_id].id_of_kyber=i;
+            players[chosen_troop->player_id].does_have_kyber_type=kybers[i].type;
             kybers[i].is_on=1;
             kybers[i].player_id=chosen_troop->player_id;
             if(kybers[i].type==1)
             {
-                global_second_kyber++;
-                for (int j = 0; j < number_of_enemies + 1; j++)
+                int k=1;
+                for (int j = 0; j < number_of_enemies+1; ++j)
+                    if(players[j].does_have_kyber_type==2)
+                    {
+                        k=0;
+                        players[j].till_end_a = dist_moving_trooper_per_sec*2;
+                    }
+                for (int j = 0;k && j < number_of_enemies + 1; j++)
                     if (j != chosen_troop->player_id)
-                        players[j].till_end_a *= 2;
+                        players[j].till_end_a = dist_moving_trooper_per_sec*2;
             }
             if(kybers[i].type==2)
             {
@@ -83,6 +90,7 @@ int check_if_any_enemy_soldier_is_nearby_poli(struct troop *chosen_troop)
                 for(int j=0;j<number_of_enemies+1;j++)
                     if(j!=chosen_troop->player_id)
                         players[j].till_end_a=0;
+                till_out_changer_spellthree();
             }
             gettimeofday(&kybers[i].time,NULL);
         }
@@ -121,26 +129,40 @@ int dist_two_point(int i_one, int j_one, int i_two, int j_two)
 }
 void spell_type_one(struct troop *chosen_troop)
 {
+    int k=1,type=-10;
+    for(int i=0;i<number_of_enemies+1;i++)
+        if(players[i].does_have_kyber_type==2 || players[i].does_have_kyber_type==1)
+        {
+            k=0;
+            type=players[i].does_have_kyber_type;
+            break;
+        }
     struct timeval tv;
-    if(players[chosen_troop->player_id].does_have_kyber==-1 || kybers[players[chosen_troop->player_id].does_have_kyber].type!=0)
+    if(players[chosen_troop->player_id].id_of_kyber==-1 || kybers[players[chosen_troop->player_id].id_of_kyber].type!=0)
     {
-        if(global_second_kyber==0 && global_third_kyber==0)
+        if(k)
             players[chosen_troop->player_id].till_end_a = dist_moving_trooper_per_sec;
         return;
     }
     gettimeofday(&tv,NULL);
-    if((long int)(tv.tv_sec - kybers[players[chosen_troop->player_id].does_have_kyber].time.tv_sec)*1000000 +
-        tv.tv_usec - kybers[players[chosen_troop->player_id].does_have_kyber].time.tv_usec
+    if((long int)(tv.tv_sec - kybers[players[chosen_troop->player_id].id_of_kyber].time.tv_sec)*1000000 +
+        tv.tv_usec - kybers[players[chosen_troop->player_id].id_of_kyber].time.tv_usec
         >
         kybers_time_till_end[0])
         {
-            kybers[players[chosen_troop->player_id].does_have_kyber].is_dead=1;
-            players[chosen_troop->player_id].till_end_a =dist_moving_trooper_per_sec;
-            players[chosen_troop->player_id].does_have_kyber=-1;
+            kybers[players[chosen_troop->player_id].id_of_kyber].is_dead=1;
+            if(k)
+                players[chosen_troop->player_id].till_end_a =dist_moving_trooper_per_sec;
+            if(k==0 && type==1)
+                players[chosen_troop->player_id].till_end_a =dist_moving_trooper_per_sec*2;
+            if(k==0 && type==2)
+                players[chosen_troop->player_id].till_end_a =0;
+            players[chosen_troop->player_id].id_of_kyber=-1;
+            players[chosen_troop->player_id].does_have_kyber_type=-1;
         }
-    else if(players[chosen_troop->player_id].does_have_kyber!=-1 &&
-            kybers[players[chosen_troop->player_id].does_have_kyber].type==0 &&
-            kybers[players[chosen_troop->player_id].does_have_kyber].is_dead==0)
+    else if(k && players[chosen_troop->player_id].id_of_kyber!=-1 &&
+            kybers[players[chosen_troop->player_id].id_of_kyber].type==0 &&
+            kybers[players[chosen_troop->player_id].id_of_kyber].is_dead==0)
         players[chosen_troop->player_id].till_end_a=dist_moving_trooper_per_sec*2;
 }
 void spell_type_two_endcheck()
@@ -157,14 +179,35 @@ void spell_type_two_endcheck()
             kybers_time_till_end[1])
             {
                 kybers[i].is_dead=1;
-                for(int j=0;j<10;j++)
-                    if(j!=kybers[i].player_id)
-                        players[j].till_end_a /=2;
-                players[kybers[i].player_id].does_have_kyber=-1;
-                global_second_kyber--;
+                int k=1;
+                for(int j=0;j<number_of_enemies+1;j++)
+                    if(players[j].does_have_kyber_type==2)
+                    {
+                        players[j].till_end_a =dist_moving_trooper_per_sec;
+                        k=0;
+                    }
+                for(int j=0;k && j<number_of_enemies+1;j++)
+                    if (j != kybers[i].player_id)
+                    {
+                        if(players[j].does_have_kyber_type==0)
+                            players[j].till_end_a = dist_moving_trooper_per_sec*2;
+                        else
+                            players[j].till_end_a = dist_moving_trooper_per_sec;
+                    }
+                players[kybers[i].player_id].id_of_kyber=-1;
+                players[kybers[i].player_id].does_have_kyber_type=-1;
             }
         }
     }
+}
+void till_out_changer_spellthree()
+{
+    for(int i=0;i<size_of_politic_sides;i++)
+        for(int j=0;j< politic_sides[i].id_of_moving_troppers;j++ )
+            if(politic_sides[i].troopers[j].is_out==0)
+            {
+                politic_sides[i].troopers[j].time.tv_sec-=kybers_time_till_end[2];
+            }
 }
 void spell_type_three_endcheck()
 {
@@ -180,11 +223,30 @@ void spell_type_three_endcheck()
             kybers_time_till_end[2])
             {
                 kybers[i].is_dead=1;
-                for(int j=0;j<10;j++)
-                    if(j!=kybers[i].player_id)
-                        players[j].till_end_a = dist_moving_trooper_per_sec;
-                players[kybers[i].player_id].does_have_kyber=-1;
-                global_third_kyber--;
+                players[kybers[i].player_id].id_of_kyber=-1;
+                players[kybers[i].player_id].does_have_kyber_type=-1;
+                int isthereanother=0;
+                for(int j=0;j<number_of_enemies+1;j++)
+                    if(players[j].does_have_kyber_type==2)
+                    {
+                        players[j].till_end_a =dist_moving_trooper_per_sec;
+                        isthereanother=1;
+                        break;
+                    }
+                if(isthereanother==0)
+                {
+                    int k=1,id=-10;
+                    for(int j=0;j<number_of_enemies+1;j++)
+                        if(players[j].does_have_kyber_type==1)
+                        {
+                            players[j].till_end_a =dist_moving_trooper_per_sec;
+                            k=2;
+                            id=j;
+                        }
+                    for(int j=0;j<number_of_enemies+1;j++)
+                        if(j!=id)
+                            players[j].till_end_a =dist_moving_trooper_per_sec*k;
+                }
             }
         }
     }
@@ -192,39 +254,39 @@ void spell_type_three_endcheck()
 void spell_type_four(int player_id)
 {
     struct timeval tv;
-    if(players[player_id].does_have_kyber==-1 || kybers[players[player_id].does_have_kyber].type!=3)
+    if(players[player_id].id_of_kyber==-1 || kybers[players[player_id].id_of_kyber].type!=3)
         return;
     gettimeofday(&tv,NULL);
-    if((tv.tv_sec - kybers[players[player_id].does_have_kyber].time.tv_sec)*1000000 +
-        tv.tv_usec - kybers[players[player_id].does_have_kyber].time.tv_usec
+    if((tv.tv_sec - kybers[players[player_id].id_of_kyber].time.tv_sec)*1000000 +
+        tv.tv_usec - kybers[players[player_id].id_of_kyber].time.tv_usec
         >
         kybers_time_till_end[3])
         {
-            kybers[players[player_id].does_have_kyber].is_dead=1;
+            kybers[players[player_id].id_of_kyber].is_dead=1;
             players[player_id].create_trooper_rate = 1;
-            players[player_id].does_have_kyber=-1;
+            players[player_id].id_of_kyber=-1;
         }
-    else if(players[player_id].does_have_kyber!=-1 &&
-            kybers[players[player_id].does_have_kyber].type==3 &&
-            kybers[players[player_id].does_have_kyber].is_dead==0)
+    else if(players[player_id].id_of_kyber!=-1 &&
+            kybers[players[player_id].id_of_kyber].type==3 &&
+            kybers[players[player_id].id_of_kyber].is_dead==0)
         players[player_id].create_trooper_rate=3;
 }
 void spell_type_five()
 {
     struct timeval tv;
     gettimeofday(&tv,NULL);
-    for(int i = 0 ; i< 15;i++)
+    for(int i = 0 ; i< number_of_enemies+1;i++)
     {
-        if(players[i].does_have_kyber!=-1 &&
-            kybers[players[i].does_have_kyber].type==4 &&
-            kybers[players[i].does_have_kyber].is_dead==0 &&
-            (tv.tv_sec - kybers[players[i].does_have_kyber].time.tv_sec)*1000000 +
-        tv.tv_usec - kybers[players[i].does_have_kyber].time.tv_usec
+        if(players[i].id_of_kyber!=-1 &&
+            kybers[players[i].id_of_kyber].type==4 &&
+            kybers[players[i].id_of_kyber].is_dead==0 &&
+            (tv.tv_sec - kybers[players[i].id_of_kyber].time.tv_sec)*1000000 +
+        tv.tv_usec - kybers[players[i].id_of_kyber].time.tv_usec
         >
         kybers_time_till_end[4])
         {
-            kybers[players[i].does_have_kyber].is_dead=1;
-            players[i].does_have_kyber=-1;
+            kybers[players[i].id_of_kyber].is_dead=1;
+            players[i].id_of_kyber=-1;
         }
     }
 }
@@ -280,9 +342,9 @@ void moving_troopers_update_location()
                 if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id!=politic_sides[j].player_id)
                 {
                     if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id!=nomansland_playerid &&
-                        players[politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id].does_have_kyber!=-1 &&
-                       kybers[players[politic_sides[j].troopers[i].enemy_politic_side_number].does_have_kyber].type==4 &&
-                       kybers[players[politic_sides[j].troopers[i].enemy_politic_side_number].does_have_kyber].is_dead==0)
+                        players[politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id].id_of_kyber!=-1 &&
+                       kybers[players[politic_sides[j].troopers[i].enemy_politic_side_number].id_of_kyber].type==4 &&
+                       kybers[players[politic_sides[j].troopers[i].enemy_politic_side_number].id_of_kyber].is_dead==0)
                     {
                         politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers++;  
                         if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_moving_troopers>politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers)
@@ -373,9 +435,10 @@ int assign_politic_sides()
     for(int i=0;i<10;i++)
     {
         players[i].till_end_a = dist_moving_trooper_per_sec;
-        players[i].does_have_kyber=-1;
+        players[i].id_of_kyber=-1;
         players[i].create_trooper_rate=1;
         players[i].is_on=0;
+        players[i].does_have_kyber_type=-1;
     }
     players[main_players_id].is_on=1;
     size_of_kybers=0;
@@ -469,7 +532,7 @@ void save_the_map()
     fclose(mapsave);
     FILE *mapwrite = fopen(path, "w");
     fprintf(mapwrite,"%s\n", username_text);
-    fprintf(mapwrite,"%d %d %d %d %d\n",number_of_nomansland,max_troop_in_someones_land,max_troop_no_mans_land,start_troop_in_someones_land, main_players_id);
+    fprintf(mapwrite,"%d %d %d %d %d %d\n",number_of_nomansland,max_troop_in_someones_land,max_troop_no_mans_land,start_troop_in_someones_land, swap_char,number_of_systems_of_the_user);
     fprintf(mapwrite, "%d %d %d %d %d %d %d\n", number_of_cells_x,number_of_cells_y,rand_start_x, rand_start_y, number_of_enemies,number_of_politic_sides_per_user,size_of_politic_sides);
     for(int j = 0;j<number_of_cells_y;j++)
         for(int i=0;i<number_of_cells_x;i++)
@@ -517,10 +580,11 @@ void save_the_map()
                                 kybers[i].seconds_till_off,
                                 kybers[i].player_id);
     for(int i=0;i<number_of_enemies+1;i++)
-        fprintf(mapwrite,"%d %d %d %d %d\n",  players[i].player_id,
+        fprintf(mapwrite,"%d %d %d %d %d %d\n",  players[i].player_id,
                                                             players[i].is_on,
                                                             players[i].till_end_a,
-                                                            players[i].does_have_kyber,
+                                                            players[i].does_have_kyber_type,
+                                                            players[i].id_of_kyber,
                                                             players[i].create_trooper_rate);
     fprintf(mapwrite,"%d\n",size_of_troops_with_no_home);
     for(int i=0; i<size_of_troops_with_no_home;i++)
@@ -546,7 +610,8 @@ void load_the_map()
     sprintf(path, "assets/save/maps/map%d.txt", mapseltonum);
     FILE *loadedmap = fopen(path, "r");
     fscanf(loadedmap,"%s\n", username_text);
-    fscanf(loadedmap,"%d %d %d %d %d\n",&number_of_nomansland,&max_troop_in_someones_land,&max_troop_no_mans_land,&start_troop_in_someones_land, &main_players_id);
+    fscanf(loadedmap,"%d %d %d %d %d %d\n",&number_of_nomansland,&max_troop_in_someones_land,&max_troop_no_mans_land,&start_troop_in_someones_land, &swap_char, &number_of_systems_of_the_user);
+    printf("%d\n",swap_char);
     fscanf(loadedmap, "%d %d %d %d %d %d %d",&number_of_cells_x,&number_of_cells_y, &rand_start_x, &rand_start_y, &number_of_enemies, &number_of_politic_sides_per_user, &size_of_politic_sides);
     for(int j = 0;j<number_of_cells_y;j++)
         for(int i=0;i<number_of_cells_x;i++)
@@ -593,10 +658,11 @@ void load_the_map()
                                                             &kybers[i].seconds_till_off,
                                                             &kybers[i].player_id);
     for(int i=0;i<number_of_enemies+1;i++)
-        fscanf(loadedmap,"%d %d %d %d %d",&players[i].player_id,
+        fscanf(loadedmap,"%d %d %d %d %d %d",&players[i].player_id,
                                                         &players[i].is_on,
                                                         &players[i].till_end_a,
-                                                        &players[i].does_have_kyber,
+                                                        &players[i].does_have_kyber_type,
+                                                        &players[i].id_of_kyber,
                                                         &players[i].create_trooper_rate);
     fscanf(loadedmap,"%d\n",&size_of_troops_with_no_home);
     for(int i=0; i<size_of_troops_with_no_home;i++)
@@ -614,6 +680,8 @@ void load_the_map()
                                                                     &troops_with_no_home[i].enemy_politic_side_number);
     update_politic_sides_of_users();
     fclose(loadedmap);
+    if(swap_char!=0)
+        change_char(main_players_id,swap_char);
 }
 void first_user_save()
 {
@@ -921,7 +989,8 @@ void create_kyber()
         int dist_rand = rand()%70 + 15;
         kybers[size_of_kybers].x = (first_center_x* dist_rand + second_center_x*(100-dist_rand))/100;
         kybers[size_of_kybers].y = (first_center_y* dist_rand + second_center_y*(100-dist_rand))/100;
-        kybers[size_of_kybers].type = rand()%5;
+//        kybers[size_of_kybers].type = rand()%5;
+        kybers[size_of_kybers].type = 2;
         kybers[size_of_kybers].is_on=0;
         kybers[size_of_kybers].is_dead=0;
         size_of_kybers++;
