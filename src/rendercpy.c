@@ -255,7 +255,6 @@ void rendercpypage10()
                 if(difftime(time_now,start_time)>=1 && politic_sides[i].player_id!=nomansland_playerid &&
                 ((politic_sides[i].player_id==nomansland_playerid && politic_sides[i].number_of_troopers<max_troop_no_mans_land) || (politic_sides[i].player_id!=nomansland_playerid && politic_sides[i].number_of_troopers<max_troop_in_someones_land)))
                 {
-                    spell_type_four(politic_sides[i].player_id);
                     politic_sides[i].number_of_troopers+=(int)difftime(time_now,start_time) * players[politic_sides[i].player_id].create_trooper_rate;
                     if(politic_sides[i].player_id==nomansland_playerid && politic_sides[i].number_of_troopers>max_troop_no_mans_land)
                         politic_sides[i].number_of_troopers = max_troop_no_mans_land;
@@ -308,7 +307,7 @@ void rendercpypage10()
             kyber_target.x -=size_of_kyber_photo_x/2;
             kyber_target.y -=size_of_kyber_photo_y/2;
             SDL_RenderCopy(renderer, kyberontexture[kybers[i].type], NULL, &kyber_target);
-            kyber_target.w = 24*1920/window_width;
+            kyber_target.w = 24*(double)window_width/1920;
             kyber_target.h = (int)(5.5*kyber_target.w);
             SDL_RenderCopy(renderer,kybersabertexture[kybers[i].player_id],NULL,&kyber_target);
         }

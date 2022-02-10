@@ -265,8 +265,8 @@ void page2()
             game_running=0;
             return;
         }
-        else if(click_x>mapsel_target.x && click_x<mapsel_target.x + mapsel_target.w
-                && click_y>mapsel_target.y && click_y<mapsel_target.y + mapsel_target.h)
+        else if(click_x>textbox_target.x && click_x<textbox_target.x + textbox_target.w
+                && click_y>textbox_target.y && click_y<textbox_target.y + textbox_target.h)
             writing_mode_map_select=1;
         else if(click_x>start_game_target.x && click_x<start_game_target.x + start_game_target.w 
         && click_y>start_game_target.y && click_y<start_game_target.y + start_game_target.h && size_of_text_mapselect>0)
@@ -398,6 +398,7 @@ void page10()
             else if(click_x > closebutton_target.x && click_x < closebutton_target.x + closebutton_target.w 
                     && click_y > closebutton_target.y && click_y < closebutton_target.y + closebutton_target.h)
             {
+                save_the_map();
                 game_running=0;
                 return;
             }
@@ -419,6 +420,7 @@ void page10()
     upboard_setup();
     spell_type_two_endcheck();
     spell_type_three_endcheck();
+    spell_type_four();
     spell_type_five();
     if(did_win())
     {   

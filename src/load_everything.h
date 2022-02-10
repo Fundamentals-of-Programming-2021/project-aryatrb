@@ -56,6 +56,7 @@ struct kyber_cristal{
     int player_id;
     int politic_side_id_first;
     int politic_side_id_second;
+    int affected_players[10];
 };
 struct leaderboard_or_something{
     char name[100];
@@ -90,7 +91,7 @@ int dist_two_point(int i_one, int j_one, int i_two, int j_two);
 void spell_type_one(struct troop *chosen_troop);
 void spell_type_two_endcheck();
 void spell_type_three_endcheck();
-void spell_type_four(int player_id);
+void spell_type_four();
 void spell_type_five();
 void moving_troopers_update_location();
 void create_cells();
@@ -116,7 +117,7 @@ void loadimages();
 void rendercpypage1text(char text[],SDL_Surface *textsurface,SDL_Texture *text_texture ,SDL_Rect *target);
 void rendercpypage3text(char text[],SDL_Surface *textsurface,SDL_Texture *text_texture ,SDL_Rect *target);
 void change_char(int i, int j);
-void till_out_changer_spellthree();
+void till_out_changer_spellthree(int o);
 
 struct player_himself players[11];
 struct leaderboard_or_something leaderboard_users[50];
@@ -164,12 +165,10 @@ int size_of_each_cell_x,size_of_each_cell_y ,number_of_cells_x, number_of_cells_
 int first_click;
 int second_click;
 int is_first_clicked;
-int global_second_kyber;
-int global_third_kyber;
 int dist_moving_trooper_per_sec;
 unsigned int start_ticks;
 double seconds_until_trooper_is_out;
-double kybers_time_till_end[5];
+int kybers_time_till_end[5];
 int size_of_wall_y;
 char username_text[33];
 char mapselect[33];

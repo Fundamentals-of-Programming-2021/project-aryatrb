@@ -73,25 +73,26 @@ int check_if_any_enemy_soldier_is_nearby_poli(struct troop *chosen_troop)
             kybers[i].player_id=chosen_troop->player_id;
             if(kybers[i].type==1)
             {
-                int k=1;
-                for (int j = 0; j < number_of_enemies+1; ++j)
-                    if(players[j].does_have_kyber_type==2)
+                for (int j = 0; j < number_of_enemies + 1; j++)
+                    if (j != chosen_troop->player_id && players[j].does_have_kyber_type == -1)
                     {
-                        k=0;
-                        players[j].till_end_a = dist_moving_trooper_per_sec*2;
+                        players[j].till_end_a = dist_moving_trooper_per_sec * 2;
+                        kybers[i].affected_players[j] = 1;
                     }
-                for (int j = 0;k && j < number_of_enemies + 1; j++)
-                    if (j != chosen_troop->player_id)
-                        players[j].till_end_a = dist_moving_trooper_per_sec*2;
             }
             if(kybers[i].type==2)
             {
-                global_third_kyber++;
-                for(int j=0;j<number_of_enemies+1;j++)
-                    if(j!=chosen_troop->player_id)
-                        players[j].till_end_a=0;
-                till_out_changer_spellthree();
+                for (int j = 0; j < number_of_enemies + 1; j++)
+                    if (j != chosen_troop->player_id && players[j].does_have_kyber_type == -1)
+                    {
+                        players[j].till_end_a = 0;
+                        kybers[i].affected_players[j] = 1;
+                    }
+                players[chosen_troop->player_id].till_end_a=dist_moving_trooper_per_sec;
+                till_out_changer_spellthree(i);
             }
+            if(kybers[i].type==3)
+                players[chosen_troop->player_id].create_trooper_rate=3;
             gettimeofday(&kybers[i].time,NULL);
         }
     for(int i=0;i<size_of_politic_sides;i++)
@@ -129,38 +130,21 @@ int dist_two_point(int i_one, int j_one, int i_two, int j_two)
 }
 void spell_type_one(struct troop *chosen_troop)
 {
-    int k=1,type=-10;
-    for(int i=0;i<number_of_enemies+1;i++)
-        if(players[i].does_have_kyber_type==2 || players[i].does_have_kyber_type==1)
-        {
-            k=0;
-            type=players[i].does_have_kyber_type;
-            break;
-        }
-    struct timeval tv;
-    if(players[chosen_troop->player_id].id_of_kyber==-1 || kybers[players[chosen_troop->player_id].id_of_kyber].type!=0)
-    {
-        if(k)
-            players[chosen_troop->player_id].till_end_a = dist_moving_trooper_per_sec;
+    if(players[chosen_troop->player_id].does_have_kyber_type!=0)
         return;
-    }
+    struct timeval tv;
     gettimeofday(&tv,NULL);
     if((long int)(tv.tv_sec - kybers[players[chosen_troop->player_id].id_of_kyber].time.tv_sec)*1000000 +
-        tv.tv_usec - kybers[players[chosen_troop->player_id].id_of_kyber].time.tv_usec
-        >
-        kybers_time_till_end[0])
+                  tv.tv_usec - kybers[players[chosen_troop->player_id].id_of_kyber].time.tv_usec
+                  >
+                  kybers_time_till_end[0] || upboardwidth[chosen_troop->player_id]==0)
         {
             kybers[players[chosen_troop->player_id].id_of_kyber].is_dead=1;
-            if(k)
-                players[chosen_troop->player_id].till_end_a =dist_moving_trooper_per_sec;
-            if(k==0 && type==1)
-                players[chosen_troop->player_id].till_end_a =dist_moving_trooper_per_sec*2;
-            if(k==0 && type==2)
-                players[chosen_troop->player_id].till_end_a =0;
+            players[chosen_troop->player_id].till_end_a =dist_moving_trooper_per_sec;
             players[chosen_troop->player_id].id_of_kyber=-1;
             players[chosen_troop->player_id].does_have_kyber_type=-1;
         }
-    else if(k && players[chosen_troop->player_id].id_of_kyber!=-1 &&
+    else if(players[chosen_troop->player_id].id_of_kyber!=-1 &&
             kybers[players[chosen_troop->player_id].id_of_kyber].type==0 &&
             kybers[players[chosen_troop->player_id].id_of_kyber].is_dead==0)
         players[chosen_troop->player_id].till_end_a=dist_moving_trooper_per_sec*2;
@@ -176,38 +160,24 @@ void spell_type_two_endcheck()
             if((tv.tv_sec - kybers[i].time.tv_sec)*1000000 +
             tv.tv_usec - kybers[i].time.tv_usec
             >
-            kybers_time_till_end[1])
+            kybers_time_till_end[1] || upboardwidth[kybers[i].player_id]==0)
             {
                 kybers[i].is_dead=1;
-                int k=1;
                 for(int j=0;j<number_of_enemies+1;j++)
-                    if(players[j].does_have_kyber_type==2)
-                    {
-                        players[j].till_end_a =dist_moving_trooper_per_sec;
-                        k=0;
-                    }
-                for(int j=0;k && j<number_of_enemies+1;j++)
-                    if (j != kybers[i].player_id)
-                    {
-                        if(players[j].does_have_kyber_type==0)
-                            players[j].till_end_a = dist_moving_trooper_per_sec*2;
-                        else
+                    if (kybers[i].affected_players[j]==1)
                             players[j].till_end_a = dist_moving_trooper_per_sec;
-                    }
                 players[kybers[i].player_id].id_of_kyber=-1;
                 players[kybers[i].player_id].does_have_kyber_type=-1;
             }
         }
     }
 }
-void till_out_changer_spellthree()
+void till_out_changer_spellthree(int o)
 {
     for(int i=0;i<size_of_politic_sides;i++)
-        for(int j=0;j< politic_sides[i].id_of_moving_troppers;j++ )
+        for(int j=0; kybers[o].affected_players[politic_sides[i].player_id]==1 && j< politic_sides[i].id_of_moving_troppers;j++ )
             if(politic_sides[i].troopers[j].is_out==0)
-            {
-                politic_sides[i].troopers[j].time.tv_sec-=kybers_time_till_end[2];
-            }
+                politic_sides[i].troopers[j].time.tv_sec+=(int)(kybers_time_till_end[2]/1000000);
 }
 void spell_type_three_endcheck()
 {
@@ -217,76 +187,54 @@ void spell_type_three_endcheck()
     {
         if(kybers[i].type==2 && kybers[i].is_dead==0 && kybers[i].is_on==1)
         {
-            if((tv.tv_sec - kybers[i].time.tv_sec)*1000000 +
-            tv.tv_usec - kybers[i].time.tv_usec
-            >
-            kybers_time_till_end[2])
+            if((tv.tv_sec - kybers[i].time.tv_sec)*1000000 + tv.tv_usec - kybers[i].time.tv_usec >kybers_time_till_end[2] || upboardwidth[kybers[i].player_id]==0)
             {
                 kybers[i].is_dead=1;
+                for(int j=0;j<number_of_enemies+1;j++)
+                    if (kybers[i].affected_players[j]==1)
+                        players[j].till_end_a = dist_moving_trooper_per_sec;
                 players[kybers[i].player_id].id_of_kyber=-1;
                 players[kybers[i].player_id].does_have_kyber_type=-1;
-                int isthereanother=0;
-                for(int j=0;j<number_of_enemies+1;j++)
-                    if(players[j].does_have_kyber_type==2)
-                    {
-                        players[j].till_end_a =dist_moving_trooper_per_sec;
-                        isthereanother=1;
-                        break;
-                    }
-                if(isthereanother==0)
-                {
-                    int k=1,id=-10;
-                    for(int j=0;j<number_of_enemies+1;j++)
-                        if(players[j].does_have_kyber_type==1)
-                        {
-                            players[j].till_end_a =dist_moving_trooper_per_sec;
-                            k=2;
-                            id=j;
-                        }
-                    for(int j=0;j<number_of_enemies+1;j++)
-                        if(j!=id)
-                            players[j].till_end_a =dist_moving_trooper_per_sec*k;
-                }
             }
         }
     }
 }
-void spell_type_four(int player_id)
+void spell_type_four()
 {
     struct timeval tv;
-    if(players[player_id].id_of_kyber==-1 || kybers[players[player_id].id_of_kyber].type!=3)
-        return;
     gettimeofday(&tv,NULL);
-    if((tv.tv_sec - kybers[players[player_id].id_of_kyber].time.tv_sec)*1000000 +
-        tv.tv_usec - kybers[players[player_id].id_of_kyber].time.tv_usec
-        >
-        kybers_time_till_end[3])
+    for(int i=0;i<size_of_kybers;i++)
+    {
+        if(kybers[i].type==3 && kybers[i].is_dead==0 && kybers[i].is_on==1)
         {
-            kybers[players[player_id].id_of_kyber].is_dead=1;
-            players[player_id].create_trooper_rate = 1;
-            players[player_id].id_of_kyber=-1;
+            if((tv.tv_sec - kybers[i].time.tv_sec)*1000000 + tv.tv_usec - kybers[i].time.tv_usec >kybers_time_till_end[3] || upboardwidth[kybers[i].player_id]==0)
+            {
+                kybers[i].is_dead=1;
+                players[kybers[i].player_id].create_trooper_rate=1;
+                players[kybers[i].player_id].id_of_kyber=-1;
+                players[kybers[i].player_id].does_have_kyber_type=-1;
+            }
         }
-    else if(players[player_id].id_of_kyber!=-1 &&
-            kybers[players[player_id].id_of_kyber].type==3 &&
-            kybers[players[player_id].id_of_kyber].is_dead==0)
-        players[player_id].create_trooper_rate=3;
+    }
 }
 void spell_type_five()
 {
     struct timeval tv;
     gettimeofday(&tv,NULL);
+
     for(int i = 0 ; i< number_of_enemies+1;i++)
     {
         if(players[i].id_of_kyber!=-1 &&
-            kybers[players[i].id_of_kyber].type==4 &&
+            players[i].does_have_kyber_type ==4 &&
             kybers[players[i].id_of_kyber].is_dead==0 &&
             (tv.tv_sec - kybers[players[i].id_of_kyber].time.tv_sec)*1000000 +
         tv.tv_usec - kybers[players[i].id_of_kyber].time.tv_usec
         >
-        kybers_time_till_end[4])
+        kybers_time_till_end[4] || upboardwidth[i]==0)
         {
             kybers[players[i].id_of_kyber].is_dead=1;
             players[i].id_of_kyber=-1;
+            players[i].does_have_kyber_type=-1;
         }
     }
 }
@@ -294,22 +242,25 @@ void moving_troopers_update_location()
 {
     struct timeval tv;
     for(int j=0;j<size_of_politic_sides;j++)
-        for(int i = 0 ; i<politic_sides[j].id_of_moving_troppers; i++)
+    {
+//        if(players[politic_sides[j].player_id].till_end_a==0)
+//            continue;
+        for (int i = 0; i < politic_sides[j].id_of_moving_troppers; i++)
         {
-            gettimeofday(&tv,NULL);
-            if(politic_sides[j].troopers[i].is_out==0 &&
-                    (tv.tv_sec -politic_sides[j].troopers[i].time.tv_sec)*1000000
-                + tv.tv_usec-politic_sides[j].troopers[i].time.tv_usec >politic_sides[j].troopers[i].seconds_till_out)
-            {
+            gettimeofday(&tv, NULL);
+            if (politic_sides[j].troopers[i].is_out == 0 &&
+                (tv.tv_sec - politic_sides[j].troopers[i].time.tv_sec) * 1000000
+                + tv.tv_usec - politic_sides[j].troopers[i].time.tv_usec >
+                politic_sides[j].troopers[i].seconds_till_out) {
                 politic_sides[j].number_of_troopers--;
                 politic_sides[j].number_of_moving_troopers--;
-                politic_sides[j].troopers[i].is_out=1;
-                if(politic_sides[j].number_of_moving_troopers<=0)
-                    politic_sides[j].is_moving=0;
+                politic_sides[j].troopers[i].is_out = 1;
+                if (politic_sides[j].number_of_moving_troopers <= 0)
+                    politic_sides[j].is_moving = 0;
             }
-            if(politic_sides[j].troopers[i].did_end==1 || politic_sides[j].troopers[i].is_out==0)
+            if (politic_sides[j].troopers[i].did_end == 1 || politic_sides[j].troopers[i].is_out == 0)
                 continue;
-            if(check_if_any_enemy_soldier_is_nearby_poli(&politic_sides[j].troopers[i]))
+            if (check_if_any_enemy_soldier_is_nearby_poli(&politic_sides[j].troopers[i]))
                 continue;
             spell_type_one(&politic_sides[j].troopers[i]);
             int m = politic_sides[j].troopers[i].dest_x - politic_sides[j].troopers[i].current_x;
@@ -318,66 +269,68 @@ void moving_troopers_update_location()
             int n = politic_sides[j].troopers[i].dest_y - politic_sides[j].troopers[i].current_y;
             int sgn_n = sgn(n);
             n = abs(n);
-            if(abs(m)>abs(n) && m!=0 && n!=0)
+            if (abs(m) > abs(n) && m != 0 && n != 0)
             {
-                politic_sides[j].troopers[i].current_x += ceil(players[politic_sides[j].player_id].till_end_a*(double)m/(double)(sqrt(m*m+n*n))*sgn_m);
-                politic_sides[j].troopers[i].current_y += ceil(players[politic_sides[j].player_id].till_end_a)*(double)n/(double)(sqrt(m*m+n*n))*sgn_n;
+                politic_sides[j].troopers[i].current_x +=
+                        players[politic_sides[j].troopers[i].player_id].till_end_a * (double) m / (double) (sqrt(m * m + n * n)) * sgn_m;
+                politic_sides[j].troopers[i].current_y +=
+                        players[politic_sides[j].troopers[i].player_id].till_end_a* (double) n / (double) (sqrt(m * m + n * n)) * sgn_n;
             }
-            else if(m!=0 && n!=0)
+            else if (m != 0 && n != 0)
             {
-                politic_sides[j].troopers[i].current_x += ceil(players[politic_sides[j].player_id].till_end_a)*(double)m/(double)(sqrt(m*m+n*n))*sgn_m;
-                politic_sides[j].troopers[i].current_y += ceil((players[politic_sides[j].player_id].till_end_a)*(double)n/(double)(sqrt(m*m+n*n))*sgn_n);
+                politic_sides[j].troopers[i].current_x +=
+                        players[politic_sides[j].troopers[i].player_id].till_end_a * (double) m / (double) (sqrt(m * m + n * n)) * sgn_m;
+                politic_sides[j].troopers[i].current_y +=
+                        players[politic_sides[j].troopers[i].player_id].till_end_a * (double) n / (double) (sqrt(m * m + n * n)) * sgn_n;
             }
-            else if(m==0)
-                politic_sides[j].troopers[i].current_y += players[politic_sides[j].player_id].till_end_a*sgn_n;
-            else if(n==0)
-                politic_sides[j].troopers[i].current_x += players[politic_sides[j].player_id].till_end_a*sgn_m;
+            else if (m == 0 && n!= 0)
+                politic_sides[j].troopers[i].current_y += players[politic_sides[j].troopers[i].player_id].till_end_a * sgn_n;
+            else if (n == 0 && m!=0)
+                politic_sides[j].troopers[i].current_x += players[politic_sides[j].troopers[i].player_id].till_end_a * sgn_m;
             m = politic_sides[j].troopers[i].current_x - politic_sides[j].troopers[i].dest_x;
             n = politic_sides[j].troopers[i].current_y - politic_sides[j].troopers[i].dest_y;
-            if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id!=politic_sides[j].player_id)
-                politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].is_getting_attacked=1;
-            if(sqrt(m*m+n*n) < (float)size_of_each_cell_x*(float)1/5)
-            {
-                politic_sides[j].troopers[i].did_end=1;
-                if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id!=politic_sides[j].player_id)
+            if (politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id !=
+                politic_sides[j].player_id)
+                politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].is_getting_attacked = 1;
+            if (sqrt(m * m + n * n) < (float) size_of_each_cell_x * (float) 1 / 5) {
+                politic_sides[j].troopers[i].did_end = 1;
+                if (politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id != politic_sides[j].player_id)
                 {
-                    if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id!=nomansland_playerid &&
-                        players[politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id].id_of_kyber!=-1 &&
-                       kybers[players[politic_sides[j].troopers[i].enemy_politic_side_number].id_of_kyber].type==4 &&
-                       kybers[players[politic_sides[j].troopers[i].enemy_politic_side_number].id_of_kyber].is_dead==0)
-                    {
-                        politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers++;  
-                        if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_moving_troopers>politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers)
-                            politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_moving_troopers++;    
-                    }
-                    else   
+                    if (players[politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id].does_have_kyber_type ==4)
+                        politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers++;
+                    else
                     {
                         politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers--;
-                        if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_moving_troopers>politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers)
-                            politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_moving_troopers--;    
+                        if (politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_moving_troopers >
+                            politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers)
+                            politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_moving_troopers--;
                     }
-                }
-                else
+
+                } else
                     politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers++;
-                if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers<0 && politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id!=politic_sides[j].player_id)
+                if (politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers < 0 &&
+                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id !=
+                    politic_sides[j].player_id)
                 {
                     politic_sides_of_user[politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id]--;
                     politic_sides_of_user[politic_sides[j].player_id]++;
-                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id=politic_sides[j].troopers[i].player_id;
-                    for(int w=0;w<politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].id_of_moving_troppers;w++)
-                        if(politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].troopers[w].is_out==0)
-                            politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].troopers[w].did_end =1;
-                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers*=(-1);
-                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_moving_troopers=0;
-                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].is_moving=0;
+                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].player_id = politic_sides[j].troopers[i].player_id;
+                    for (int w = 0; w <
+                                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].id_of_moving_troppers; w++)
+                        if (politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].troopers[w].is_out ==
+                            0)
+                            politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].troopers[w].did_end = 1;
+                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_troopers *= (-1);
+                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].number_of_moving_troopers = 0;
+                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].is_moving = 0;
                 }
-                if(politic_sides[j].number_of_moving_troopers<=0)
-                {
-                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].is_getting_attacked=0;
-                    politic_sides[j].is_moving=0;
+                if (politic_sides[j].number_of_moving_troopers <= 0) {
+                    politic_sides[politic_sides[j].troopers[i].enemy_politic_side_number].is_getting_attacked = 0;
+                    politic_sides[j].is_moving = 0;
                 }
             }
         }
+    }
 }
 void create_cells()
 {
@@ -427,8 +380,6 @@ void change_char(int i, int j)
 int assign_politic_sides()
 {
     size_of_politic_sides=0;
-    int planets[15] = {0};
-    planets[main_players_id]=1;
     for(int i =0 ;i<100;i++)
         politic_sides_of_user[i]=0;
     int politic_sides_of_user_temp;
@@ -445,7 +396,6 @@ int assign_politic_sides()
     for(int i=0;i<number_of_enemies*number_of_politic_sides_per_user + number_of_nomansland + number_of_systems_of_the_user;i++)
     {
         politic_sides_of_user_temp=0;
-        int temp_id;
         int attemp=0;
         while((i!=main_players_id && politic_sides_of_user_temp<number_of_politic_sides_per_user)
                 || (i==main_players_id && politic_sides_of_user_temp<number_of_systems_of_the_user))
@@ -465,24 +415,11 @@ int assign_politic_sides()
                     politic_sides[size_of_politic_sides].player_id=nomansland_playerid;
                 }
                 else if(i==main_players_id)
-                {
                     politic_sides[size_of_politic_sides].player_id=main_players_id;
-                }
                 else
                 {
-                    int temp_rand;
-                    if(politic_sides_of_user_temp!=0)
-                        temp_rand=temp_id;
-                    else
-                    {
-                        temp_rand=2;
-                        while(planets[temp_rand]==1)
-                            temp_rand=rand()%number_of_enemies+1;
-                        temp_id=temp_rand;
-                    }
-                    politic_sides[size_of_politic_sides].player_id=temp_id;
-                    planets[temp_rand]=1;
-                    players[temp_rand].is_on=1;
+                    politic_sides[size_of_politic_sides].player_id=i;
+                    players[i].is_on=1;
                 }
                 politic_sides[size_of_politic_sides].number_of_troopers = start_troop_in_someones_land;
                 if(politic_sides[size_of_politic_sides].player_id==nomansland_playerid)
@@ -989,10 +926,12 @@ void create_kyber()
         int dist_rand = rand()%70 + 15;
         kybers[size_of_kybers].x = (first_center_x* dist_rand + second_center_x*(100-dist_rand))/100;
         kybers[size_of_kybers].y = (first_center_y* dist_rand + second_center_y*(100-dist_rand))/100;
-//        kybers[size_of_kybers].type = rand()%5;
-        kybers[size_of_kybers].type = 2;
+        kybers[size_of_kybers].type = rand()%5;
+//        kybers[size_of_kybers].type = 4;
         kybers[size_of_kybers].is_on=0;
         kybers[size_of_kybers].is_dead=0;
+        for(int i=0;i<number_of_enemies+1;i++)
+            kybers[size_of_kybers].affected_players[i]=0;
         size_of_kybers++;
     }
 }
@@ -1010,11 +949,11 @@ void enemy_ai()
     int didsendforkyber[15] ={0};
     for(int j=0;j<size_of_politic_sides;j++)
     {
-        if(didsendforkyber[politic_sides[j].player_id]==1 || politic_sides[j].player_id==main_players_id || politic_sides[j].player_id==nomansland_playerid)
+        if(didsendforkyber[politic_sides[j].player_id]==1 || politic_sides[j].player_id==main_players_id || politic_sides[j].player_id==nomansland_playerid || players[politic_sides[j].player_id].does_have_kyber_type!=-1)
             continue;
         for(int i=0;i<size_of_kybers;i++)
         {
-            if(kybers[i].is_on!=1 && kybers[i].is_dead!=1 && (j==kybers[i].politic_side_id_first || j==kybers[i].politic_side_id_second))
+            if(kybers[i].is_on!=1 && kybers[i].is_dead!=1 && kybers[i].type!=1 && (j==kybers[i].politic_side_id_first || j==kybers[i].politic_side_id_second))
             {
                 didsendforkyber[politic_sides[j].player_id]=1;
                 if(j==kybers[i].politic_side_id_first)
@@ -1026,7 +965,7 @@ void enemy_ai()
     }
     int tot_of_user[10] = {0};
     for(int j=0;j<15;j++)
-        if(j!=nomansland_playerid && j!=main_players_id && politic_sides_of_user[j]>1 && players[j].is_on==1)
+        if(j!=nomansland_playerid && j!=main_players_id && politic_sides_of_user[j]>1 && players[j].is_on==1 && players[j].does_have_kyber_type!=4)
             for(int i=0,d=0;i<size_of_politic_sides && d<politic_sides_of_user[j];i++)
                 if(politic_sides[i].player_id==j)
                 {
@@ -1039,8 +978,8 @@ void enemy_ai()
                     int did_attack=0;
                     for(int k=0;k<size_of_politic_sides;k++)
                         if(j!=politic_sides[k].player_id &&
-                            politic_sides[k].player_id!=nomansland_playerid
-                            &&
+                            politic_sides[k].player_id!=nomansland_playerid &&
+                            players[politic_sides[k].player_id].does_have_kyber_type!=4 &&
                                 ((politic_sides[k].is_moving==1 &&  
                                 tot_of_user[j]>10)
                                 ||
@@ -1066,16 +1005,18 @@ void enemy_ai()
     {
         if((politic_sides[j].player_id!=nomansland_playerid && 
             politic_sides[j].is_moving==0 &&
-            politic_sides[j].player_id!=main_players_id))
+            politic_sides[j].player_id!=main_players_id) &&
+            players[politic_sides[j].player_id].does_have_kyber_type!=4)
         {
             int optionss[40] = {0};
             int choosen_ans=-1;
             int does_have_anything_other_than_nomansland=0;
             int dist = 10000;
             for(int i=0;i<size_of_politic_sides;i++)
-                if((politic_sides[j].player_id!=politic_sides[i].player_id)
+                if(politic_sides[j].player_id!=politic_sides[i].player_id &&
+                    players[politic_sides[j].player_id].does_have_kyber_type!=4
                     &&
-                        ((politic_sides[i].is_moving==1 &&  
+                        ((politic_sides[i].is_moving==1 &&
                         politic_sides[j].number_of_troopers-politic_sides[j].number_of_moving_troopers>10)
                         ||
                         (politic_sides[j].number_of_troopers - politic_sides[j].number_of_moving_troopers>politic_sides[i].number_of_troopers+3)))
@@ -1140,8 +1081,6 @@ void leaderboard_set()
                 leaderboard_users[i]=temp;
             }
 }
-
-
 void upboard_setup()
 {
     total_of_soldiers_in_map=0;
@@ -1154,25 +1093,10 @@ void upboard_setup()
         {
             if(politic_sides[i].troopers[j].is_out==0 || politic_sides[i].troopers[j].did_end==1)
                 continue;
-            upboardwidth[politic_sides[i].player_id]++;
+            upboardwidth[politic_sides[i].troopers[j].player_id]++;
         }
-    }
-    for(int i=0;i<size_of_troops_with_no_home;i++)
-    {
-        if(troops_with_no_home[i].is_out==0 || troops_with_no_home[i].did_end==1)
-            continue;
-        upboardwidth[troops_with_no_home[i].player_id]++;
     }
     for(int i=0;i<15;i++)
         total_of_soldiers_in_map+= upboardwidth[i];
     total_of_soldiers_in_map+= upboardwidth[nomansland_playerid];
-
-    for(int j=0;j<number_of_enemies+1;j++)
-        if(upboardwidth[j]==0)
-            for(int w=0;w<size_of_kybers;w++)
-                if(kybers[w].player_id==j && kybers[w].is_on==1 && kybers[w].is_dead==0)
-                {
-                    kybers[w].is_dead=1;
-                    break;
-                }
 }
