@@ -156,5 +156,4 @@ CMakeFiles/state.dir/src/the_pages_themselves.c.o: \
  /usr/include/SDL2/SDL_timer.h /usr/include/SDL2/SDL_version.h \
  /usr/include/SDL2/SDL_mixer.h /usr/include/SDL2/SDL_ttf.h \
  /usr/include/SDL2/SDL.h /home/arya/state.io/src/load_everything.h \
- /usr/include/x86_64-linux-gnu/sys/time.h \
- /usr/include/SDL2/SDL2_gfxPrimitives.h
+ /usr/include/x86_64-linux-gnu/sys/time.h
